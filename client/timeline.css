@@ -1,0 +1,44 @@
+.timeline {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	--top-gap: 0.5rem;
+	--line-gap: 0.5rem;
+	--circle-diameter: 1.5rem;
+	--max-item-width: 12rem;
+}
+
+.timeline-point {
+	flex: 1 1 0;
+	max-width: var(--max-item-width);
+	padding-top: calc(var(--top-gap) + var(--circle-diameter));
+	position: relative;
+	text-align: center;
+	font-size: 90%;
+}
+
+.timeline-point::before {
+	content: "";
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+	width: var(--circle-diameter);
+	height: var(--circle-diameter);
+	top: 0;
+	left: calc(50% - var(--circle-diameter) / 2);
+	border: 1px solid var(--secondary);
+}
+
+.timeline-point.done::before {
+	background-color: var(--secondary);
+}
+
+.timeline-point:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	top: calc(var(--circle-diameter) / 2);
+	left: calc(50% + var(--circle-diameter) / 2 + var(--line-gap));
+	width: calc(100% - var(--circle-diameter) - var(--line-gap) * 2);
+	height: 0;
+	border-bottom: 1px solid var(--secondary2);
+}

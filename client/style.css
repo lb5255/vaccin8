@@ -1,0 +1,68 @@
+html {
+	--neutral: #232323;
+	--neutral2: #6c6c6c;
+	--neutral3: #c4c4c4;
+	--neutral4: #e3e3e3;
+	--primary: #2187ff;
+	--primary2: #67adff;
+	--primary3: #b7d8ff;
+	--secondary: #bb2cff;
+	--secondary2: #d06cff;
+	--secondary3: #e5aeff;
+	--success: #4fef7c;
+	--success-lite: #a7ffc0;
+	--error: #ef624f;
+	--error-lite: #ee9589;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+	font-family: Roboto, 'Noto Sans', sans-serif;
+}
+
+header {
+	display: flex;
+	flex-direction: row;
+	padding: 2.5rem 3.5rem;
+	background-color: var(--primary);
+	color: white;
+}
+
+#header-title {
+	flex: 1 1 auto;
+	font-weight: bold;
+}
+
+#header-links a {
+	color: inherit;
+	margin-left: 2rem;
+}
+
+#header-links a:not(:hover) {
+	text-decoration: none;
+}
+
+main {
+	margin: auto;
+	padding: 5rem;
+	max-width: 60rem;
+}
+
+h1 {
+	text-align: center;
+}
+
+section {
+	margin: auto;
+	width: 40rem;
+	margin-bottom: 3rem;
+}
+
+[centered] {
+	text-align: center;
+}
+
+[fullwidth] {
+	width: auto;
+}

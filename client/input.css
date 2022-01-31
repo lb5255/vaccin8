@@ -1,0 +1,19 @@
+select {
+	padding: 0.5rem;
+	border: 1px solid black;
+	background-color: transparent;
+	min-width: 16rem;
+}
+
+button {
+	border-radius: 0.25rem;
+	min-width: 8rem;
+	background-color: var(--primary);
+	color: white;
+	border: none;
+	padding: 0.5rem;
+}
+
+.input-label {
+	margin-bottom: 0.5rem;
+}

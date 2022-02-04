@@ -1,8 +1,12 @@
-select {
+select, input {
 	padding: 0.5rem;
 	border: 1px solid black;
 	background-color: transparent;
 	min-width: 16rem;
+}
+
+input[type=checkbox],input[type=radio] {
+	min-width: auto;
 }
 
 button {
@@ -10,10 +14,34 @@ button {
 	min-width: 8rem;
 	background-color: var(--primary);
 	color: white;
-	border: none;
-	padding: 0.5rem;
+	border: 2px solid var(--primary);
+	padding: 0.5rem 2rem;
+	margin: 0 2rem;
+	cursor: pointer;
+	transition: background-color 0.25s, color 0.25s, border 0.25s;
+}
+
+button:hover {
+	background-color: white;
+	color: var(--primary);
+}
+
+button[unfilled] {
+	background-color: transparent;
+	border: 2px solid var(--neutral2);
+	color: var(--neutral2);
+}
+
+button[unfilled]:hover {
+	color: white;
+	background-color: var(--neutral2);
 }
 
 .input-label {
 	margin-bottom: 0.5rem;
+}
+
+label {
+	display: inline-block;
+	margin-bottom: 2rem;
 }

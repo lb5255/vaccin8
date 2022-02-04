@@ -66,3 +66,15 @@ section {
 [fullwidth] {
 	width: auto;
 }
+
+.page {
+	display: none;
+}
+
+.page.active {
+	display: initial;
+}
+
+ul {
+	column-count: 2;
+}

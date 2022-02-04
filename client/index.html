@@ -21,34 +21,321 @@
 			<section fullwidth>
 				<div class="timeline">
 					<div class="timeline-point done">Vaccine Type</div>
-					<div class="timeline-point">Pre-Screening</div>
-					<div class="timeline-point">Date & Time</div>
+					<div class="timeline-point done">Pre-Screening</div>
+					<div class="timeline-point done">Date & Time</div>
 					<div class="timeline-point">Details</div>
 				</div>
 			</section>
-			<h1>Schedule a Vaccine Appointment Today</h1>
-			<section>
-				Welcome to the Monroe County Vaccination Scheduling site.
-				Please proceed to schedule your &lt;campaign name&gt; vaccination at your earliest convenience.
-				You will find additional information on &lt;campaign name&gt;
-				from the Monroe County Department of Public Health at <a href="https://monroecounty.gov/health">https://monroecounty.gov/health</a>.
-			</section>
-			<section centered>
-				<label>
-					<div class="input-label">
-						What type of vaccine do you need?
+			
+			<div class="page">
+				<h1>Schedule a Vaccine Appointment Today</h1>
+				
+				<section>
+					Welcome to the Monroe County Vaccination Scheduling site.
+					Please proceed to schedule your &lt;campaign name&gt; vaccination at your earliest convenience.
+					You will find additional information on &lt;campaign name&gt;
+					from the Monroe County Department of Public Health at <a href="https://monroecounty.gov/health">https://monroecounty.gov/health</a>.
+				</section>
+				
+				<section centered>
+					<label>
+						<div class="input-label">
+							What type of vaccine do you need?
+						</div>
+						<select>
+							<option value="" selected disabled>Choose an immunization</option>
+							<option>Pfizer</option>
+							<option>Moderna</option>
+							<option>Johnson & Johnson</option>
+						</select>
+					</label>
+				</section>
+				
+				<section centered>
+					<button>Next</button>
+				</section>
+			</div>
+			
+			<div class="page">
+				<h1>Pre-Screening Questions</h1>
+				
+				<section>
+					Please answer a few questions about the vaccine recipient.
+				</section>
+				
+				<section>
+					<label>
+						<div class="input-label">
+							Date of birth
+						</div>
+						<input type="date" />
+					</label>
+					
+					<label>
+						<div class="input-label">
+							Are you an essential worker?
+						</div>
+						<select>
+							<option value="" selected disabled></option>
+						</select>
+					</label>
+					
+					<p>
+						Do you have any of these underlying medical conditions?
+						
+						<ul>
+							<li>Cancer</li>
+							<li>Chronic kidney disease</li>
+							<li>Chronic liver disease</li>
+							<li>Chronic lung diseases</li>
+							<li>Dementia or other neurological conditions</li>
+							<li>Diabetes</li>
+							<li>Down syndrome</li>
+							<li>Heart conditions</li>
+							<li>HIV infection</li>
+							<li>Immunocompromised state (weakened immune system)</li>
+							<li>Mental health conditions</li>
+							<li>Overweight and obesity</li>
+							<li>Pregnancy</li>
+							<li>Sickle cell disease or thalassemia</li>
+							<li>Smoking, current or former</li>
+							<li>Solid organ or blood stem cell transplant</li>
+							<li>Stroke or cerebrovascular disease, which affects blood flow to the brain</li>
+							<li>Substance use disorders</li>
+							<li>Tuberculosis</li>
+						</ul>
+					</p>
+					
+					<label>
+						<input type="radio" name="medical_condition" value="yes" />
+						Yes
+					</label>
+					<br />
+					<label>
+						<input type="radio" name="medical_condition" value="no" />
+						No
+					</label>
+				</section>
+				
+				<section centered>
+					<button unfilled>Back</button>
+					<button>Next</button>
+				</section>
+			</div>
+			
+			<div class="page active">
+				<h1>Personal Info</h1>
+				
+				<section>
+					Please answer a few questions about the vaccine recipient.
+				</section>
+				
+				<section>
+					<div style="column-count: 2;">
+						<label>
+							<div class="input-label">
+								First name *
+							</div>
+							<input type="text" placeholder="Enter your first name" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Last name *
+							</div>
+							<input type="text" placeholder="Enter your last name" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Zip code *
+							</div>
+							<input type="text" placeholder="Enter your zip code" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Address *
+							</div>
+							<input type="text" placeholder="Enter your address" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								City *
+							</div>
+							<input type="text" placeholder="Enter your city" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								State *
+							</div>
+							<select>
+								<option value="" selected disabled>Enter your state</option>
+								<option>panic</option>
+								<option>distress</option>
+								<option>exhaustion</option>
+								<option>utter confusion</option>
+								<option>denial</option>
+								<option>anger</option>
+								<option>bargaining</option>
+								<option>depression</option>
+								<option>acceptance</option>
+							</select>
+						</label>
 					</div>
-					<select>
-						<option value="" selected disabled>Choose an immunization</option>
-						<option>Pfizer</option>
-						<option>Moderna</option>
-						<option>Johnson & Johnson</option>
-					</select>
-				</label>
-			</section>
-			<section centered>
-				<button>Next</button>
-			</section>
+					
+					<div style="column-count: 2;">
+						<label>
+							<div class="input-label">
+								Receive reminders by email or phone number? *
+							</div>
+							<select>
+								<option selected>Email</option>
+								<option>Text</option>
+							</select>
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Primary care provider
+							</div>
+							<input type="text" placeholder="Enter your primary care provider" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Email
+							</div>
+							<input type="text" placeholder="Enter your email" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Insurance ID #
+							</div>
+							<input type="text" placeholder="Enter your insurance ID #" />
+						</label>
+					</div>
+				</section>
+				
+				<section centered>
+					<button unfilled>Back</button>
+					<button>Next</button>
+				</section>
+			</div>
+			
+			<div class="page">
+				<h1>Select a Date and Time</h1>
+				
+				<style>
+					#datetime-filter, #datetime-results-container {
+						display: inline-block;
+					}
+					
+					.datetime-filter-group {
+						margin-bottom: 1.5rem;
+						line-height: 180%;
+					}
+					
+					.datetime-result {
+						padding: 1rem;
+					}
+					
+					.datetime-result-details {
+						width: 12rem;
+					}
+					
+					.datetime-result-title {
+						font-weight: bold;
+						margin-top: 0;
+					}
+					
+					.datetime-more {
+						display: block;
+						text-align: right;
+						text-decoration: none;
+						color: inherit;
+						margin-right: 0.5rem;
+						cursor: pointer;
+					}
+					
+					.datetime-result {
+						border: 1px solid black;
+						display: flex;
+						flex-direction: row;
+					}
+					
+					.datetime-date {
+						width: 12rem;
+						margin: 0 0 0.5rem 0.5rem;
+						display: block;
+						background-color: transparent;
+						border: 2px solid var(--primary);
+						color: var(--primary);
+					}
+					
+					.datetime-date:hover {
+						background-color: var(--neutral3);
+						color: white;
+						border: 2px solid var(--neutral3);
+					}
+				</style>
+				<div style="column-count: 2;">
+					<div id="datetime-filter">
+						<label>
+							<div class="input-label">
+								What is your zip code?
+							</div>
+							<input type="text" placeholder="Enter zip code" />
+						</label>
+						
+						<div class="datetime-filter-group">
+							Day of Week:<br />
+							<input type="checkbox" /> Weekdays<br />
+							<input type="checkbox" /> Weekends<br />
+						</div>
+						
+						<div class="datetime-filter-group">
+							Time of Day:<br />
+							<input type="checkbox" /> Morning (before 12:00pm)<br />
+							<input type="checkbox" /> Afternoon (12:00pm-5:00pm)<br />
+							<input type="checkbox" /> Evening (after 5:00pm)<br />
+						</div>
+						
+						<div class="datetime-filter-group">
+							Sort by:<br />
+							<input type="radio" name="datetime-filter-sort" value="distance" /> Distance<br />
+							<input type="radio" name="datetime-filter-sort" value="available" /> Next Available<br />
+							<input type="radio" name="datetime-filter-sort" value="appointments" /> Number of Appointments<br />
+						</div>
+					</div>
+					
+					<div id="datetime-results-container">
+						<p>
+							All available locations for the ___ vaccine:
+						</p>
+						
+						<div id="datetime-results">
+							<div class="datetime-result">
+								<div class="datetime-result-details">
+									<p class="datetime-result-title">1567 Penfield Road</p>
+									<p>Rochester, NY 14625<br />
+									(585) 586-8857</p>
+									<p>8.5 miles away</p>
+								</div>
+								<div class="datetime-result-dates">
+									<button class="datetime-date">Thu November 25</button>
+									<button class="datetime-date">Fri November 26</button>
+									<button class="datetime-date">Sat November 27</button>
+									<a class="datetime-more">More dates ></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 	</body>
 </html>

@@ -52,6 +52,20 @@ button[unfilled]:hover {
 	transition: background-color 0.25s, color 0.25s, border 0.25s;
 }
 
+.PickSignIn {
+	border-radius: 0.25rem;
+	min-width: 8rem;
+	background-color: white;
+	color: var(--neutral2);
+	size: 18px;
+	border: 2px solid var(--neutral2);
+	padding: 1rem 2rem;
+	margin: 0 2rem;
+	cursor: pointer;
+	transition: background-color 0.25s, color 0.25s, border 0.25s;
+	display: block;
+}
+
 .input-label {
 	margin-bottom: 0.5rem;
 	margin-top: 2rem;

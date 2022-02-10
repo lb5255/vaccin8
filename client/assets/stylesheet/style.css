@@ -77,10 +77,12 @@ section {
 
 .loginSetup {
 	margin-top: 6rem;
+	padding: 2rem 20rem;
 }
 
-.loginContainer {
-	/* padding: 2rem 35rem; */
+.loginbbby{
+	margin-top: 2rem;
+	font-size: 12px
 }
 
 .two-column {
@@ -95,4 +97,10 @@ section {
 	.two-column {
 		column-count: initial;
 	}
+
+	.loginSetup {
+		margin-top: 6rem;
+		padding: 2rem 10rem;
+	}
+
 }

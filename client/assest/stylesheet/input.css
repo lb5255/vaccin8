@@ -9,6 +9,14 @@ input[type=checkbox],input[type=radio] {
 	min-width: auto;
 }
 
+input[type=text], input[type=password] {
+	width: 100%; 
+	padding: 10px 20px; 
+	display: inline-block; 
+	border: 1px solid #6c6c6c; 
+	box-sizing: border-box; 
+}
+
 button {
 	border-radius: 0.25rem;
 	min-width: 8rem;
@@ -35,6 +43,18 @@ button[unfilled] {
 button[unfilled]:hover {
 	color: white;
 	background-color: var(--neutral2);
+}
+
+.buttonBack {
+	border-radius: 0.25rem;
+	min-width: 8rem;
+	background-color: white;
+	color: var(--neutral2);
+	border: 2px solid var(--neutral2);
+	padding: 0.5rem 2rem;
+	margin: 0 2rem;
+	cursor: pointer;
+	transition: background-color 0.25s, color 0.25s, border 0.25s;
 }
 
 .input-label {

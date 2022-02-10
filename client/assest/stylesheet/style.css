@@ -75,6 +75,14 @@ section {
 	display: initial;
 }
 
+.loginSetup {
+	margin-top: 6rem;
+}
+
+.loginContainer {
+	/* padding: 2rem 35rem; */
+}
+
 ul {
 	column-count: 2;
 }

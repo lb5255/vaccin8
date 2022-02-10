@@ -9,6 +9,14 @@ input[type=checkbox],input[type=radio] {
 	min-width: auto;
 }
 
+input[type=text], input[type=password] {
+	width: 100%; 
+	padding: 10px 20px; 
+	display: inline-block; 
+	border: 1px solid #6c6c6c; 
+	box-sizing: border-box; 
+}
+
 button {
 	border-radius: 0.25rem;
 	min-width: 8rem;
@@ -16,14 +24,9 @@ button {
 	color: white;
 	border: 2px solid var(--primary);
 	padding: 0.5rem 2rem;
-	margin: 0 2rem;
+	margin: 1rem 2rem;
 	cursor: pointer;
 	transition: background-color 0.25s, color 0.25s, border 0.25s;
-}
-
-button:hover {
-	background-color: white;
-	color: var(--primary);
 }
 
 button[unfilled] {
@@ -37,11 +40,23 @@ button[unfilled]:hover {
 	background-color: var(--neutral2);
 }
 
-.input-label {
-	margin-bottom: 0.5rem;
+.buttonBack {
+	border-radius: 0.25rem;
+	min-width: 8rem;
+	background-color: white;
+	color: var(--neutral2);
+	border: 2px solid var(--neutral2);
+	padding: 0.5rem 2rem;
+	margin: 0 2rem;
+	cursor: pointer;
+	transition: background-color 0.25s, color 0.25s, border 0.25s;
 }
 
-label {
+.input-label {
+	margin-bottom: 0.5rem;
+	margin-top: 2rem;
+}
+
+label:not([thin]) {
 	display: inline-block;
-	margin-bottom: 2rem;
 }

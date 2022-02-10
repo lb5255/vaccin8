@@ -4,9 +4,10 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Vaccin8</title>
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<link rel="stylesheet" type="text/css" href="timeline.css" />
-		<link rel="stylesheet" type="text/css" href="input.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script type="module" src="../assets/javascript/prototype.js"></script>
 	</head>
 	<body>
 		<header>
@@ -18,16 +19,16 @@
 		</header>
 		
 		<main>
-			<section fullwidth>
+			<section fullwidth centered>
 				<div class="timeline">
 					<div class="timeline-point done">Vaccine Type</div>
-					<div class="timeline-point done">Pre-Screening</div>
-					<div class="timeline-point done">Date & Time</div>
+					<div class="timeline-point">Pre-Screening</div>
+					<div class="timeline-point">Date & Time</div>
 					<div class="timeline-point">Details</div>
 				</div>
 			</section>
 			
-			<div class="page">
+			<div class="page" data-timeline="1">
 				<h1>Schedule a Vaccine Appointment Today</h1>
 				
 				<section>
@@ -52,11 +53,11 @@
 				</section>
 				
 				<section centered>
-					<button>Next</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page">
+			<div class="page" data-timeline="2">
 				<h1>Pre-Screening Questions</h1>
 				
 				<section>
@@ -83,7 +84,7 @@
 					<p>
 						Do you have any of these underlying medical conditions?
 						
-						<ul>
+						<ul class="two-column">
 							<li>Cancer</li>
 							<li>Chronic kidney disease</li>
 							<li>Chronic liver disease</li>
@@ -106,24 +107,24 @@
 						</ul>
 					</p>
 					
-					<label>
+					<label thin>
 						<input type="radio" name="medical_condition" value="yes" />
 						Yes
 					</label>
 					<br />
-					<label>
+					<label thin>
 						<input type="radio" name="medical_condition" value="no" />
 						No
 					</label>
 				</section>
 				
 				<section centered>
-					<button unfilled>Back</button>
-					<button>Next</button>
+					<button unfilled prev>Back</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page active">
+			<div class="page active" data-timeline="2">
 				<h1>Personal Info</h1>
 				
 				<section>
@@ -131,7 +132,7 @@
 				</section>
 				
 				<section>
-					<div style="column-count: 2;">
+					<div class="two-column">
 						<label>
 							<div class="input-label">
 								First name *
@@ -186,7 +187,7 @@
 						</label>
 					</div>
 					
-					<div style="column-count: 2;">
+					<div class="two-column">
 						<label>
 							<div class="input-label">
 								Receive reminders by email or phone number? *
@@ -221,12 +222,12 @@
 				</section>
 				
 				<section centered>
-					<button unfilled>Back</button>
-					<button>Next</button>
+					<button unfilled prev>Back</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page">
+			<div class="page" data-timeline="3">
 				<h1>Select a Date and Time</h1>
 				
 				<style>
@@ -265,6 +266,7 @@
 						border: 1px solid black;
 						display: flex;
 						flex-direction: row;
+						flex-wrap: wrap;
 					}
 					
 					.datetime-date {
@@ -282,7 +284,7 @@
 						border: 2px solid var(--neutral3);
 					}
 				</style>
-				<div style="column-count: 2;">
+				<div class="two-column">
 					<div id="datetime-filter">
 						<label>
 							<div class="input-label">
@@ -335,6 +337,11 @@
 						</div>
 					</div>
 				</div>
+				
+				<section centered>
+					<button unfilled prev>Back</button>
+					<button next>Next</button>
+				</section>
 			</div>
 		</main>
 	</body>

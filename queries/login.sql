@@ -19,6 +19,7 @@ UPDATE account SET password = ? WHERE email = ?;
 --Query to display the locations that the account is able to view.
 --Uses accountID that was stored from their login. 
 --Store the locationID they choose.
+
 SELECT locationName, location.locationID FROM acctLocation
 INNER JOIN location on acctLocation.locationID = location.locationID
 WHERE accountID = ?;

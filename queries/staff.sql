@@ -17,6 +17,7 @@ WHERE appointment.locationID = 1 AND appointment.campaignID IN (
 
 UPDATE appointment SET apptStatus = "A" WHERE appointmentID = ?;
 
+
 --Query to cancel an appointment.
 
 UPDATE appointment SET apptStatus = "X" WHERE appointmentID = ?;

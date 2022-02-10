@@ -29,11 +29,6 @@ button {
 	transition: background-color 0.25s, color 0.25s, border 0.25s;
 }
 
-button:hover {
-	background-color: white;
-	color: var(--primary);
-}
-
 button[unfilled] {
 	background-color: transparent;
 	border: 2px solid var(--neutral2);
@@ -59,9 +54,9 @@ button[unfilled]:hover {
 
 .input-label {
 	margin-bottom: 0.5rem;
+	margin-top: 2rem;
 }
 
 label:not([thin]) {
 	display: inline-block;
-	margin-bottom: 2rem;
 }

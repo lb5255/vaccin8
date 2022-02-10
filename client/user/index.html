@@ -7,6 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script type="module" src="../assets/javascript/prototype.js"></script>
 	</head>
 	<body>
 		<header>
@@ -21,13 +22,13 @@
 			<section fullwidth>
 				<div class="timeline">
 					<div class="timeline-point done">Vaccine Type</div>
-					<div class="timeline-point done">Pre-Screening</div>
-					<div class="timeline-point done">Date & Time</div>
+					<div class="timeline-point">Pre-Screening</div>
+					<div class="timeline-point">Date & Time</div>
 					<div class="timeline-point">Details</div>
 				</div>
 			</section>
 			
-			<div class="page">
+			<div class="page active" data-timeline="1">
 				<h1>Schedule a Vaccine Appointment Today</h1>
 				
 				<section>
@@ -52,11 +53,11 @@
 				</section>
 				
 				<section centered>
-					<button>Next</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page">
+			<div class="page" data-timeline="2">
 				<h1>Pre-Screening Questions</h1>
 				
 				<section>
@@ -106,24 +107,24 @@
 						</ul>
 					</p>
 					
-					<label>
+					<label thin>
 						<input type="radio" name="medical_condition" value="yes" />
 						Yes
 					</label>
 					<br />
-					<label>
+					<label thin>
 						<input type="radio" name="medical_condition" value="no" />
 						No
 					</label>
 				</section>
 				
 				<section centered>
-					<button unfilled>Back</button>
-					<button>Next</button>
+					<button unfilled prev>Back</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page active">
+			<div class="page" data-timeline="2">
 				<h1>Personal Info</h1>
 				
 				<section>
@@ -221,12 +222,12 @@
 				</section>
 				
 				<section centered>
-					<button unfilled>Back</button>
-					<button>Next</button>
+					<button unfilled prev>Back</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page">
+			<div class="page" data-timeline="3">
 				<h1>Select a Date and Time</h1>
 				
 				<style>

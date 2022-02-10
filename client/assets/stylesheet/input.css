@@ -41,7 +41,7 @@ button[unfilled]:hover {
 	margin-bottom: 0.5rem;
 }
 
-label {
+label:not([thin]) {
 	display: inline-block;
 	margin-bottom: 2rem;
 }

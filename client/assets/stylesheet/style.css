@@ -45,7 +45,7 @@ header {
 
 main {
 	margin: auto;
-	padding: 5rem;
+	padding: 5rem 1rem;
 	max-width: 60rem;
 }
 
@@ -55,7 +55,7 @@ h1 {
 
 section {
 	margin: auto;
-	width: 40rem;
+	max-width: 40rem;
 	margin-bottom: 3rem;
 }
 
@@ -83,6 +83,16 @@ section {
 	/* padding: 2rem 35rem; */
 }
 
-ul {
+.two-column {
 	column-count: 2;
+}
+
+@media (max-width: 50rem) {
+	main {
+		padding: 1rem;
+	}
+	
+	.two-column {
+		column-count: initial;
+	}
 }

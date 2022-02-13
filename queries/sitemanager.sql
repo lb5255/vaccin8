@@ -9,10 +9,17 @@ WHERE siteMngr = "Y" AND accountID = ?;
 
 --Query to set appointment timeslots.
 
-
+INSERT INTO appointment(locationID,campaignID,apptDate,apptTime,apptStatus)
+    VALUES(?,?,?,?,?);
 
 
 --Query to assign a staff member to one of the sites that the site manager is staffed at.
+
+INSERT INTO acctlocation(accountID,locationID,acctStatus,siteMngr)
+    VALUES(?,?,"Active","N");
+
+--Query to unassign a staff member from one of the sites the staff manager is staffed at
+UPDATE acctLocation SET acctStatus = "Inactive" WHERE accountID = ? AND locationID = ?;
 
 
 

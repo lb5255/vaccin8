@@ -2,4 +2,4 @@ FROM node:lts
 RUN npm i -g nodemon
 WORKDIR /code
 
-CMD npm i && nodemon .
+CMD ([ -e node_modules ] || npm i) && nodemon .

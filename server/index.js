@@ -10,9 +10,12 @@ const app = express();
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 
-app.get("/campaign",(req, res) => {
-
-    
+app.get("/campaign", async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT campaignName from campaign WHERE campaignStatus = 'a';"
+    );
+    res.json(result);
 });
 //graphQL for multiple queries
 
@@ -20,7 +23,7 @@ app.get("/api/index", async (req, res) => {
     //respond with GET request for all available vaccines.
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT DISTINCT vaccineType, manufacturer FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
+        "SELECT DISTINCT campaignVaccID, vaccineType, manufacturer FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
     );
     res.json(result);
 });

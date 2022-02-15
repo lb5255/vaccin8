@@ -1,6 +1,7 @@
 -- Mike Haboian
 -- Queries needed for recipients to sign up and recieve their vaccines, or to cancel an appointment
 
+SELECT campaignName from campaignVaccines WHERE campaignStatus = "a";
 
 --Recipient Screen, Vaccine Type
 --selects the available vaccines at the currently active campaign

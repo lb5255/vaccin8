@@ -1,6 +1,8 @@
 const path = require("path");
 const express = require("express");
+
 const mysql = require("mysql2");
+
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -19,7 +21,13 @@ const app = express();
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 
-app.get("/user",(req, res) => {
+app.get("/campaign",(req, res) => {
+
+    
+});
+//graphQL for multiple queries
+
+app.get("/api/index",(req, res) => {
     //respond with GET request for all available vaccines.
     con.connect(function(err) {
         if (err) throw err;
@@ -33,7 +41,6 @@ app.get("/user",(req, res) => {
 
 });
 
-
-
-
 app.listen(8080, () => console.log("Listening on port 8080"));
+
+

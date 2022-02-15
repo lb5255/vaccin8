@@ -19,14 +19,14 @@ const app = express();
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 
-app.get("/api/index",(req, res) => {
+app.get("/user",(req, res) => {
     //respond with GET request for all available vaccines.
     con.connect(function(err) {
         if (err) throw err;
         con.query("SELECT DISTINCT vaccineType, manufacturer FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');",
         function (err, result, fields) {
             if (err) throw err;
-            res.json();
+            console.log(result);
         });
 
     });

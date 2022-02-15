@@ -7,7 +7,9 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
-		<script type="module" src="../assets/javascript/prototype.js"></script>
+		<script src="../assets/javascript/prototype.js"></script>
+		<script src="../assets/javascript/index.js"></script>
+		<script src="../assets/javascript/user.js"></script>
 	</head>
 	<body>
 		<header>
@@ -43,11 +45,8 @@
 						<div class="input-label">
 							What type of vaccine do you need?
 						</div>
-						<select>
+						<select id="vaccine-select-dropdown">
 							<option value="" selected disabled>Choose an immunization</option>
-							<option>Pfizer</option>
-							<option>Moderna</option>
-							<option>Johnson & Johnson</option>
 						</select>
 					</label>
 				</section>

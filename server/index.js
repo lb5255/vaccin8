@@ -23,7 +23,7 @@ app.get("/api/index", async (req, res) => {
     //respond with GET request for all available vaccines.
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT DISTINCT campaignVaccID, vaccineType, manufacturer FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
+        "SELECT DISTINCT campaignVaccID, vaccineType, manufacturer, vaccineDose FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
     );
     res.json(result);
 });

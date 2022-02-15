@@ -1,0 +1,14 @@
+FROM node:lts
+RUN npm i -g nodemon
+WORKDIR /code
+
+COPY ./server /code
+COPY ./client /client
+
+RUN npm i
+
+RUN useradd -m user
+USER user
+
+ENTRYPOINT ["npm"]
+CMD ["start"]

@@ -2,8 +2,4 @@ FROM node:lts
 RUN npm i -g nodemon
 WORKDIR /code
 
-RUN useradd -m user
-USER user
-
-ENTRYPOINT ["nodemon"]
-CMD ["."]
+CMD npm i && nodemon .

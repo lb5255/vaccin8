@@ -34,9 +34,15 @@ SELECT locationID, locationName FROM location;
 INSERT INTO acctlocation(accountID, locationID, acctStatus, siteMngr)
     VALUES (?,?,"Active","N");
 
+--Add a vaccine
+INSERT INTO vaccine(vaccineType, manufacturer) 
+    VALUES (?,?);
 
 
- 
+--Configure a vaccine to be used in a campaign
+
+INSERT INTO campaignVaccines(campaignID, vaccineType, manufacturer, vaccineDose, daysBetweenDoses, ageGroup, doseAmount)
+    VALUES (?,?,?,?,?,?,?,?);
 
 
 --edit a user

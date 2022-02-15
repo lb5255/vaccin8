@@ -32,7 +32,7 @@ CREATE TABLE `account` (
   `email` varchar(50) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`accountID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'mikeh350','Test_Passwd01','Michael','Haboian','Admin','mh4636@rit.edu','5853606646'),(2,'TestNurse','Test_Passwd02','Terry','Rohan','Nurse','terry32@outlook.com','5851532242'),(3,'TestNurse02','Test_Passwd03','Sarah','Yost','Nurse','sarah32@outlook.com','5853329878'),(4,'TestStaff','Test_Passwd04','Jake','Karo','Staff','jake32@outlook.com','5851338484'),(5,'TestStaff02','Test_Passwd05','Sandra','Read','Staff','sandra32@yahoo.com','5852344348'),(6,'TestAdmin','Test_Passwd06','John','Tester','Admin','john12@gmail.com','5852606567'),(8,'TestNurse03','$2b$12$SDksU5j7lOBeZKeLTpbPU.2MEE.Na.Bb7OrHTuYKCXOjboSGcADcu',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `account` VALUES (1,'mikeh350','ChangedPassword','Michael','Haboian','Admin','mh4636@rit.edu','5853606646'),(2,'TestNurse','Test_Passwd02','Terry','Rohan','Nurse','terry32@outlook.com','5851532242'),(3,'TestNurse02','Test_Passwd03','Sarah','Yost','Nurse','sarah32@outlook.com','5853329878'),(4,'TestStaff','Test_Passwd04','Jake','Karo','Staff','jake32@outlook.com','5851338484'),(5,'TestStaff02','Test_Passwd05','Sandra','Read','Staff','sandra32@yahoo.com','5852344348'),(6,'TestAdmin','Test_Passwd06','John','Tester','Admin','john12@gmail.com','5852606567'),(14,'TestNurse03','$2b$12$9Pz.nt3tpzq/LqKRQ6SybumZ6niPvykPM5ezohae0hkm83US.Qsau',NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +86,7 @@ CREATE TABLE `appointment` (
   `locationID` int(11) DEFAULT NULL,
   `campaignID` int(11) DEFAULT NULL,
   `campaignVaccID` int(11) DEFAULT NULL,
-  `batchNum` int(11) DEFAULT NULL,
+  `batchNum` varchar(50) DEFAULT NULL,
   `patientID` int(11) DEFAULT NULL,
   `apptDate` date DEFAULT NULL,
   `apptTime` time DEFAULT NULL,
@@ -96,6 +96,7 @@ CREATE TABLE `appointment` (
   `preCheck` varchar(255) DEFAULT NULL,
   `staffMember` int(11) DEFAULT NULL,
   `advReaction` varchar(255) DEFAULT NULL,
+  `vaccDatestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`appointmentID`),
   KEY `locationID` (`locationID`,`campaignID`),
   KEY `campaignVaccID` (`campaignVaccID`),
@@ -114,7 +115,7 @@ CREATE TABLE `appointment` (
 
 LOCK TABLES `appointment` WRITE;
 /*!40000 ALTER TABLE `appointment` DISABLE KEYS */;
-INSERT INTO `appointment` VALUES (1,1,1,1,104,1,'2022-01-24','12:00:00','C','Email','On Time','Had a cough and runny nose.',2,NULL),(2,1,1,4,236,2,'2022-01-24','12:00:00','C','Phone','Late',NULL,2,NULL),(3,1,1,4,236,3,'2022-02-11','12:00:00','F','Phone',NULL,NULL,NULL,NULL),(4,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL),(5,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL),(6,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL),(7,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL),(8,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL),(9,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL),(10,1,1,1,NULL,4,'2022-02-12','12:15:00','F','Phone',NULL,NULL,NULL,NULL),(11,1,1,NULL,NULL,NULL,'2022-02-12','12:30:00','O',NULL,NULL,NULL,NULL,NULL),(12,1,1,NULL,NULL,NULL,'2022-02-12','12:30:00','O',NULL,NULL,NULL,NULL,NULL),(13,1,1,NULL,NULL,NULL,'2022-02-12','12:30:00','O',NULL,NULL,NULL,NULL,NULL),(14,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,NULL),(15,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,NULL),(16,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,NULL),(17,1,1,NULL,NULL,NULL,'2022-02-12','13:00:00','O',NULL,NULL,NULL,NULL,NULL),(18,1,1,NULL,NULL,NULL,'2022-02-12','13:00:00','O',NULL,NULL,NULL,NULL,NULL),(19,1,1,NULL,NULL,NULL,'2022-01-28','13:00:00','O',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `appointment` VALUES (1,1,1,1,'104',1,'2022-01-24','12:00:00','C','Email','On Time','Had a cough and runny nose.',2,NULL,NULL),(2,1,1,4,'236',2,'2022-01-24','12:00:00','C','Phone','Late',NULL,2,NULL,NULL),(3,1,1,4,'236',3,'2022-02-11','12:00:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(4,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(5,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(6,1,1,NULL,NULL,NULL,'2022-02-12','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(7,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(8,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(9,1,1,NULL,NULL,NULL,'2022-02-12','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(10,1,1,1,NULL,4,'2022-02-12','12:15:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(11,1,1,NULL,NULL,NULL,'2022-02-12','12:30:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(12,1,1,4,'320',5,'2022-02-12','12:30:00','C','Email',NULL,NULL,3,NULL,'2022-02-07 18:13:04'),(13,1,1,NULL,NULL,NULL,'2022-02-12','12:30:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(14,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(15,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(16,1,1,NULL,NULL,NULL,'2022-02-12','12:45:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(17,1,1,NULL,NULL,NULL,'2022-02-12','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(18,1,1,NULL,NULL,NULL,'2022-02-12','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(19,1,1,NULL,NULL,NULL,'2022-01-28','13:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `appointment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -218,6 +219,8 @@ CREATE TABLE `campaignvaccines` (
   `manufacturer` varchar(50) DEFAULT NULL,
   `vaccineDose` varchar(20) DEFAULT NULL,
   `daysBetweenDoses` int(4) DEFAULT NULL,
+  `ageGroup` varchar(20) DEFAULT NULL,
+  `doseAmount` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`campaignVaccID`),
   KEY `campaignID` (`campaignID`),
   KEY `vaccineType` (`vaccineType`,`manufacturer`),
@@ -232,7 +235,7 @@ CREATE TABLE `campaignvaccines` (
 
 LOCK TABLES `campaignvaccines` WRITE;
 /*!40000 ALTER TABLE `campaignvaccines` DISABLE KEYS */;
-INSERT INTO `campaignvaccines` VALUES (1,1,'COVID-19','Johnson & Johnson','1st',30),(2,1,'COVID-19','Johnson & Johnson','Booster',30),(3,1,'COVID-19','Moderna','1st',14),(4,1,'COVID-19','Moderna','2nd',30),(5,1,'COVID-19','Moderna','Booster',30),(6,1,'COVID-19','Pfizer','1st',14),(7,1,'COVID-19','Pfizer','2nd',30),(8,1,'COVID-19','Pfizer','Booster',30);
+INSERT INTO `campaignvaccines` VALUES (1,1,'COVID-19','Johnson & Johnson','1st',30,'Adult 12+','0.3 mL'),(2,1,'COVID-19','Johnson & Johnson','Booster',30,'Adult 12+','0.3 mL'),(3,1,'COVID-19','Moderna','1st',14,'Adult 12+','0.3 mL'),(4,1,'COVID-19','Moderna','2nd',30,'Adult 12+','0.3 mL'),(5,1,'COVID-19','Moderna','Booster',30,'Adult 12+','0.3 mL'),(6,1,'COVID-19','Pfizer','1st',14,'Adult 12+','0.3 mL'),(7,1,'COVID-19','Pfizer','2nd',30,'Adult 12+','0.3 mL'),(8,1,'COVID-19','Pfizer','Booster',30,'Adult 12+','0.3 mL');
 /*!40000 ALTER TABLE `campaignvaccines` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -265,6 +268,33 @@ INSERT INTO `location` VALUES (1,'Dome Arena','Henrietta','NY','2695 East Henrie
 UNLOCK TABLES;
 
 --
+-- Table structure for table `locationtimes`
+--
+
+DROP TABLE IF EXISTS `locationtimes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `locationtimes` (
+  `locationID` int(11) NOT NULL,
+  `locationDay` char(3) NOT NULL,
+  `locationOpen` time DEFAULT NULL,
+  `locationClose` time DEFAULT NULL,
+  PRIMARY KEY (`locationID`,`locationDay`),
+  CONSTRAINT `locationtimes_ibfk_1` FOREIGN KEY (`locationID`) REFERENCES `location` (`locationID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `locationtimes`
+--
+
+LOCK TABLES `locationtimes` WRITE;
+/*!40000 ALTER TABLE `locationtimes` DISABLE KEYS */;
+INSERT INTO `locationtimes` VALUES (1,'Fri','09:00:00','18:00:00'),(1,'Mon','10:00:00','22:00:00'),(1,'Thu','09:00:00','18:00:00'),(1,'Tue','09:00:00','18:00:00'),(1,'Wed','09:00:00','18:00:00'),(2,'Fri','11:00:00','15:00:00'),(2,'Thu','11:00:00','15:00:00'),(3,'Sat','11:00:00','18:00:00'),(3,'Sun','11:00:00','18:00:00');
+/*!40000 ALTER TABLE `locationtimes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `patient`
 --
 
@@ -273,21 +303,29 @@ DROP TABLE IF EXISTS `patient`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `patient` (
   `patientID` int(11) NOT NULL AUTO_INCREMENT,
-  `firstName` varchar(20) DEFAULT NULL,
-  `lastName` varchar(20) DEFAULT NULL,
+  `firstName` varchar(50) DEFAULT NULL,
+  `middleName` varchar(50) DEFAULT NULL,
+  `lastName` varchar(50) DEFAULT NULL,
   `dateOfBirth` date DEFAULT NULL,
   `sex` char(1) DEFAULT NULL,
   `race` varchar(20) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
+  `address` varchar(50) DEFAULT NULL,
+  `addressTwo` varchar(50) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
   `state` char(2) DEFAULT NULL,
-  `address` varchar(50) DEFAULT NULL,
   `zip` varchar(10) DEFAULT NULL,
-  `careProvider` varchar(50) DEFAULT NULL,
+  `idType` varchar(50) DEFAULT NULL,
+  `idNum` varchar(9) DEFAULT NULL,
+  `insuranceProvider` varchar(50) DEFAULT NULL,
+  `ownerName` varchar(50) DEFAULT NULL,
   `insuranceNum` varchar(20) DEFAULT NULL,
+  `insuranceGroup` varchar(50) DEFAULT NULL,
+  `insurancePlan` varchar(50) DEFAULT NULL,
+  `insuranceOther` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`patientID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,7 +334,7 @@ CREATE TABLE `patient` (
 
 LOCK TABLES `patient` WRITE;
 /*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-INSERT INTO `patient` VALUES (1,'Troy','Seeley','1999-12-22','M','White','tseeley32@gmail.com','5852343220','Rochester','NY','22 Fetzner Road','14616','MVP Healthcare','234D14A065'),(2,'Mark','Seeley','1994-10-04','M','White','mseeley32@outlook.com','5852453221','Rochester','NY','22 Fetzner Road','14616','MVP Healthcare','234D14A064'),(3,'John','Brown','1951-04-13','M','White','johnEBrown@outlook.com','5852453221','Henrietta','NY','2043 Concord Street','14627','Bluecross Blueshield','23E414A066'),(4,'Scott','Wilson','1970-03-19','M','White','swilson445@gmail.com','8604182843','Brockport','NY','183 Rockwell Lane','14610','Johnson & Johnson','21GF896A934');
+INSERT INTO `patient` VALUES (1,'Troy',NULL,'Seeley','1999-12-22','M','White','tseeley32@gmail.com','5852343220','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A065',NULL,NULL,NULL),(2,'Mark',NULL,'Seeley','1994-10-04','M','White','mseeley32@outlook.com','5852453221','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A064',NULL,NULL,NULL),(3,'John',NULL,'Brown','1951-04-13','M','White','johnEBrown@outlook.com','5852453221','2043 Concord Street',NULL,'Henrietta','NY','14627',NULL,NULL,'Bluecross Blueshield',NULL,'23E414A066',NULL,NULL,NULL),(4,'Scott',NULL,'Wilson','1970-03-19','M','White','swilson445@gmail.com','8604182843','183 Rockwell Lane',NULL,'Brockport','NY','14610',NULL,NULL,'Johnson & Johnson',NULL,'21GF896A934',NULL,NULL,NULL),(5,'Mark',NULL,'Haboian','1978-10-21','M','White','mhaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL),(6,'Maria',NULL,'Haboian','1978-10-21','F','White','mariahaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `patient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,4 +372,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-31 18:16:41
+-- Dump completed on 2022-02-12 19:46:32

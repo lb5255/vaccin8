@@ -10,16 +10,16 @@ const app = express();
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 
-app.get("/campaign", async (req, res) => {
+app.get("/api/campaignName", async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT campaignName from campaign WHERE campaignStatus = 'a';"
     );
-    res.json(result);
+    // only one result is expected
+    res.json(result[0]);
 });
-//graphQL for multiple queries
 
-app.get("/api/index", async (req, res) => {
+app.get("/api/vaccineList", async (req, res) => {
     //respond with GET request for all available vaccines.
     const conn = await connProm;
     const [result, _fields] = await conn.execute(

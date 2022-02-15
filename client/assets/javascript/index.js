@@ -2,6 +2,12 @@
 function id(i) {
 	return document.getElementById(i);
 }
+function q(q) {
+	return document.querySelector(q);
+}
+function qa(q) {
+	return document.querySelectorAll(q);
+}
 
 // short function to create an element with attributes and children
 function element(tag, attr = {}, ...children) {

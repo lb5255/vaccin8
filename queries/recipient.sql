@@ -39,11 +39,11 @@ SELECT campaignVaccID, vaccineType, Manufacturer, vaccineDose FROM campaignVacci
 --Patient info matches the information they filled in.
 --CampaignVaccID is from the selected vaccine type they chose,
 --appointmentID matches the appointment timeslot that they selected
-BEGIN;
+BEGIN TRANSACTION;
 INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,careProvider,insuranceNum)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
     SET @id = @@IDENTITY;
-    update appointment set campaignVaccID = ?, patientID = @id, apptStatus = "F", perferredContact = "Email" WHERE appointmentID = ?;
+    UPDATE appointment SET campaignVaccID = ?, patientID = @id, apptStatus = "F", perferredContact = "Email" WHERE appointmentID = ?;
 COMMIT;
 
 

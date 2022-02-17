@@ -15,12 +15,19 @@ SELECT campaignlocation.locationID, location.locationName FROM campaignlocation
     INNER JOIN location ON campaignlocation.locationID = location.locationID
     WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = "a") AND status = "Active";
 
+-- Recipient Screen, Date & Time
+--select all available appointments
+
+
+
 
 -- Recipient Screen, Date & Time
 --selects the available open timeslots at the chosen location and date
 --Will need to store the appointmentID from the timeslot they choose for later use. 
-SELECT appointmentID, locationID, apptTime FROM appointment
-WHERE apptStatus = "O" AND apptDate = ? AND locationID = ?;
+SELECT appointmentID, appointment.locationID, location.locationName ,apptDate, apptTime FROM appointment
+    INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
+    INNER JOIN location ON campaignLocation.locationID = location.locationID
+    WHERE apptStatus = "O" AND apptDate > (NOW() + INTERVAL 1 DAY);
 
 --Display info about the available vaccines they want. 
 --Will need to store the campaignVaccID that they choose for later use.

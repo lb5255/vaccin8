@@ -17,7 +17,7 @@ const config = {
 // a promise that waits a specified amount of milliseconds
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
-// waits for the database to be ready, and loadas the table definitions if necessary
+// waits for the database to be ready, and loads the table definitions if necessary
 // this is a self-executing async function
 // async functions return promises, and you can use `await` inside them
 // so module.exports is a promise you can `await`

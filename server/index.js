@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 
 // load the database
 const connProm = require("./load-db.js");
+const { query } = require("express");
 
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
@@ -44,46 +45,32 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     const conn = await connProm;
     //req.body.<input> gets info on each field.
 
-    //query for entering user info into patient table based on what they entered, 
-    //and also schedules them for their selected timeslot.
+    //query for entering user info into patient table based on what they entered, and also schedules them for their selected timeslot.
     //Patient info matches the information they filled in.
     //CampaignVaccID is from the selected vaccine type they chose,
     //appointmentID is from the appointment timeslot that they selected
+    //Not tested yet, 3 statements need to execute back to back to back, thinking of the best way to do this transaction in node
+    try {
+        await conn.execute("START TRANSACTION;");
+        //first query, insert patient data into patient table
+        await conn.execute(
+            "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,careProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.careProvider, req.body.insuranceNum
+        );
+        await conn.execute(
+            "SET @id = @@IDENTITY;" //get the auto-incremented patientID to be used in 3rd query.
+        );
+        await conn.execute(
+            "UPDATE appointment SET campaignVaccID = ?, patientID = @id, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
+             req.body.campaignVaccID, req.body.appointmentID
+        );
+        await conn.commit(); //Commit the changes
+    } catch(e) {
+        console.log("An error has occurred with this transaction.");
+        await conn.rollback();
 
-    //Not tested yet, 2 queries need to execute back to back, thinking of the best way to do this transaction in node
-    // const [result, _fields] = await conn.execute(
-    //     "BEGIN TRANSACTION; INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,careProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); SET @id = @@IDENTITY; UPDATE appointment SET campaignVaccID = ?, patientID = @id, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?; COMMIT;",
-    //     [req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race. req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.careProvider, req.body.insuranceNum, req.body.campaignVaccID, req.body.appointmentID]
-    // );
-    conn.beginTransaction(function(err) {
-        let id = "";
-        if (err) { throw err; }
-        conn.execute("INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,careProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.careProvider, req.body.insuranceNum, function(err, result) {
-            if (err) {
-                conn.rollback(function() {
-                    throw err;
-                });
-                id = result.insertID; //set id to the auto-incremented ID, this will be used in the 2nd query
-            } //end of first query for new patient data insert
-
-            conn.execute("UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;", req.body.campaignVaccID, id, req.body.appointmentID, function(err, result) {
-                if (err) {
-                    conn.rollback(function() {
-                        throw err;
-                    });
-                }
-                conn.commit(function(err) {
-                    if (err) {
-                        conn.rollback(function() {
-                            throw err;
-                        });
-                    }
-                    console.log('Transaction success!');
-                });
-            });
-        });
-    }); 
-});
+    }
+}); //End of app.post
 
 
 app.listen(8080, () => console.log("Listening on port 8080"));

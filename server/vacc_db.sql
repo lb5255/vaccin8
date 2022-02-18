@@ -339,6 +339,31 @@ INSERT INTO `patient` VALUES (1,'Troy',NULL,'Seeley','1999-12-22','M','White','t
 UNLOCK TABLES;
 
 --
+-- Table structure for table `session`
+--
+
+DROP TABLE IF EXISTS `session`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `session` (
+  `sessionInfo` varchar(100) NOT NULL,
+  `accountID` int(11) NOT NULL,
+  PRIMARY KEY (`sessionInfo`),
+  KEY `accountID` (`accountID`),
+  CONSTRAINT `session_ibfk_1` FOREIGN KEY (`accountID`) REFERENCES `account` (`accountID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `session`
+--
+
+LOCK TABLES `session` WRITE;
+/*!40000 ALTER TABLE `session` DISABLE KEYS */;
+/*!40000 ALTER TABLE `session` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `vaccine`
 --
 
@@ -372,4 +397,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-17  1:14:14
+-- Dump completed on 2022-02-17 20:56:19

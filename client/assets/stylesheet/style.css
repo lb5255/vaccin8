@@ -104,3 +104,12 @@ section {
 	}
 
 }
+
+.error-message {
+	color: #f00;
+	font-weight: bold;
+}
+
+.error-button {
+	border-color: #f00;
+}

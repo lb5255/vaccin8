@@ -30,7 +30,7 @@
 				</div>
 			</section>
 			
-			<div class="page active" data-timeline="1">
+			<div class="page active" data-timeline="1" validate="validateVaccineType()">
 				<h1>Schedule a Vaccine Appointment Today</h1>
 				
 				<section>
@@ -56,7 +56,7 @@
 				</section>
 			</div>
 			
-			<div class="page" data-timeline="2">
+			<div class="page" data-timeline="2" validate="validatePreScreening()">
 				<h1>Pre-Screening Questions</h1>
 				
 				<section>
@@ -68,15 +68,17 @@
 						<div class="input-label">
 							Date of birth
 						</div>
-						<input type="date" />
+						<input type="date" id="date-of-birth" />
 					</label>
 					
 					<label>
 						<div class="input-label">
 							Are you an essential worker?
 						</div>
-						<select>
+						<select id="is-essential-worker">
 							<option value="" selected disabled></option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 					</label>
 					

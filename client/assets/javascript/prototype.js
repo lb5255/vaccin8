@@ -20,10 +20,40 @@ function updateTimeline() {
 	})
 }
 
-function nextPage() {
+async function nextPage() {
+	// clear any validation errors that exist
+	qa(".error-message").forEach(n => n.remove());
+	qa(".error-button").forEach(n => n.classList.remove("error-button"));
+	
 	const pages = getPages();
 	for(let i = 0; i < pages.length; i++) {
 		if(pages[i].classList.contains("active")) {
+			// optionally validate
+			let validator = pages[i].getAttribute("validate");
+			if(validator) {
+				let res = (new Function("return " + validator))();
+				if(res?.then) { // can be awaited
+					res = await res;
+				}
+				
+				// display the error message
+				if(res === false || typeof(res) === "string") {
+					const nextButton = pages[i].querySelector("[next]");
+					nextButton.classList.add("error-button");
+					
+					if(typeof(res) === "string") {
+						nextButton.parentNode.appendChild(
+							element("div", {
+								class: "error-message"
+							}, res)
+						);
+					}
+					
+					return;
+				}
+			}
+			
+			// switch pages
 			const nextpage = pages[i + 1];
 			if(nextpage) {
 				nextpage.classList.add("active");
@@ -51,6 +81,6 @@ function prevPage() {
 }
 
 window.onload = () => {
-	document.querySelectorAll("[next]").forEach(n => n.onclick = nextPage);
-	document.querySelectorAll("[prev]").forEach(n => n.onclick = prevPage);
+	qa("[next]").forEach(n => n.onclick = nextPage);
+	qa("[prev]").forEach(n => n.onclick = prevPage);
 }

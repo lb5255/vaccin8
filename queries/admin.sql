@@ -38,6 +38,9 @@ INSERT INTO acctlocation(accountID, locationID, acctStatus, siteMngr)
 INSERT INTO vaccine(vaccineType, manufacturer) 
     VALUES (?,?);
 
+--Get all vaccines
+select vaccineType, manufacturer FROM vaccine;
+
 
 --Configure a vaccine to be used in a campaign
 

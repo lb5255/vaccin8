@@ -43,34 +43,60 @@ app.get("/api/recipient/vaccineAppts", async (req, res) => {
 //api call to put user info into patient table and to update the timeslot they selected.
 app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     const conn = await connProm;
+    const connection = await conn.getConnection(); //Need to get a new connection in order for a transaction to work.
     //req.body.<input> gets info on each field.
-
+    // console.log("recieved data!");
+    // console.log(req.body);
+    
     //query for entering user info into patient table based on what they entered, and also schedules them for their selected timeslot.
     //Patient info matches the information they filled in.
     //CampaignVaccID is from the selected vaccine type they chose,
     //appointmentID is from the appointment timeslot that they selected
-    //Not tested yet, 3 statements need to execute back to back to back, thinking of the best way to do this transaction in node
+    //Tested and working. 
     try {
-        await conn.execute("START TRANSACTION;");
+        await connection.beginTransaction();
         //first query, insert patient data into patient table
-        await conn.execute(
-            "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,careProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.careProvider, req.body.insuranceNum
+        await connection.execute(
+            "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            [req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
         );
-        await conn.execute(
-            "SET @id = @@IDENTITY;" //get the auto-incremented patientID to be used in 3rd query.
+        //2nd query, get the auto-incremented patientID to be used in 3rd query.
+        await connection.execute(
+            "SET @id = @@IDENTITY;"
         );
-        await conn.execute(
+        //3rd query, update the chosen timeslot with patient info.
+        await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = @id, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
-             req.body.campaignVaccID, req.body.appointmentID
+            [req.body.campaignVaccID, req.body.appointmentID]
         );
-        await conn.commit(); //Commit the changes
-    } catch(e) {
-        console.log("An error has occurred with this transaction.");
-        await conn.rollback();
-
+        await connection.commit();//Commit the changes
+    } 
+    catch(e) {
+        console.log("An error has occurred with this transaction.", e);
+        await connection.rollback(); //roll back the changes
     }
+    finally {
+        if (connection) connection.release(); 
+    }
+
+    
 }); //End of app.post
+
+
+app.post("/api/admin/vaccines", encodedParser, async (req,res) => {
+    const conn = await connProm;
+    console.log(req.body);
+    try {
+        await conn.execute(
+            "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
+        );
+        res.send("Inserted into vaccine table!");
+    } catch(e) {
+        console.log("An error has occurred.");
+        await conn.rollback();
+    }
+});
+ 
 
 
 app.listen(8080, () => console.log("Listening on port 8080"));

@@ -6,8 +6,6 @@
 	--line-gap: 0.5rem;
 	--circle-diameter: 1.5rem;
 	--max-item-width: 12rem;
-	--vertical-spacing-on-mobile: 1rem;
-	--left-gap-on-mobile: 1rem;
 }
 
 .timeline-point {
@@ -46,32 +44,8 @@
 }
 
 @media (max-width: 50rem) {
-	.timeline {
-		flex-direction: column;
-	}
-	
 	.timeline-point {
-		text-align: initial;
-		max-width: initial;
-		padding-top: initial;
-		padding-left: calc(var(--left-gap-on-mobile) + var(--circle-diameter));
-		min-height: calc(var(--line-gap) + var(--circle-diameter));
-	}
-	
-	.timeline-point:not(:last-child) {
-		margin-bottom: calc(var(--vertical-spacing-on-mobile) + var(--line-gap));
-	}
-	
-	.timeline-point::before {
-		left: 0;
-	}
-	
-	.timeline-point:not(:last-child)::after {
-		top: calc(100%);
-		left: calc(var(--circle-diameter) / 2);
-		width: 0;
-		height: var(--vertical-spacing-on-mobile);
-		border-bottom: none;
-		border-left: 1px solid var(--secondary2);
+		font-size: 0;
+		color: transparent;
 	}
 }

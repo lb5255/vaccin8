@@ -92,6 +92,7 @@ section {
 @media (max-width: 50rem) {
 	main {
 		padding: 1rem;
+		padding-top: 5rem;
 	}
 	
 	.two-column {

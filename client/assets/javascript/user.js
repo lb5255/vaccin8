@@ -27,11 +27,11 @@ function validatePreScreening() {
 		return "Please select your date of birth";
 	}
 	
-	if(id("is-essential-worker").value === "") {
+	if(!q("input[name=is-essential-worker]:checked")) {
 		return "Please answer whether you are an essential worker";
 	}
 	
-	if(!q("input[name=medical_condition]:checked")) {
+	if(!q("input[name=medical-condition]:checked")) {
 		return "Please select whether you have an underlying medical condition";
 	}
 }

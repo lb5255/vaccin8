@@ -71,15 +71,17 @@
 						<input type="date" id="date-of-birth" />
 					</label>
 					
-					<label>
-						<div class="input-label">
-							Are you an essential worker?
-						</div>
-						<select id="is-essential-worker">
-							<option value="" selected disabled></option>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
+					<p>
+						Are you an essential worker?
+					</p>
+					<label thin>
+						<input type="radio" name="is-essential-worker" value="yes" />
+						Yes
+					</label>
+					<br />
+					<label thin>
+						<input type="radio" name="is-essential-worker" value="no" />
+						No
 					</label>
 					
 					<p>
@@ -109,12 +111,12 @@
 					</p>
 					
 					<label thin>
-						<input type="radio" name="medical_condition" value="yes" />
+						<input type="radio" name="medical-condition" value="yes" />
 						Yes
 					</label>
 					<br />
 					<label thin>
-						<input type="radio" name="medical_condition" value="no" />
+						<input type="radio" name="medical-condition" value="no" />
 						No
 					</label>
 				</section>

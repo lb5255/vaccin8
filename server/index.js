@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
+const crypto = require("crypto");
 
 // load the database
 const connProm = require("./load-db.js");
@@ -52,7 +53,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     //Patient info matches the information they filled in.
     //CampaignVaccID is from the selected vaccine type they chose,
     //appointmentID is from the appointment timeslot that they selected
-    //Tested and working. 
+    //Tested
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
@@ -83,6 +84,62 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 }); //End of app.post
 
 
+//Login
+app.get("/api/login", encodedParser, async (req, res) => {
+    const conn = await connProm;
+    console.log(req.body); //username and password come in from user.
+
+
+    //get user info from db
+    const [result, _fields] = await conn.execute(
+        'SELECT username, password, accountID FROM account WHERE username = ?', [req.body.username]
+        );
+    //console.log(result[0].password); //gets the password
+    console.log(result);
+    
+
+    //If the user exists
+    if (result = undefined) {
+        return res.status.apply(401).send("Invalid login.");
+    }
+    else {
+        //If the hashed user entered password matches the one in the db
+        bcrypt.compare(req.body.password, result[0].password, function(err,flag) { 
+            if (err) throw err;
+            if (flag) {
+                console.log("The password is valid.");
+                //create random string
+                const token = await new Promise((res, rej) =>
+                    crypto.randomBytes(128, (err, bytes) =>
+                        err ? rej(err) : res(bytes.toString("base64"))
+                    )
+                );
+                //store string in db alongside the accountID
+                const [result, _fields] = await conn.execute(
+                    'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, req.body.accountID]
+                );
+                //create a cookie with the random string inside.
+                
+                return res.status.reply(200).send("Login successful.");
+            }
+            else {
+                return res.status.apply(401).send("Invalid login.");
+            }
+        }); //End of bcrypt.hash
+        
+
+
+
+
+    }
+}); //end of login api call
+
+
+
+
+
+
+//api call to add a new vaccine to vaccine table.
 app.post("/api/admin/vaccines", encodedParser, async (req,res) => {
     const conn = await connProm;
     console.log(req.body);
@@ -96,6 +153,9 @@ app.post("/api/admin/vaccines", encodedParser, async (req,res) => {
         await conn.rollback();
     }
 });
+
+
+
  
 
 

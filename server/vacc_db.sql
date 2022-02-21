@@ -115,7 +115,7 @@ CREATE TABLE `appointment` (
 
 LOCK TABLES `appointment` WRITE;
 /*!40000 ALTER TABLE `appointment` DISABLE KEYS */;
-INSERT INTO `appointment` VALUES (1,1,1,1,'104',1,'2022-01-24','12:00:00','C','Email','On Time','Had a cough and runny nose.',2,NULL,NULL),(2,1,1,4,'236',2,'2022-01-24','12:00:00','C','Phone','Late',NULL,2,NULL,NULL),(3,1,1,4,'236',3,'2022-02-11','12:00:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(4,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(5,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(6,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(7,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(8,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(9,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(10,1,1,1,NULL,4,'2022-02-12','12:15:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(11,1,1,NULL,NULL,NULL,'2022-02-27','12:30:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(12,1,1,4,'320',5,'2022-02-12','12:30:00','C','Email',NULL,NULL,3,NULL,'2022-02-07 18:13:04'),(13,1,1,NULL,NULL,NULL,'2022-02-27','12:30:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(14,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(15,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(16,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(17,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(18,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(19,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `appointment` VALUES (1,1,1,1,'104',1,'2022-01-24','12:00:00','C','Email','On Time','Had a cough and runny nose.',2,NULL,NULL),(2,1,1,4,'236',2,'2022-01-24','12:00:00','C','Phone','Late',NULL,2,NULL,NULL),(3,1,1,4,'236',3,'2022-02-11','12:00:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(4,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(5,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(6,1,1,NULL,NULL,NULL,'2022-02-27','12:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(7,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(8,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(9,1,1,NULL,NULL,NULL,'2022-02-27','12:15:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(10,1,1,1,NULL,4,'2022-02-12','12:15:00','F','Phone',NULL,NULL,NULL,NULL,NULL),(11,1,1,7,NULL,7,'2022-02-27','12:30:00','F','Email',NULL,NULL,NULL,NULL,NULL),(12,1,1,4,'320',5,'2022-02-12','12:30:00','C','Email',NULL,NULL,3,NULL,'2022-02-07 18:13:04'),(13,1,1,NULL,NULL,NULL,'2022-02-27','12:30:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(14,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(15,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,NULL,NULL),(16,1,1,NULL,NULL,NULL,'2022-02-27','12:45:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(17,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(18,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,'Had a coughing fit 10 minutes after recieving the dose',NULL),(19,1,1,NULL,NULL,NULL,'2022-02-27','13:00:00','O',NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `appointment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -325,7 +325,7 @@ CREATE TABLE `patient` (
   `insurancePlan` varchar(50) DEFAULT NULL,
   `insuranceOther` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`patientID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -334,7 +334,7 @@ CREATE TABLE `patient` (
 
 LOCK TABLES `patient` WRITE;
 /*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-INSERT INTO `patient` VALUES (1,'Troy',NULL,'Seeley','1999-12-22','M','White','tseeley32@gmail.com','5852343220','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A065',NULL,NULL,NULL),(2,'Mark',NULL,'Seeley','1994-10-04','M','White','mseeley32@outlook.com','5852453221','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A064',NULL,NULL,NULL),(3,'John',NULL,'Brown','1951-04-13','M','White','johnEBrown@outlook.com','5852453221','2043 Concord Street',NULL,'Henrietta','NY','14627',NULL,NULL,'Bluecross Blueshield',NULL,'23E414A066',NULL,NULL,NULL),(4,'Scott',NULL,'Wilson','1970-03-19','M','White','swilson445@gmail.com','8604182843','183 Rockwell Lane',NULL,'Brockport','NY','14610',NULL,NULL,'Johnson & Johnson',NULL,'21GF896A934',NULL,NULL,NULL),(5,'Mark',NULL,'Haboian','1978-10-21','M','White','mhaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL),(6,'Maria',NULL,'Haboian','1978-10-21','F','White','mariahaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL);
+INSERT INTO `patient` VALUES (1,'Troy',NULL,'Seeley','1999-12-22','M','White','tseeley32@gmail.com','5852343220','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A065',NULL,NULL,NULL),(2,'Mark',NULL,'Seeley','1994-10-04','M','White','mseeley32@outlook.com','5852453221','22 Fetzner Road',NULL,'Rochester','NY','14616',NULL,NULL,'MVP Healthcare',NULL,'234D14A064',NULL,NULL,NULL),(3,'John',NULL,'Brown','1951-04-13','M','White','johnEBrown@outlook.com','5852453221','2043 Concord Street',NULL,'Henrietta','NY','14627',NULL,NULL,'Bluecross Blueshield',NULL,'23E414A066',NULL,NULL,NULL),(4,'Scott',NULL,'Wilson','1970-03-19','M','White','swilson445@gmail.com','8604182843','183 Rockwell Lane',NULL,'Brockport','NY','14610',NULL,NULL,'Johnson & Johnson',NULL,'21GF896A934',NULL,NULL,NULL),(5,'Mark',NULL,'Haboian','1978-10-21','M','White','mhaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL),(6,'Maria',NULL,'Haboian','1978-10-21','F','White','mariahaboian@frontiernet.net','5855459112','29 Stonehill Drive',NULL,'Rochester','NY','14615',NULL,NULL,'MVP',NULL,'4FSD23545V',NULL,NULL,NULL),(7,'Marco',NULL,'Cooper','1998-01-20','M','White','rcooper@yahoo.com','5853452202','22 Fetzner Lane',NULL,'Rochester','NY','14623',NULL,NULL,'MVP Healthcare',NULL,'E44507F32D',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `patient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -346,7 +346,7 @@ DROP TABLE IF EXISTS `session`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `session` (
-  `sessionInfo` varchar(100) NOT NULL,
+  `sessionInfo` varchar(255) NOT NULL,
   `accountID` int(11) NOT NULL,
   PRIMARY KEY (`sessionInfo`),
   KEY `accountID` (`accountID`),
@@ -384,7 +384,7 @@ CREATE TABLE `vaccine` (
 
 LOCK TABLES `vaccine` WRITE;
 /*!40000 ALTER TABLE `vaccine` DISABLE KEYS */;
-INSERT INTO `vaccine` VALUES ('COVID-19','Johnson & Johnson','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}'),('COVID-19','Moderna','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}'),('COVID-19','Pfizer','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}');
+INSERT INTO `vaccine` VALUES ('COVID-19','Johnson & Johnson','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}'),('COVID-19','Moderna','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}'),('COVID-19','Pfizer','{\"q1\": {\"flag\": \"Yes\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Are you immunocompromised, a healthcare worker, first responder, or over the age of 65?\"}, \"q2\": {\"flag\": \"No\", \"answers\": [\"Yes\", \"No\"], \"question\": \"Have you had a fever, cough, or sore throat in the past 48 hours?\"}, \"flagsToQualify\": 2}'),('Flu','Afluria Quadrivalent',NULL);
 /*!40000 ALTER TABLE `vaccine` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -397,4 +397,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-17 20:56:19
+-- Dump completed on 2022-02-21  1:34:21

@@ -18,6 +18,34 @@ app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.use(cookieParser());
 
+//Authentication code
+const authMiddleware = async (req, res, next) => {
+    const conn = await connProm;
+    if (!req.cookies.token) {
+        return res.status(401).send("Unauthorized.");
+    }
+    else {
+        //Query to get userID
+        const [result, _fields] = await conn.execute(
+            "SELECT accountID FROM session WHERE sessionInfo = ?", [req.cookies.token]
+        );
+        req.userID = result[0].accountID;
+    }
+    if(!req.userID) {
+        res.status(401).send("Unauthorized");
+    }
+    
+    
+    next(); //forwards to the api that was called
+}
+
+
+
+
+
+
+
+
 app.get("/api/campaignName", async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -96,7 +124,7 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
     //get user info from db
     const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ? AND WHERE ', [req.body.username]
+        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
         );
     //console.log(result[0].password); //gets the password
     //If the user does not exist i.e 0 rows returned
@@ -137,10 +165,6 @@ app.get("/api/login", encodedParser, async (req, res) => {
             return res.status(401).send("Invalid login.");
         }
 
-        
-
-
-
 
     }
 }); //end of login api call
@@ -148,18 +172,14 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
 
 //api call to add a new vaccine to vaccine table.
-app.post("/api/admin/vaccines", encodedParser, async (req,res) => {
+app.post("/api/admin/vaccines", encodedParser, authMiddleware, async (req,res) => {
     const conn = await connProm;
-    console.log(req.body);
-    try {
-        await conn.execute(
-            "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
-        );
-        res.send("Inserted into vaccine table!");
-    } catch(e) {
-        console.log("An error has occurred.");
-        await conn.rollback();
-    }
+    // console.log(req.body);
+
+    await conn.execute(
+        "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
+    );
+    res.status(200).send("Inserted into vaccine table!");
 });
 
 

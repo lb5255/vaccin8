@@ -2,6 +2,9 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const cookieParser = require('cookie-parser')
+
 
 // load the database
 const connProm = require("./load-db.js");
@@ -96,36 +99,48 @@ app.get("/api/login", encodedParser, async (req, res) => {
         );
     //console.log(result[0].password); //gets the password
     console.log(result);
+
     
 
-    //If the user exists
-    if (result = undefined) {
-        return res.status.apply(401).send("Invalid login.");
+    //If the user does not exist i.e 0 rows returned
+    if (!result.length) {
+        return res.status(401).send("Invalid login.");
     }
     else {
-        //If the hashed user entered password matches the one in the db
-        bcrypt.compare(req.body.password, result[0].password, function(err,flag) { 
-            if (err) throw err;
-            if (flag) {
-                console.log("The password is valid.");
-                //create random string
-                const token = await new Promise((res, rej) =>
-                    crypto.randomBytes(128, (err, bytes) =>
-                        err ? rej(err) : res(bytes.toString("base64"))
-                    )
-                );
-                //store string in db alongside the accountID
-                const [result, _fields] = await conn.execute(
-                    'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, req.body.accountID]
-                );
-                //create a cookie with the random string inside.
-                
-                return res.status.reply(200).send("Login successful.");
-            }
-            else {
-                return res.status.apply(401).send("Invalid login.");
-            }
-        }); //End of bcrypt.hash
+        //Compare hashed user-entered password with the one in the db
+        console.log("Password Entered from user: ",req.body.password);
+        console.log("Hashed Password from DB",result[0].password);
+        const flag = await new Promise((res, rej) => 
+            bcrypt.compare(req.body.password, result[0].password, (err,
+                flag) => err ? rej(err) : res(flag))
+        );
+        //If it matches
+        if (flag) {
+            console.log("The password is valid.");
+            //create random string
+            const token = await new Promise((res, rej) =>
+                crypto.randomBytes(128, (err, bytes) =>
+                    err ? rej(err) : res(bytes.toString("base64"))
+                )
+            );
+            console.log("Token: ",token);
+            //store string in db alongside the accountID
+            const [result2, _fields2] = await conn.execute(
+                'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, result[0].accountID]
+            );
+            //create a cookie with the random string inside.
+            
+
+
+
+                          
+            return res.status(200).send("Login successful.");
+        }
+        //If it doesn't match
+        else {
+            return res.status(401).send("Invalid login.");
+        }
+
         
 
 

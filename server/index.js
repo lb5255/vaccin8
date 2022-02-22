@@ -16,6 +16,7 @@ const encodedParser = bodyParser.urlencoded({ extended: false});
 // statically serve the client on /
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/api/campaignName", async (req, res) => {
     const conn = await connProm;
@@ -90,7 +91,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 //Login
 app.get("/api/login", encodedParser, async (req, res) => {
     const conn = await connProm;
-    console.log(req.body); //username and password come in from user.
+    //console.log(req.body); //username and password come in from user.
 
 
     //get user info from db
@@ -98,18 +99,13 @@ app.get("/api/login", encodedParser, async (req, res) => {
         'SELECT username, password, accountID FROM account WHERE username = ?', [req.body.username]
         );
     //console.log(result[0].password); //gets the password
-    console.log(result);
-
-    
-
     //If the user does not exist i.e 0 rows returned
     if (!result.length) {
         return res.status(401).send("Invalid login.");
     }
     else {
         //Compare hashed user-entered password with the one in the db
-        console.log("Password Entered from user: ",req.body.password);
-        console.log("Hashed Password from DB",result[0].password);
+        
         const flag = await new Promise((res, rej) => 
             bcrypt.compare(req.body.password, result[0].password, (err,
                 flag) => err ? rej(err) : res(flag))
@@ -129,7 +125,10 @@ app.get("/api/login", encodedParser, async (req, res) => {
                 'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, result[0].accountID]
             );
             //create a cookie with the random string inside.
-            
+            res.cookie(token, result[0].accountID, {
+                    secure: false,  //Will need to be set to true when deployed
+                    httpOnly: true,
+                });
 
 
 
@@ -148,6 +147,16 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
     }
 }); //end of login api call
+
+app.get('/api/setcookie', (req, res) => {
+    res.cookie("Cookie Name", "This is encrypted", {
+        secure: false,  
+        httpOnly: true,
+
+    
+    });
+    return res.status(200).send("Cookie");
+});
 
 
 

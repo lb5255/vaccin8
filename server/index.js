@@ -96,7 +96,7 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
     //get user info from db
     const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ?', [req.body.username]
+        'SELECT username, password, accountID FROM account WHERE username = ? AND WHERE ', [req.body.username]
         );
     //console.log(result[0].password); //gets the password
     //If the user does not exist i.e 0 rows returned
@@ -125,14 +125,11 @@ app.get("/api/login", encodedParser, async (req, res) => {
                 'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, result[0].accountID]
             );
             //create a cookie with the random string inside.
-            res.cookie(token, result[0].accountID, {
+            res.cookie("token", token, {
                     secure: false,  //Will need to be set to true when deployed
                     httpOnly: true,
                 });
-
-
-
-                          
+            //return successful login                
             return res.status(200).send("Login successful.");
         }
         //If it doesn't match
@@ -147,19 +144,6 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
     }
 }); //end of login api call
-
-app.get('/api/setcookie', (req, res) => {
-    res.cookie("Cookie Name", "This is encrypted", {
-        secure: false,  
-        httpOnly: true,
-
-    
-    });
-    return res.status(200).send("Cookie");
-});
-
-
-
 
 
 

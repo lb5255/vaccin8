@@ -1,6 +1,3 @@
-// just some javascript to make the page minimally interactive without a server (yet)
-// should be replaced once server-side stuff gets filled in
-
 function getPages() {
 	const main = document.querySelector("main");
 	return [...main.children].filter(n => n.classList.contains("page"));
@@ -80,7 +77,7 @@ function prevPage() {
 	updateTimeline();
 }
 
-window.onload = () => {
+window.addEventListener("load", () => {
 	qa("[next]").forEach(n => n.onclick = nextPage);
 	qa("[prev]").forEach(n => n.onclick = prevPage);
-}
+})

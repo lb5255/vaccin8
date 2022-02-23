@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
-		<script src="../assets/javascript/prototype.js"></script>
+		<script src="../assets/javascript/nav.js"></script>
 		<script src="../assets/javascript/index.js"></script>
 		<script src="../assets/javascript/user.js"></script>
 	</head>
@@ -127,7 +127,7 @@
 				</section>
 			</div>
 			
-			<div class="page" data-timeline="2">
+			<div class="page" data-timeline="2" validate="validatePersonalInfo()">
 				<h1>Personal Info</h1>
 				
 				<section>
@@ -140,52 +140,43 @@
 							<div class="input-label">
 								First name *
 							</div>
-							<input type="text" placeholder="Enter your first name" />
+							<input id="first-name" type="text" placeholder="Enter your first name" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								Last name *
 							</div>
-							<input type="text" placeholder="Enter your last name" />
+							<input id="last-name" type="text" placeholder="Enter your last name" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								Zip code *
 							</div>
-							<input type="text" placeholder="Enter your zip code" />
+							<input id="zipcode" type="text" placeholder="Enter your zip code" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								Address *
 							</div>
-							<input type="text" placeholder="Enter your address" />
+							<input id="address" type="text" placeholder="Enter your address" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								City *
 							</div>
-							<input type="text" placeholder="Enter your city" />
+							<input id="city" type="text" placeholder="Enter your city" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								State *
 							</div>
-							<select>
+							<select id="state-input">
 								<option value="" selected disabled>Enter your state</option>
-								<option>panic</option>
-								<option>distress</option>
-								<option>exhaustion</option>
-								<option>utter confusion</option>
-								<option>denial</option>
-								<option>anger</option>
-								<option>bargaining</option>
-								<option>depression</option>
-								<option>acceptance</option>
 							</select>
 						</label>
 					</div>
@@ -195,7 +186,7 @@
 							<div class="input-label">
 								Receive reminders by email or phone number? *
 							</div>
-							<select>
+							<select id="email-or-phone">
 								<option selected>Email</option>
 								<option>Text</option>
 							</select>
@@ -205,21 +196,21 @@
 							<div class="input-label">
 								Primary care provider
 							</div>
-							<input type="text" placeholder="Enter your primary care provider" />
+							<input id="primary-care" type="text" placeholder="Enter your primary care provider" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								Email
 							</div>
-							<input type="text" placeholder="Enter your email" />
+							<input id="email" type="text" placeholder="Enter your email" />
 						</label>
 						
 						<label>
 							<div class="input-label">
 								Insurance ID #
 							</div>
-							<input type="text" placeholder="Enter your insurance ID #" />
+							<input id="insurance-id" type="text" placeholder="Enter your insurance ID #" />
 						</label>
 					</div>
 				</section>

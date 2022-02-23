@@ -17,8 +17,8 @@ WHERE patientID = ? AND apptStatus = "";
 SELECT location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment 
 INNER JOIN patient on appointment.patientID = patient.patientID
 INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID
-INNER JOIN campaignLocation on appointment.locationID = campaignLocation.locationID
-INNER JOIN location on campaignLocation.locationID = location.locationID
+INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID
+INNER JOIN location on campaignlocation.locationID = location.locationID
 WHERE patient.patientID = ? AND apptStatus = "F";
 
 

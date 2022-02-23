@@ -87,7 +87,7 @@ app.get("/api/vaccineList", async (req, res) => {
 app.get("/api/recipient/vaccineAppts", async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT appointmentID, appointment.locationID, location.locationName ,apptDate, apptTime FROM appointment INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID INNER JOIN location ON campaignLocation.locationID = location.locationID WHERE apptStatus = 'O' AND apptDate > (NOW() + INTERVAL 1 DAY);"
+        "SELECT appointmentID, appointment.locationID, location.locationName ,apptDate, apptTime FROM appointment INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID INNER JOIN location ON campaignlocation.locationID = location.locationID WHERE apptStatus = 'O' AND apptDate > (NOW() + INTERVAL 1 DAY);"
     );
     res.json(result);
 });
@@ -211,7 +211,7 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), async (
     const conn = await connProm;
     try {
         const [result, _fields] = await conn.execute(
-            "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignLocation on appointment.locationID = campaignLocation.locationID INNER JOIN location on campaignLocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
+            "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
             [req.body.locationID, req.body.startDate, req.body.endDate]
         );
         res.json(result);
@@ -277,7 +277,7 @@ app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), async (
     const conn = await connProm;
     try {
         const [result, _fields] = await conn.execute(
-            "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignLocation on appointment.locationID = campaignLocation.locationID INNER JOIN location on campaignLocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
+            "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
             [req.body.appointmentID]
         );
     }

@@ -28,30 +28,36 @@ app.use(cookieParser());
 //Authentication code
 const authMiddleware = function(role){ return async (req, res, next) => {
     const conn = await connProm;
- 
-    if (!req.cookies.token) {
-        return res.status(401).send("Unauthorized.");
-    }
-    else {
-        //Query to get userID and their role
-        const [result, _fields] = await conn.execute(
-            "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
-        );
+    try {
+        if (!req.cookies.token) {
+            return res.status(401).send("Unauthorized.");
+        }
+        else {
+            //Query to get userID and their role
+            const [result, _fields] = await conn.execute(
+                "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
+            );
 
-        req.userID = result[0].accountID;
-        req.position = result[0].position;
-        console.log(result);
+            req.userID = result[0].accountID;
+            req.position = result[0].position;
+            //console.log(result);
+        }
+        if(!req.userID) {
+            return res.status(401).send("Unauthorized");
+        }
+        //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
+        else if(req.position != role) {
+            return res.status(401).send("Unauthorized");
+        }
+        
+        
+        next(); //forwards to the api that was called
+
+    }   
+    catch (e) {
+        return res.status(500).send("Internal server error");
     }
-    if(!req.userID) {
-        return res.status(401).send("Unauthorized");
-    }
-    //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
-    else if(req.position != role) {
-        return res.status(401).send("Unauthorized");
-    }
-    
-    
-    next(); //forwards to the api that was called
+
     }  
 }
 

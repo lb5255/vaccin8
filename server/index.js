@@ -1,3 +1,4 @@
+
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -6,6 +7,11 @@ const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser')
 
 
+const admin = "Admin";
+const nurse = "Nurse";
+const staff = "Staff";
+const sitemgr = "Site Manager";
+
 // load the database
 const connProm = require("./load-db.js");
 const { query } = require("express");
@@ -13,37 +19,41 @@ const { query } = require("express");
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 
+
 // statically serve the client on /
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.use(cookieParser());
 
 //Authentication code
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = function(role){ return async (req, res, next) => {
     const conn = await connProm;
+ 
     if (!req.cookies.token) {
         return res.status(401).send("Unauthorized.");
     }
     else {
-        //Query to get userID
+        //Query to get userID and their role
         const [result, _fields] = await conn.execute(
-            "SELECT accountID FROM session WHERE sessionInfo = ?", [req.cookies.token]
+            "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
         );
+
         req.userID = result[0].accountID;
+        req.position = result[0].position;
+        console.log(result);
     }
     if(!req.userID) {
-        res.status(401).send("Unauthorized");
+        return res.status(401).send("Unauthorized");
+    }
+    //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
+    else if(req.position != role) {
+        return res.status(401).send("Unauthorized");
     }
     
     
     next(); //forwards to the api that was called
+    }  
 }
-
-
-
-
-
-
 
 
 app.get("/api/campaignName", async (req, res) => {
@@ -121,7 +131,6 @@ app.get("/api/login", encodedParser, async (req, res) => {
     const conn = await connProm;
     //console.log(req.body); //username and password come in from user.
 
-
     //get user info from db
     const [result, _fields] = await conn.execute(
         'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
@@ -172,14 +181,18 @@ app.get("/api/login", encodedParser, async (req, res) => {
 
 
 //api call to add a new vaccine to vaccine table.
-app.post("/api/admin/vaccines", encodedParser, authMiddleware, async (req,res) => {
+app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), async (req,res) => {
     const conn = await connProm;
     // console.log(req.body);
-
-    await conn.execute(
-        "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
-    );
-    res.status(200).send("Inserted into vaccine table!");
+    try {
+        await conn.execute(
+            "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
+        );
+        res.status(200).send("Inserted into vaccine table!");
+    }
+    catch (e) {
+        return res.status(500).send("Internal server error");
+    }
 });
 
 

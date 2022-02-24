@@ -37,7 +37,7 @@ const authMiddleware = function(role){ return async (req, res, next) => {
             const [result, _fields] = await conn.execute(
                 "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
             );
-
+            
             req.userID = result[0].accountID;
             req.position = result[0].position;
             //console.log(result);
@@ -59,9 +59,67 @@ const authMiddleware = function(role){ return async (req, res, next) => {
     }
 
     }  
-}
+} // End of authMiddleware
 
 
+//Login
+//Takes a JSON string with username, password, and position.
+app.get("/api/login", encodedParser, async (req, res) => {
+    const conn = await connProm;
+    //console.log(req.body); //username password, and position come in from user.
+
+    //get user info from db
+    const [result, _fields] = await conn.execute(
+        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
+        );
+    //console.log(result[0].password); //gets the password
+    //If the user does not exist i.e 0 rows returned
+    if (!result.length) {
+        return res.status(401).send("Invalid login.");
+    }
+    else {
+        //Compare hashed user-entered password with the one in the db
+        
+        const flag = await new Promise((res, rej) => 
+            bcrypt.compare(req.body.password, result[0].password, (err,
+                flag) => err ? rej(err) : res(flag))
+        );
+        //If it matches
+        if (flag) {
+            console.log("The password is valid.");
+            //create random string
+            const token = await new Promise((res, rej) =>
+                crypto.randomBytes(128, (err, bytes) =>
+                    err ? rej(err) : res(bytes.toString("base64"))
+                )
+            );
+            console.log("Token: ",token);
+            //store string in db alongside the accountID
+            const [result2, _fields2] = await conn.execute(
+                'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, result[0].accountID]
+            );
+            //create a cookie with the random string inside.
+            res.cookie("token", token, {
+                    secure: false,  //Will need to be set to true when deployed
+                    httpOnly: true,
+                });
+            //return successful login                
+            return res.status(200).send("Login successful.");
+        }
+        //If it doesn't match
+        else {
+            return res.status(401).send("Invalid login.");
+        }
+
+
+    }
+}); //end of login api call
+
+
+
+
+//Recipient APIs 
+//Gets the campaign name
 app.get("/api/campaignName", async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -71,6 +129,7 @@ app.get("/api/campaignName", async (req, res) => {
     res.json(result[0]);
 });
 
+//gets the vaccine list
 app.get("/api/vaccineList", async (req, res) => {
     //respond with GET request for all available vaccines.
     const conn = await connProm;
@@ -132,59 +191,16 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 }); //End of app.post
 
 
-//Login
-app.get("/api/login", encodedParser, async (req, res) => {
-    const conn = await connProm;
-    //console.log(req.body); //username and password come in from user.
-
-    //get user info from db
-    const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
-        );
-    //console.log(result[0].password); //gets the password
-    //If the user does not exist i.e 0 rows returned
-    if (!result.length) {
-        return res.status(401).send("Invalid login.");
-    }
-    else {
-        //Compare hashed user-entered password with the one in the db
-        
-        const flag = await new Promise((res, rej) => 
-            bcrypt.compare(req.body.password, result[0].password, (err,
-                flag) => err ? rej(err) : res(flag))
-        );
-        //If it matches
-        if (flag) {
-            console.log("The password is valid.");
-            //create random string
-            const token = await new Promise((res, rej) =>
-                crypto.randomBytes(128, (err, bytes) =>
-                    err ? rej(err) : res(bytes.toString("base64"))
-                )
-            );
-            console.log("Token: ",token);
-            //store string in db alongside the accountID
-            const [result2, _fields2] = await conn.execute(
-                'INSERT INTO session(sessionInfo, accountID) VALUES (?,?)', [token, result[0].accountID]
-            );
-            //create a cookie with the random string inside.
-            res.cookie("token", token, {
-                    secure: false,  //Will need to be set to true when deployed
-                    httpOnly: true,
-                });
-            //return successful login                
-            return res.status(200).send("Login successful.");
-        }
-        //If it doesn't match
-        else {
-            return res.status(401).send("Invalid login.");
-        }
 
 
-    }
-}); //end of login api call
+//Staff API calls
 
 
+
+//Nurse API calls
+
+
+//Admin API calls
 
 //api call to add a new vaccine to vaccine table.
 app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), async (req,res) => {
@@ -203,7 +219,9 @@ app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), async (req
 
 
 
- 
+
+//Site Manager API calls
+
 
 
 app.listen(8080, () => console.log("Listening on port 8080"));

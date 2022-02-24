@@ -77,6 +77,13 @@ window.addEventListener("load", () => {
 			value: stateCode
 		}, states[stateCode]))
 	}
+	
+	id("email-or-phone").addEventListener("change", () => {
+		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+		id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
+	})
+	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+	id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 })
 
 function validateVaccineType() {

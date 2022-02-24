@@ -13,7 +13,9 @@
 	</head>
 	<body>
 		<header>
-			<div id="header-title">VACCIN8</div>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
 			<div id="header-links">
 				<a href="#">Home</a>
 				<a href="#">Report Adverse Reaction</a>
@@ -135,7 +137,17 @@
 				</section>
 				
 				<section>
-					<div class="two-column">
+					<style>
+						.personal-info-section {
+							display: flex;
+							flex-wrap: wrap;
+						}
+						
+						.personal-info-section>label {
+							width: 50%;
+						}
+					</style>
+					<div class="personal-info-section">
 						<label>
 							<div class="input-label">
 								First name *
@@ -181,15 +193,22 @@
 						</label>
 					</div>
 					
-					<div class="two-column">
+					<div class="personal-info-section">
 						<label>
 							<div class="input-label">
 								Receive reminders by email or phone number? *
 							</div>
 							<select id="email-or-phone">
-								<option selected>Email</option>
-								<option>Text</option>
+								<option selected value="email">Email</option>
+								<option value="text">Text</option>
 							</select>
+						</label>
+						
+						<label>
+							<div class="input-label" id="notification-label">
+								Email
+							</div>
+							<input id="notification" type="text" placeholder="Enter your email" />
 						</label>
 						
 						<label>
@@ -197,13 +216,6 @@
 								Primary care provider
 							</div>
 							<input id="primary-care" type="text" placeholder="Enter your primary care provider" />
-						</label>
-						
-						<label>
-							<div class="input-label">
-								Email
-							</div>
-							<input id="email" type="text" placeholder="Enter your email" />
 						</label>
 						
 						<label>

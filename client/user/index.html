@@ -13,7 +13,9 @@
 	</head>
 	<body>
 		<header>
-			<div id="header-title">VACCIN8</div>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
 			<div id="header-links">
 				<a href="#">Home</a>
 				<a href="#">Report Adverse Reaction</a>
@@ -135,7 +137,17 @@
 				</section>
 				
 				<section>
-					<div class="two-column">
+					<style>
+						.personal-info-section {
+							display: flex;
+							flex-wrap: wrap;
+						}
+						
+						.personal-info-section>label {
+							width: 50%;
+						}
+					</style>
+					<div class="personal-info-section">
 						<label>
 							<div class="input-label">
 								First name *
@@ -148,13 +160,6 @@
 								Last name *
 							</div>
 							<input id="last-name" type="text" placeholder="Enter your last name" />
-						</label>
-						
-						<label>
-							<div class="input-label">
-								Zip code *
-							</div>
-							<input id="zipcode" type="text" placeholder="Enter your zip code" />
 						</label>
 						
 						<label>
@@ -173,6 +178,13 @@
 						
 						<label>
 							<div class="input-label">
+								Zip code *
+							</div>
+							<input id="zipcode" type="text" placeholder="Enter your zip code" />
+						</label>
+						
+						<label>
+							<div class="input-label">
 								State *
 							</div>
 							<select id="state-input">
@@ -181,15 +193,22 @@
 						</label>
 					</div>
 					
-					<div class="two-column">
+					<div class="personal-info-section">
 						<label>
 							<div class="input-label">
 								Receive reminders by email or phone number? *
 							</div>
 							<select id="email-or-phone">
-								<option selected>Email</option>
-								<option>Text</option>
+								<option selected value="email">Email</option>
+								<option value="text">Text</option>
 							</select>
+						</label>
+						
+						<label>
+							<div class="input-label" id="notification-label">
+								Email
+							</div>
+							<input id="notification" type="text" placeholder="Enter your email" />
 						</label>
 						
 						<label>
@@ -197,13 +216,6 @@
 								Primary care provider
 							</div>
 							<input id="primary-care" type="text" placeholder="Enter your primary care provider" />
-						</label>
-						
-						<label>
-							<div class="input-label">
-								Email
-							</div>
-							<input id="email" type="text" placeholder="Enter your email" />
 						</label>
 						
 						<label>
@@ -284,7 +296,7 @@
 							<div class="input-label">
 								What is your zip code?
 							</div>
-							<input type="text" placeholder="Enter zip code" />
+							<input id="zipcode-search" type="text" placeholder="Enter zip code" />
 						</label>
 						
 						<div class="datetime-filter-group">
@@ -317,8 +329,10 @@
 							<div class="datetime-result">
 								<div class="datetime-result-details">
 									<p class="datetime-result-title"></p>
-									<p><span class="datetime-result-city"></span><br />
-									<span class="datetime-result-phone"></span></p>
+									<p>
+										<span class="datetime-result-address"></span><br />
+										<span class="datetime-result-city"></span>
+									</p>
 									<p class="datetime-result-dist"></p>
 								</div>
 								<div class="datetime-result-dates">
@@ -363,10 +377,17 @@
 					</div>
 					
 					<div>You have been sent a confirmation email or text message.</div>
-					
-					<button>Cancel Appointment</button>
-					<br /><br />
+					<br>
 					<button>Change Appointment</button>
+
+					<button id="cancelAppUserButton" onclick="displayUserCancelModal()">Cancel Appointment</button>
+					<div id="cancelAppUserModal" class="modal">
+						<!-- Modal content -->
+						<div class="modal-content">
+						  <span class="close">&times;</span>
+						  <h1> Are you sure you want to cancel your appointment? </h1>
+						</div>
+					  </div>
 				</section>
 			</div>
 		</main>

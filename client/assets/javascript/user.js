@@ -77,6 +77,13 @@ window.addEventListener("load", () => {
 			value: stateCode
 		}, states[stateCode]))
 	}
+	
+	id("email-or-phone").addEventListener("change", () => {
+		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+		id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
+	})
+	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+	id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 })
 
 function validateVaccineType() {
@@ -117,9 +124,48 @@ function validatePersonalInfo() {
 	}
 }
 
+const locations = {};
+
 function loadDateTimePage() {
-    const vaccineName = q("#vaccine-select-dropdown>:checked")?.textContent || "unknown vaccine";
-    qa(".vaccine-name").forEach(n => n.textContent = vaccineName);
+	const vaccineName = q("#vaccine-select-dropdown>:checked")?.textContent || "unknown vaccine";
+	qa(".vaccine-name").forEach(n => n.textContent = vaccineName);
+	
+	// fill zipcode box with previously entered zip code by default
+	id("zipcode-search").value = id("zipcode-search").value || id("zipcode").value;
+	
+	apiGet("/api/recipient/vaccineAppts").then(results => {
+		// sort the results by location
+		for(const result of results) {
+			// parse the date
+			result.date = new Date(result.apptDate.replace(/T[\d:]+\./,
+				"T" + result.apptTime.replace(/^(\d):/, "0$1") + "."));
+			if(!(result.locationID in locations)) {
+				locations[result.locationID] = {
+					id: result.locationID,
+					name: result.locationName,
+					address: result.locationAddr,
+					city: result.locationCity + ", " + result.locationState + " " + result.locationZip,
+					zip: result.locationZip,
+					appts: [result]
+				}
+			} else {
+				locations[result.locationID].appts.push(result);
+			}
+		}
+		
+		showDateTimeResults();
+	});
+}
+
+function showDateTimeResults() {
+	clearDateTimeResults();
+	for(const locationId in locations) {
+		createDateTimeResult(locations[locationId]);
+	}
+}
+
+function clearDateTimeResults() {
+	id("datetime-results").innerHTML = "";
 }
 
 function createDateTimeResult(data) {
@@ -127,11 +173,41 @@ function createDateTimeResult(data) {
 	const template = id("datetime-result-template");
 	const element = template.content.cloneNode(true);
 	
-	element.querySelector(".datetime-result-title").textContent = data.address;
+	element.querySelector(".datetime-result-title").textContent = data.name;
+	element.querySelector(".datetime-result-address").textContent = data.address;
 	element.querySelector(".datetime-result-city").textContent = data.city;
-	element.querySelector(".datetime-result-phone").textContent = data.phone;
-	const dist = Math.floor(data.dist * 2) / 2;
-	element.querySelector(".datetime-result-dist").textContent = dist + " mile" + (dist === 1 ? "" : "s") + " away";
+	
+	// sort the appointments into chronological order
+	const appts = data.appts.sort((a, b) => a.date.getTime() - b.date.getTime());
+	// todo: fill in date buttons
 	
 	id("datetime-results").appendChild(element);
+}
+
+function displayUserCancelModal() {
+	// Get the modal
+	var modal = document.getElementById("cancelAppUserModal");
+
+	// Get the button that opens the modal
+	var btn = document.getElementById("cancelAppUserButton");
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
+
+	// When the user clicks the button, open the modal 
+	btn.onclick = function() {
+		modal.style.display = "block";
+	}
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function() {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
 }

@@ -194,13 +194,14 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), asyn
     const conn = await connProm;
     try {
         const [result, _fields] = await conn.execute(
-            "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation WHERE accountID = ?;",
+            "SELECT acctlocation.accountID, location.locationID, location.locationName FROM location INNER JOIN acctlocation ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
             [req.body.accountID]
         );
         res.json(result);
 
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 
@@ -321,7 +322,35 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), asyn
     }
 });
 
+//api call for admin to get all accounts in the database.
 
+app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), async(req, res) => {
+    const conn = await connProm;
+    try {
+        const [result, _fields] = await conn.execute(
+            "select * from account;"
+        );
+        return res.json(result);
+    }
+    catch (e) {
+        return res.status(500).send("Internal server error");
+    }
+
+});
+
+app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), async(req, res) => {
+    const conn = await connProm;
+    try {
+        const [result, _fields] = await conn.execute(
+            "select * from account where firstName = ? AND LastName = ?;",
+            [req.body.firstName, req.body.lastName]
+        );
+        return res.json(result);
+    }
+    catch (e) {
+        return res.status(500).send("Internal server error");
+    }
+});
 
 
 

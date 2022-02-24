@@ -4,7 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const dateFormat = require("./dateFormat.js");
 
 
 const admin = "Admin";
@@ -18,12 +19,16 @@ const { query } = require("express");
 
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
+const convertDate = require("./dateFormat.js");
 
 
 // statically serve the client on /
 app.use("/", express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.use(cookieParser());
+
+
+
 
 //Authentication code
 const authMiddleware = function(role){ return async (req, res, next) => {
@@ -217,13 +222,13 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), async (
     const conn = await connProm;
     
     //Convert MM/DD/YYYY to YYYY-MM-DD for Mysql
-    const startDate = req.body.startDate.split("/").reverse().join("-"); 
-    const endDate = req.body.endDate.split("/").reverse().join("-");
+    const startDate = dateFormat.mysqlFormat(req.body.startDate);
+    const endDate = dateFormat.mysqlFormat(req.body.endDate);
 
     try {
         const [result, _fields] = await conn.execute(
             "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
-            [req.body.locationID, endDate, startDate]
+            [req.body.locationID, startDate, endDate]
         );
         res.status(200).send(result);
     }
@@ -244,6 +249,7 @@ app.put("/api/staff/appointment/check", encodedParser, authMiddleware(staff), as
         return res.status(200).send("Successfully checked in patient.");
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });
@@ -260,6 +266,7 @@ app.put("/api/staff/appointment/cancel", encodedParser, authMiddleware(staff), a
         return res.status(200).send("Successfully cancelled appointment.");
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });
@@ -271,15 +278,20 @@ app.put("/api/staff/appointment/cancel", encodedParser, authMiddleware(staff), a
 //Takes the entered firstName, lastName, and date of birth as query parameters.
 app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), async (req,res) =>{
     const conn = await connProm;
+
+    //Format mm/dd/yyyy to yyyy-mm-dd for mysql
+    const dob = convertDate.mysqlFormat(req.body.dob);
+    console.log(dob);
     try {
         const [result, _fields] = await conn.execute(
             "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
-            [req.body.firstName, req.body.lastName, req.body.dob]
+            [req.body.firstName, req.body.lastName, dob]
         );
         return res.json(result);
     }
 
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 

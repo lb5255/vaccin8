@@ -145,7 +145,7 @@ app.get("/api/vaccineList", async (req, res) => {
 app.get("/api/recipient/vaccineAppts", async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT appointmentID, appointment.locationID, location.locationName ,apptDate, apptTime FROM appointment INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID INNER JOIN location ON campaignlocation.locationID = location.locationID WHERE apptStatus = 'O' AND apptDate > (NOW() + INTERVAL 1 DAY);"
+        "SELECT appointmentID, appointment.locationID, location.locationName, location.locationCity, location.locationState, location.locationZip, location.locationAddr, apptDate, apptTime FROM appointment INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID INNER JOIN location ON campaignlocation.locationID = location.locationID WHERE apptStatus = 'O' AND apptDate > (NOW() + INTERVAL 1 DAY);"
     );
     res.json(result);
 });

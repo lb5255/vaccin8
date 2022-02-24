@@ -316,6 +316,7 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), hand
 
 //Admin API calls
 
+
 //api call to add a new vaccine to vaccine table.
 app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
     const conn = await connProm;

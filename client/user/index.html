@@ -377,10 +377,17 @@
 					</div>
 					
 					<div>You have been sent a confirmation email or text message.</div>
-					
-					<button>Cancel Appointment</button>
-					<br /><br />
+					<br>
 					<button>Change Appointment</button>
+
+					<button id="cancelAppUserButton" onclick="displayUserCancelModal()">Cancel Appointment</button>
+					<div id="cancelAppUserModal" class="modal">
+						<!-- Modal content -->
+						<div class="modal-content">
+						  <span class="close">&times;</span>
+						  <h1> Are you sure you want to cancel your appointment? </h1>
+						</div>
+					  </div>
 				</section>
 			</div>
 		</main>

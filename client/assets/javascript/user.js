@@ -117,6 +117,11 @@ function validatePersonalInfo() {
 	}
 }
 
+function loadDateTimePage() {
+    const vaccineName = q("#vaccine-select-dropdown>:checked")?.textContent || "unknown vaccine";
+    qa(".vaccine-name").forEach(n => n.textContent = vaccineName);
+}
+
 function createDateTimeResult(data) {
 	/** @type {HTMLTemplateElement} */
 	const template = id("datetime-result-template");

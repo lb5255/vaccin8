@@ -53,6 +53,11 @@ async function nextPage() {
 			// switch pages
 			const nextpage = pages[i + 1];
 			if(nextpage) {
+				const nextpageonload = nextpage.getAttribute("onload");
+				if(nextpageonload) {
+					(new Function(nextpageonload))();
+				}
+				
 				nextpage.classList.add("active");
 				pages[i].classList.remove("active");
 				break;

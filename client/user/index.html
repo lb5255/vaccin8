@@ -221,7 +221,7 @@
 				</section>
 			</div>
 			
-			<div class="page" data-timeline="3">
+			<div class="page" data-timeline="3" onload="loadDateTimePage()">
 				<h1>Select a Date and Time</h1>
 				
 				<style>
@@ -310,7 +310,7 @@
 					
 					<div id="datetime-results-container">
 						<p>
-							All available locations for the ___ vaccine:
+							All available locations for the <span class="vaccine-name"></span> vaccine:
 						</p>
 						
 						<template id="datetime-result-template">

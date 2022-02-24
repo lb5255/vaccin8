@@ -313,13 +313,13 @@
 							All available locations for the ___ vaccine:
 						</p>
 						
-						<div id="datetime-results">
+						<template id="datetime-result-template">
 							<div class="datetime-result">
 								<div class="datetime-result-details">
-									<p class="datetime-result-title">1567 Penfield Road</p>
-									<p>Rochester, NY 14625<br />
-									(585) 586-8857</p>
-									<p>8.5 miles away</p>
+									<p class="datetime-result-title"></p>
+									<p><span class="datetime-result-city"></span><br />
+									<span class="datetime-result-phone"></span></p>
+									<p class="datetime-result-dist"></p>
 								</div>
 								<div class="datetime-result-dates">
 									<button class="datetime-date">Thu November 25</button>
@@ -328,6 +328,8 @@
 									<a class="datetime-more">More dates ></a>
 								</div>
 							</div>
+						</template>
+						<div id="datetime-results">
 						</div>
 					</div>
 				</div>

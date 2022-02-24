@@ -116,3 +116,17 @@ function validatePersonalInfo() {
 		}
 	}
 }
+
+function createDateTimeResult(data) {
+	/** @type {HTMLTemplateElement} */
+	const template = id("datetime-result-template");
+	const element = template.content.cloneNode(true);
+	
+	element.querySelector(".datetime-result-title").textContent = data.address;
+	element.querySelector(".datetime-result-city").textContent = data.city;
+	element.querySelector(".datetime-result-phone").textContent = data.phone;
+	const dist = Math.floor(data.dist * 2) / 2;
+	element.querySelector(".datetime-result-dist").textContent = dist + " mile" + (dist === 1 ? "" : "s") + " away";
+	
+	id("datetime-results").appendChild(element);
+}

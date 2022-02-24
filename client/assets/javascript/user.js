@@ -145,6 +145,7 @@ function loadDateTimePage() {
 					name: result.locationName,
 					address: result.locationAddr,
 					city: result.locationCity + ", " + result.locationState + " " + result.locationZip,
+					zip: result.locationZip,
 					appts: [result]
 				}
 			} else {

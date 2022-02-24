@@ -198,13 +198,14 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), asyn
     const conn = await connProm;
     try {
         const [result, _fields] = await conn.execute(
-            "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation WHERE accountID = ?;",
+            "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
             [req.body.accountID]
         );
-        res.json(result);
+        res.status(200).send(result);
 
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 

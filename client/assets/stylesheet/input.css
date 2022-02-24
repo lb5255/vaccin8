@@ -59,10 +59,10 @@ button[unfilled]:hover {
 	size: 18px;
 	border: 2px solid var(--neutral2);
 	padding: 1rem 2rem;
-	/* margin: 0 2rem; */
 	cursor: pointer;
 	transition: background-color 0.25s, color 0.25s, border 0.25s;
 	display: block;
+	min-width: 10rem;
 }
 
 .input-label {

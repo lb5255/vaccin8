@@ -308,6 +308,7 @@ app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), async (
         );
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });
@@ -323,6 +324,7 @@ app.put("/api/nurse/appointments", encodedParser, authMiddleware(nurse), async(r
         )
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 
@@ -343,6 +345,7 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), asyn
         );
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });
@@ -362,6 +365,7 @@ app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), async (req
         res.status(200).send("Inserted into vaccine table!");
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });

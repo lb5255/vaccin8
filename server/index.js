@@ -312,6 +312,33 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), hand
     res.send("");
 }));
 
+app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), async(req, res) => {
+    const conn = await connProm;
+    try {
+        const [result, _fields] = await conn.execute(
+            "select * from account;"
+        );
+        return res.json(result);
+    }
+    catch (e) {
+        return res.status(500).send("Internal server error");
+    }
+
+});
+
+app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), async(req, res) => {
+    const conn = await connProm;
+    try {
+        const [result, _fields] = await conn.execute(
+            "select * from account where firstName = ? AND LastName = ?;",
+            [req.body.firstName, req.body.lastName]
+        );
+        return res.json(result);
+    }
+    catch (e) {
+        return res.status(500).send("Internal server error");
+    }
+});
 
 
 //Admin API calls

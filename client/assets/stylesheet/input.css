@@ -35,22 +35,10 @@ button[unfilled] {
 	color: var(--neutral2);
 }
 
-button[unfilled]:hover {
+/* button[unfilled]:hover {
 	color: white;
 	background-color: var(--neutral2);
-}
-
-.buttonBack {
-	border-radius: 0.25rem;
-	min-width: 8rem;
-	background-color: white;
-	color: var(--neutral2);
-	border: 2px solid var(--neutral2);
-	padding: 0.5rem 2rem;
-	margin: 0 2rem;
-	cursor: pointer;
-	transition: background-color 0.25s, color 0.25s, border 0.25s;
-}
+} */
 
 .PickSignIn {
 	border-radius: 0.25rem;

@@ -215,14 +215,20 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), asyn
 //Takes the locationID they selected, and their entered start and end date as query parameters.
 app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), async (req, res) => {
     const conn = await connProm;
+    
+    //Convert MM/DD/YYYY to YYYY-MM-DD for Mysql
+    const startDate = req.body.startDate.split("/").reverse().join("-"); 
+    const endDate = req.body.endDate.split("/").reverse().join("-");
+
     try {
         const [result, _fields] = await conn.execute(
             "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
-            [req.body.locationID, req.body.startDate, req.body.endDate]
+            [req.body.locationID, endDate, startDate]
         );
-        res.json(result);
+        res.status(200).send(result);
     }
     catch (e) {
+        console.log(e);
         return res.status(500).send("Internal server error");
     }
 });

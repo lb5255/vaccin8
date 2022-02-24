@@ -35,11 +35,14 @@ header {
 }
 
 #header-links a {
-	color: inherit;
 	margin-left: 2rem;
 }
 
-#header-links a:not(:hover) {
+header a {
+	color: inherit;
+}
+
+header a:not(:hover) {
 	text-decoration: none;
 }
 

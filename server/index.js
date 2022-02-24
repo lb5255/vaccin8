@@ -108,18 +108,14 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
-        await connection.execute(
+        const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
             [req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
         );
-        //2nd query, get the auto-incremented patientID to be used in 3rd query.
+        //2rd query, update the chosen timeslot with patient info.
         await connection.execute(
-            "SET @id = @@IDENTITY;"
-        );
-        //3rd query, update the chosen timeslot with patient info.
-        await connection.execute(
-            "UPDATE appointment SET campaignVaccID = ?, patientID = @id, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
-            [req.body.campaignVaccID, req.body.appointmentID]
+            "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
+            [req.body.campaignVaccID, result.insertId, req.body.appointmentID]
         );
         await connection.commit();//Commit the changes
     } 

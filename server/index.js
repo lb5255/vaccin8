@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
 const dateFormat = require("./dateFormat.js");
-
+const saltRounds = 12;
 
 const admin = "Admin";
 const nurse = "Nurse";
@@ -69,7 +69,7 @@ const authMiddleware = function(role){ return async (req, res, next) => {
 const handleErrors = func => async (req, res) => {
     try{
         const r = func(req, res);
-        if(r?.then instanceof Function) { // promise interface
+        if(r && r.then instanceof Function) { // promise interface
             await r;
         }
     } catch(err) {
@@ -312,6 +312,12 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), hand
     res.send("");
 }));
 
+
+
+//Admin API calls
+
+//api call to get all accounts
+
 app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), async(req, res) => {
     const conn = await connProm;
     try {
@@ -323,9 +329,9 @@ app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), async(req, 
     catch (e) {
         return res.status(500).send("Internal server error");
     }
-
 });
 
+//api call to get all accounts by searching first/last name.
 app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), async(req, res) => {
     const conn = await connProm;
     try {
@@ -341,7 +347,50 @@ app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), asyn
 });
 
 
-//Admin API calls
+//api call to add an account
+app.post("/api/admin/accounts", encodedParser, authMiddleware(admin), handleErrors(async(req, res) => {
+    const conn = await connProm;
+    //Hash the entered password.
+    const hashedPassword = await new Promise((res, rej) => {
+        bcrypt.hash(req.body.password, saltRounds, (err,
+            result) => err ? rej(err) : res(result))
+    });
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO account(username, password, firstName, lastName, position, email, phone) VALUES (?,?,?,?,?,?,?);",
+        [req.body.username, hashedPassword, req.body.firstName, req.body.lastName, req.body.position, req.body.email, req.body.phone]
+    );
+    res.send("New account created."); 
+
+}));
+
+//api call to remove an account
+app.delete("/api/admin/accounts", encodedParser, authMiddleware(admin), handleErrors(async(req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM account WHERE accountID = ?", [req.body.accountID]
+    );
+    res.send("Deleted account.");
+}));
+
+//api call to edit an account (Except password)
+app.put("/api/admin/accounts", encodedParser, authMiddleware(admin), handleErrors(async(req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "UPDATE account SET username = ?, firstName = ?, lastName = ?, position = ?, email = ?, phone = ? WHERE accountID = ?",
+        [req.body.username, req.body.firstName, req.body.lastName, req.body.position, req.body.email, req.body.phone, req.body.accountID]
+    );
+    res.send("Updated account information.");
+})); 
+
+
+//api call to get all vaccines in the system. 
+app.get("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT vaccineType, manufacturer FROM vaccine;"
+    );
+    return res.json(result);
+}));
 
 
 //api call to add a new vaccine to vaccine table.
@@ -351,13 +400,51 @@ app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErro
     const [result, _fields] = await conn.execute(
         "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
     );
-    res.status(200).send("Inserted into vaccine table!");
+    res.status(200).send("Inserted new vaccine.");
 }));
+
+//api call to delete a vaccine
+
+//api call to edit a vaccine
+
+//api call to add a vaccine to a campaign
+
+//api call to remove a vaccine from a campaign
+
+
+//api call to add a location
+
+//api call to edit a location
+
+//api call to remove a location
+
+//api call to add a location to a campaign
+
+//api call to remove a location from a campaign
+
+
 
 
 
 
 //Site Manager API calls
+
+
+//api call to get all sites they are a site manager at
+
+//api call to manage location info
+
+//api call to get timeslots at the active location
+
+//api call to add a timeslot(Or multiple of the same timeslot)
+
+//api call to remove a timeslot
+
+//api call to search accounts by id (Staff member or Nurse only)
+
+//api call to assign an account to be active at a location.
+
+//api call to remove an account from being active at a location.
 
 
 

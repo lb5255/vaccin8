@@ -396,32 +396,113 @@ app.get("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleError
 //api call to add a new vaccine to vaccine table.
 app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
     const conn = await connProm;
-    // console.log(req.body);
     const [result, _fields] = await conn.execute(
         "INSERT INTO vaccine(vaccineType, manufacturer) VALUES (?,?);", [req.body.vaccineType, req.body.manufacturer]
     );
     res.status(200).send("Inserted new vaccine.");
 }));
 
-//api call to delete a vaccine
 
-//api call to edit a vaccine
+
+//api call to delete a vaccine
+app.delete("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM vaccine WHERE vaccineType = ? AND manufacturer = ?;", [req.body.vaccineType, req.body.manufacturer]
+    );
+    res.send("Deleted vaccine.");
+}));
 
 //api call to add a vaccine to a campaign
+app.post("/api/admin/campaign/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO campaignvaccines (vaccineType, manufacturer, vaccineDose, daysBetweenDoses, ageGroup, doseAmount) VALUES (?,?,?,?,?,?);", 
+        [req.body.vaccineType, req.body.manufacturer, req.body.vaccineDose, req.body.daysBetweenDoses, req.body.ageGroup, req.body.doseAmount]
+    );
+    res.send("Added vaccine to campaign.");
+}));
+
 
 //api call to remove a vaccine from a campaign
+app.delete("/api/admin/campaign/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM campaignvaccines WHERE campaignVaccID = ?;", 
+        [req.body.campaignVaccID]
+    );
+    res.send("Removed vaccine from campaign.");
+}));
 
+//api call to assign an account to be active at a location.
+
+//api call to remove an account from being active at a location.
+
+//api call to get all locations.
+app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT * from location;"
+    );
+}));
 
 //api call to add a location
+app.post("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO location (locationName, locationCity, locationState, locationAddr, locationZip VALUES (?,?,?,?,?);",
+        [req.body.locationName, req.body.locationCity, req.body.locationState, req.body.locationAddr, req.body.locationZip]
+    );
+    res.send("Entered new location.");
+}));
 
 //api call to edit a location
+app.put("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "UPDATE location SET locationName = ?, locationCity = ?, locationState = ?, locationAddr = ?, locationZip = ? WHERE locationID = ?;",
+        [req.body.locationName, req.body.locationCity, req.body.locationState, req.body.locationAddr, req.body.locationZip, req.body.locationID]
+    );
+    res.send("Updated location information.");
+}));
 
 //api call to remove a location
+app.delete("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM location WHERE locationID = ?;",
+        [req.body.locationID]
+    );
+    res.send("Deleted location.");
+}));
+
+//api call to get all locations at the currently active campaign
+app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT * from campaignlocation JOIN location ON location.locationID = campaignlocation.locationID INNER JOIN campaign ON campaignlocation.campaignID = campaign.campaignID WHERE campaignStatus = 'a';"
+    );
+}));
 
 //api call to add a location to a campaign
+app.post("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO campaignlocation (locationID, campaignID, status) VALUES (?,?,'Active');",
+        [req.body.locationID,req.body.campaignID]
+    );
+    res.send("Added location to a campaign.");
+}));
 
 //api call to remove a location from a campaign
-
+app.delete("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM campaignlocation WHERE campaignID = ? AND locationID = ?",
+        [req.body.locationID,req.body.campaignID]
+    );
+    res.send("Deleted location from a campaign.");
+}));
 
 
 
@@ -431,8 +512,15 @@ app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErro
 
 
 //api call to get all sites they are a site manager at
+app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
+        [req.body.accountID]
+    );
+}));
 
-//api call to manage location info
+//api call to edit location info
 
 //api call to get timeslots at the active location
 
@@ -440,7 +528,8 @@ app.post("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleErro
 
 //api call to remove a timeslot
 
-//api call to search accounts by id (Staff member or Nurse only)
+//api call to search staff and nurse accounts by id 
+
 
 //api call to assign an account to be active at a location.
 

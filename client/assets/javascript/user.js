@@ -168,20 +168,59 @@ function clearDateTimeResults() {
 	id("datetime-results").innerHTML = "";
 }
 
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 function createDateTimeResult(data) {
 	/** @type {HTMLTemplateElement} */
 	const template = id("datetime-result-template");
-	const element = template.content.cloneNode(true);
+	const el = template.content.cloneNode(true);
 	
-	element.querySelector(".datetime-result-title").textContent = data.name;
-	element.querySelector(".datetime-result-address").textContent = data.address;
-	element.querySelector(".datetime-result-city").textContent = data.city;
+	el.querySelector(".datetime-result-title").textContent = data.name;
+	el.querySelector(".datetime-result-address").textContent = data.address;
+	el.querySelector(".datetime-result-city").textContent = data.city;
 	
 	// sort the appointments into chronological order
 	const appts = data.appts.sort((a, b) => a.date.getTime() - b.date.getTime());
 	// todo: fill in date buttons
 	
-	id("datetime-results").appendChild(element);
+	const days = sortIntoDates(appts);
+	
+	for(const day of days.slice(0, 3)) { // show the first 3 days
+		const datebutton = element("button", { class: "datetime-date" }, months[day.date.getMonth()] + " " + day.date.getDate());
+		datebutton.onclick = () => displayTimeSelectModal(day.date);
+		el.querySelector(".datetime-result-date-buttons").appendChild(datebutton);
+	}
+	
+	id("datetime-results").appendChild(el);
+}
+
+function sortIntoDates(appts) {
+	const days = [];
+	
+	for(const appt of appts) {
+		const dayIndex = days.findIndex(val => isSameDay(val.date, appt.date));
+		if(dayIndex < 0) { // insert a new record for the date
+			days.push({
+				date: appt.date,
+				appts: [appt]
+			});
+		} else { // add it to the existing list
+			days[dayIndex].appts.push(appt);
+		}
+	}
+	
+	return days;
+}
+
+function isSameDay(date1, date2) {
+	return (
+		Math.abs(date1.getTime() - date2.getTime()) < 1000 * 60 * 60 * 24 && // less than 24 hours between the times
+		date1.getDate() === date2.getDate() // the same day of the month
+	)
+}
+
+function displayTimeSelectModal(date) {
+	
 }
 
 function displayUserCancelModal() {

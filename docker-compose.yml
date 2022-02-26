@@ -11,7 +11,7 @@ services:
       - ./server:/code
       - ./client:/client
     ports:
-      - "127.0.0.1:8080:8080"
+      - 8080:8080
     environment:
       - DBHOST=db
   db:

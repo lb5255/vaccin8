@@ -237,8 +237,17 @@
 				<h1>Select a Date and Time</h1>
 				
 				<style>
-					#datetime-filter, #datetime-results-container {
-						display: inline-block;
+					#datetime-display {
+						display: flex;
+						flex-direction: row;
+					}
+					
+					#datetime-filter {
+						flex: 0 0 auto;
+					}
+					
+					#datetime-results-container {
+						flex: 1 1 auto;
 					}
 					
 					.datetime-filter-group {
@@ -290,7 +299,7 @@
 						border: 2px solid var(--neutral3);
 					}
 				</style>
-				<div class="two-column">
+				<div id="datetime-display">
 					<div id="datetime-filter">
 						<label>
 							<div class="input-label">
@@ -336,9 +345,7 @@
 									<p class="datetime-result-dist"></p>
 								</div>
 								<div class="datetime-result-dates">
-									<button class="datetime-date">Thu November 25</button>
-									<button class="datetime-date">Fri November 26</button>
-									<button class="datetime-date">Sat November 27</button>
+									<div class="datetime-result-date-buttons"></div>
 									<a class="datetime-more">More dates ></a>
 								</div>
 							</div>

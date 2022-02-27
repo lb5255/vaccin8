@@ -494,7 +494,7 @@ app.post("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), 
     res.send("Added location to a campaign.");
 }));
 
-//api call to remove a location from a campaign
+//api call to remove a location from a campaign, takes the location and the campaign IDs.
 app.delete("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -522,16 +522,51 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
 
 //api call to edit location info
 
-//api call to get timeslots at the active location
 
-//api call to add a timeslot(Or multiple of the same timeslot)
 
-//api call to remove a timeslot
+//api call to get timeslots at the selected location, takes in locationID
+app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
+        [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+    );
+    res.send("Created new timeslot.");
+}));
+
+
+//api call to add a timeslot(Or multiple of the same timeslot). Takes in the locationID, campaignID,
+//apptDate, apptTime, apptStatus, and the count of appointments.
+
+app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    //Transaction to add one or more timeslots. 
+
+    const [result, _fields] = await conn.execute(
+        "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
+        [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+    );
+}));
+
+//api call to remove a timeslot. Gets the appointmentID of the timeslot.
+app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "DELETE FROM appointment WHERE appointmentID = ?;",
+        [req.body.appointmentID]
+    );
+}));
 
 //api call to search staff and nurse accounts by id 
 
 
 //api call to assign an account to be active at a location.
+
+app.post("", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const 
+
+}));
 
 //api call to remove an account from being active at a location.
 

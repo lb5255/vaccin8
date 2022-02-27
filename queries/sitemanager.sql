@@ -21,7 +21,7 @@ INSERT INTO acctlocation(accountID,locationID,acctStatus,siteMngr)
 --Query to unassign a staff member from one of the sites the staff manager is staffed at
 UPDATE acctLocation SET acctStatus = "Inactive" WHERE accountID = ? AND locationID = ?;
 
-
+INSERT INTO appointment (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (2,1,'2022-03-04','10:00:00','O');
 
 
 --Query to set or remove a location's hour of operations

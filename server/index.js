@@ -180,9 +180,10 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
+        var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, req.body.dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
+            [req.body.fName, req.body.lName, dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
         );
         //2rd query, update the chosen timeslot with patient info.
         await connection.execute(
@@ -190,6 +191,8 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
             [req.body.campaignVaccID, result.insertId, req.body.appointmentID]
         );
         await connection.commit();//Commit the changes
+
+        //Send confirmation email
         res.send("");
     } 
     catch(e) {
@@ -201,6 +204,18 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
         if (connection) connection.release(); 
     }
 })); //End of app.post
+
+
+//Api call to cancel their appointment, and putting it back into the available list of vaccines.
+//Takes in the appointmentID they selected
+app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result] = await conn.execute(
+        "UPDATE appointment SET campaignVaccID = NULL, patientID = NULL, apptStatus = 'O', perferredContact = NULL WHERE appointmentID = ?",
+        [req.body.appointmentID]
+    );
+    return res.send("Removed appointment.");
+}));
 
 
 
@@ -253,6 +268,18 @@ app.put("/api/staff/appointment/cancel", encodedParser, authMiddleware(staff), h
     );
     return res.send("Successfully cancelled appointment.");
 }));
+
+
+//API call to update the chosen timeslot with patient info. Takes in campaignVaccID, patientID, and appointmentID
+app.put("/api/staff/appointment", encodedParser, authMiddleware(staff), handleErrors(async(req,res) => {
+    const conn = await connProm;
+    const [result, _fields] = await connection.execute(
+        "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
+        [req.body.campaignVaccID, req.body.patientID, req.body.appointmentID]
+    );
+}));
+
+
 
 //Nurse api calls
 
@@ -540,7 +567,7 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
         //This query executes for as many times entered by the user.
         for (var i = 0; i < req.body.count; i++) {
             await conn.execute(
-                "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
+                "INSERT INTO appointment (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
                 [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
             );
         }

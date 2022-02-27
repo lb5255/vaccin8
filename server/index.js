@@ -172,14 +172,10 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
     const conn = await connProm;
     const connection = await conn.getConnection(); //Need to get a new connection in order for a transaction to work.
     //req.body.<input> gets info on each field.
-    // console.log("recieved data!");
-    // console.log(req.body);
-    
     //query for entering user info into patient table based on what they entered, and also schedules them for their selected timeslot.
     //Patient info matches the information they filled in.
     //CampaignVaccID is from the selected vaccine type they chose,
     //appointmentID is from the appointment timeslot that they selected
-    //Tested
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
@@ -262,7 +258,7 @@ app.put("/api/staff/appointment/cancel", encodedParser, authMiddleware(staff), h
 
 //api call to search for a patient by firstName, lastName, and date of birth
 //Takes the entered firstName, lastName, and date of birth as query parameters.
-app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handleErrors(async (req,res) =>{
+app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handleErrors(async (req,res) => {
     const conn = await connProm;
 
     //Format mm/dd/yyyy to yyyy-mm-dd for mysql
@@ -434,9 +430,6 @@ app.delete("/api/admin/campaign/vaccines", encodedParser, authMiddleware(admin),
     res.send("Removed vaccine from campaign.");
 }));
 
-//api call to assign an account to be active at a location.
-
-//api call to remove an account from being active at a location.
 
 //api call to get all locations.
 app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
@@ -520,32 +513,45 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     );
 }));
 
-//api call to edit location info
 
-
-
-//api call to get timeslots at the selected location, takes in locationID
+//api call to get open timeslots at the selected location, takes in locationID
 app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
-        [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+        "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
+        [req.body.locationID]
     );
-    res.send("Created new timeslot.");
+
 }));
 
 
 //api call to add a timeslot(Or multiple of the same timeslot). Takes in the locationID, campaignID,
-//apptDate, apptTime, apptStatus, and the count of appointments.
+//apptDate, apptTime, apptStatus, and the count of appointments they want to add (count).
 
 app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
+    const connection = await conn.getConnection();
     //Transaction to add one or more timeslots. 
+    try {
+        await connection.beginTransaction();
 
-    const [result, _fields] = await conn.execute(
-        "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
-        [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
-    );
+        //This query executes for as many times entered by the user.
+        for (var i = 0; i < req.body.count; i++) {
+            await conn.execute(
+                "INSERT INTO account (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
+                [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+            );
+        }
+    }
+    catch(e) {
+        console.log("An error has occurred with this transaction.", e);
+        await connection.rollback();
+        res.status(500).send("Internal server error");
+    }
+    finally {
+        if (connection) connection.release();
+    }
+
 }));
 
 //api call to remove a timeslot. Gets the appointmentID of the timeslot.
@@ -557,18 +563,28 @@ app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sit
     );
 }));
 
+
+//TODO
 //api call to search staff and nurse accounts by id 
 
 
-//api call to assign an account to be active at a location.
 
-app.post("", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
-    const conn = await connProm;
-    const 
+//TODO
+//api call to assign an account to be active at a location.
+//Takes in the location ID, and campaign ID.
+app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm; 
 
 }));
 
+
+//TODO
 //api call to remove an account from being active at a location.
+app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+   
+
+}));
 
 
 

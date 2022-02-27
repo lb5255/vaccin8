@@ -64,6 +64,9 @@ async function nextPage() {
 			}
 		}
 	}
+	
+	// scroll to the top of the page on page advance
+	(document.scrollingElement || document.documentElement).scrollTop = 0;
 	updateTimeline();
 }
 
@@ -85,4 +88,52 @@ function prevPage() {
 window.addEventListener("load", () => {
 	qa("[next]").forEach(n => n.onclick = nextPage);
 	qa("[prev]").forEach(n => n.onclick = prevPage);
+	
+	qa("[modal-button]").forEach(enableModalButton);
 })
+
+function enableModalButton(btn) {
+	const modal = id(btn.getAttribute("modal-button"));
+		
+	btn.onclick = () => {
+		openModal(modal);
+	}
+}
+
+function openModal(modal) {
+	// open the modal 
+	modal.style.display = "block";
+	
+	// functions to execute when the modal exits
+	const onclose = [];
+	// function to close the modal and execute all onclose functions
+	const closeModal = () => {
+		modal.style.display = "none";
+		onclose.forEach(n => n());
+	}
+	
+	// Get the <span> element that closes the modal
+	// using modal.getElementsByClassName to get the one inside the
+	// modal in case of multiple modals
+	var span = modal.getElementsByClassName("close")[0];
+
+	// all the elements inside the modal that have the close-modal
+	// attribute should close the modal when clicked
+	modal.querySelectorAll("[close-modal]").forEach(n => {
+		n.addEventListener("click", closeModal);
+		onclose.push(() => n.removeEventListener("click", closeModal));
+	})
+	
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = closeModal;
+
+	// When the user clicks anywhere outside of the modal, close it
+	const onclick = function(event) {
+		if (event.target == modal) {
+			closeModal();
+		}
+	}
+	
+	window.addEventListener("click", onclick);
+	onclose.push(() => window.removeEventListener("click", onclick));
+}

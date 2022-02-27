@@ -239,6 +239,15 @@ function displayTimeSelectModal(date, data) {
 	
 	id("datetime-appointment-times").innerHTML = "";
 	for(const appt of appts) {
-		id("datetime-appointment-times").appendChild(element("div", {}, appt.date.toLocaleString()))
+		const container = id("datetime-appointment-times");
+		const input = container.appendChild(element("input", {
+			type: "radio",
+			name: "appointment-time",
+			value: appt.appointmentID,
+			style: "display: none;"
+		}));
+		container.appendChild(element("button", { "unfilled": true },
+			appt.date.toLocaleString())
+		).onclick = () => input.click();
 	}
 }

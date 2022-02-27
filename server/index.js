@@ -208,7 +208,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
 
 //Api call to cancel their appointment, and putting it back into the available list of vaccines.
 //Takes in the appointmentID they selected
-app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
+app.put("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result] = await conn.execute(
         "UPDATE appointment SET campaignVaccID = NULL, patientID = NULL, apptStatus = 'O', perferredContact = NULL WHERE appointmentID = ?",

@@ -240,13 +240,10 @@
 					#datetime-display {
 						display: flex;
 						flex-direction: row;
+						flex-wrap: wrap;
 					}
 					
-					#datetime-filter {
-						flex: 0 0 auto;
-					}
-					
-					#datetime-results-container {
+					#datetime-filter, #datetime-results-container {
 						flex: 1 1 auto;
 					}
 					
@@ -279,7 +276,7 @@
 					
 					.datetime-result {
 						border: 1px solid black;
-						display: flex;
+						display: inline-flex;
 						flex-direction: row;
 						flex-wrap: wrap;
 					}
@@ -350,8 +347,20 @@
 								</div>
 							</div>
 						</template>
+						
 						<div id="datetime-results">
 						</div>
+					</div>
+				</div>
+				
+				<div id="datetime-modal" class="modal">
+					<div class="modal-content">
+						<span class="modal-close">&times;</span>
+						<h1 id="selected-location"></h1>
+						<p>Select a time for your appointment:</p>
+						<div id="datetime-appointment-times"></div>
+						<button id="confirm-appointment">Confirm</button>
+						<button unfilled close-modal>Back</button>
 					</div>
 				</div>
 				
@@ -363,7 +372,7 @@
 			
 			<div class="page" data-timeline="4">
 				<h1>
-					Flu Vaccine Appointment Confirmed
+					<span class="vaccine-name"></span> Vaccine Appointment Confirmed
 				</h1>
 				
 				<section centered>
@@ -387,15 +396,15 @@
 					<br>
 					<button>Change Appointment</button>
 
-					<button id="cancelAppUserButton" onclick="displayUserCancelModal()">Cancel Appointment</button>
+					<button id="cancelAppUserButton" modal-button="cancelAppUserModal">Cancel Appointment</button>
 					<div id="cancelAppUserModal" class="modal">
 						<!-- Modal content -->
 						<div class="modal-content">
-						  <span class="close">&times;</span>
+						  <span class="modal-close">&times;</span>
 						  <h1> Are you sure you want to cancel your appointment? </h1>
 						  <br>
-						  <button> Yes, cancel</button>
-						  <button unfilled prev> No, go back</button>
+						  <button close-modal onclick="console.log('appointment cancel button clicked')">Yes, cancel</button>
+						  <button unfilled close-modal>No, go back</button>
 						</div>
 					  </div>
 				</section>

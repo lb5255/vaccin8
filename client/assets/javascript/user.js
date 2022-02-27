@@ -181,24 +181,29 @@ function createDateTimeResult(data) {
 	
 	// sort the appointments into chronological order
 	const appts = data.appts.sort((a, b) => a.date.getTime() - b.date.getTime());
-	// todo: fill in date buttons
 	
 	const days = sortIntoDates(appts);
 	
 	for(const day of days.slice(0, 3)) { // show the first 3 days
-		const datebutton = element("button", { class: "datetime-date" }, months[day.date.getMonth()] + " " + day.date.getDate());
-		datebutton.onclick = () => displayTimeSelectModal(day.date);
+		const datebutton = element("button", { class: "datetime-date", "modal-button": "datetime-modal" }, months[day.date.getMonth()] + " " + day.date.getDate());
+		datebutton.onclick = () => displayTimeSelectModal(day.date, data);
+		enableModalButton(datebutton);
 		el.querySelector(".datetime-result-date-buttons").appendChild(datebutton);
 	}
 	
 	if(days.length <= 3) {
 		// don't show the More dates button
 		el.querySelector(".datetime-more").remove();
+	} else {
+		el.querySelector(".datetime-more").onclick = () => {
+			displayTimeSelectModal(undefined, data);
+		}
 	}
 	
 	id("datetime-results").appendChild(el);
 }
 
+// sorts a bunch of appointments into groups in the same day
 function sortIntoDates(appts) {
 	const days = [];
 	
@@ -217,6 +222,7 @@ function sortIntoDates(appts) {
 	return days;
 }
 
+// finds whether 2 dates are in the same day
 function isSameDay(date1, date2) {
 	return (
 		Math.abs(date1.getTime() - date2.getTime()) < 1000 * 60 * 60 * 24 && // less than 24 hours between the times
@@ -224,6 +230,15 @@ function isSameDay(date1, date2) {
 	)
 }
 
-function displayTimeSelectModal(date) {
+function displayTimeSelectModal(date, data) {
+	console.log("modal selected")
+	const appts = date ? data.appts.filter(n => isSameDay(n.date, date)) : data.appts;
 	
+	id("selected-location").style.display = date ? "initial" : "none";
+	id("selected-location").textContent = data.name + " - " + data.address + ", " + data.city;
+	
+	id("datetime-appointment-times").innerHTML = "";
+	for(const appt of appts) {
+		id("datetime-appointment-times").appendChild(element("div", {}, appt.date.toLocaleString()))
+	}
 }

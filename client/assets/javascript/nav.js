@@ -95,9 +95,9 @@ window.addEventListener("load", () => {
 function enableModalButton(btn) {
 	const modal = id(btn.getAttribute("modal-button"));
 		
-	btn.onclick = () => {
+	btn.addEventListener("click", () => {
 		openModal(modal);
-	}
+	});
 }
 
 function openModal(modal) {
@@ -115,7 +115,7 @@ function openModal(modal) {
 	// Get the <span> element that closes the modal
 	// using modal.getElementsByClassName to get the one inside the
 	// modal in case of multiple modals
-	var span = modal.getElementsByClassName("close")[0];
+	var span = modal.getElementsByClassName("modal-close")[0];
 
 	// all the elements inside the modal that have the close-modal
 	// attribute should close the modal when clicked

@@ -20,6 +20,7 @@ const { query } = require("express");
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
+const e = require("express");
 
 
 // statically serve the client on /
@@ -466,7 +467,7 @@ app.delete("/api/admin/locations", encodedParser, authMiddleware(admin), handleE
         "DELETE FROM location WHERE locationID = ?;",
         [req.body.locationID]
     );
-    res.send("Deleted location.");
+    return res.send("Deleted location.");
 }));
 
 //api call to get all locations at the currently active campaign
@@ -484,7 +485,7 @@ app.post("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), 
         "INSERT INTO campaignlocation (locationID, campaignID, status) VALUES (?,?,'Active');",
         [req.body.locationID,req.body.campaignID]
     );
-    res.send("Added location to a campaign.");
+    return res.send("Added location to a campaign.");
 }));
 
 //api call to remove a location from a campaign, takes the location and the campaign IDs.
@@ -494,7 +495,7 @@ app.delete("/api/admin/campaign/locations", encodedParser, authMiddleware(admin)
         "DELETE FROM campaignlocation WHERE campaignID = ? AND locationID = ?",
         [req.body.locationID,req.body.campaignID]
     );
-    res.send("Deleted location from a campaign.");
+    return res.send("Deleted location from a campaign.");
 }));
 
 
@@ -504,13 +505,14 @@ app.delete("/api/admin/campaign/locations", encodedParser, authMiddleware(admin)
 //Site Manager API calls
 
 
-//api call to get all sites they are a site manager at
+//api call to get all sites they are a site manager at, takes in the user's account ID
 app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
         [req.body.accountID]
     );
+    return res.json(result);
 }));
 
 
@@ -521,7 +523,7 @@ app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemg
         "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
         [req.body.locationID]
     );
-
+    return res.json(result);
 }));
 
 
@@ -550,6 +552,7 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
     }
     finally {
         if (connection) connection.release();
+        return res.send("Added timeslot(s).");
     }
 
 }));
@@ -561,27 +564,68 @@ app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sit
         "DELETE FROM appointment WHERE appointmentID = ?;",
         [req.body.appointmentID]
     );
+    return res.send("Deleted timeslot.");
 }));
 
 
 //TODO
 //api call to search staff and nurse accounts by id 
+app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff'",
+    );
 
 
 
-//TODO
+}));
+
 //api call to assign an account to be active at a location.
 //Takes in the location ID, and campaign ID.
 app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm; 
+    const connection = await conn.getConnection();
+    try {
+        //Check if the selected account is in the acctlocation table.
+        const [result, _fields] = await conn.execute(
+            "SELECT * FROM acctlocation WHERE accountID = ? AND locationID = ?",
+            [req.body.accountID, req.body.locationID]
+        ); 
+        //If the account doesn't exist, insert it into the account
+        if (!result[0].accountID) {
+            await conn.execute(
+                "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N')",
+                [req.body.accountID, req.body.locationID]
+            );
+        }
+        //If the account exists, change the status of it  active.
+        else {
+            await conn.execute(
+                "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?",
+                [req.body.accountID, req.body.locationID]
+            );  
+        }
 
+    }
+    catch (e) {
+        console.log("An error has occurred with this transaction.", e);
+        await connection.rollback();
+        res.status(500).send("Internal server error");
+    }
+    finally {
+        if (connection) connection.release();
+    }
 }));
 
 
-//TODO
+
 //api call to remove an account from being active at a location.
 app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?",
+        [req.body.accountID,req.body.locationID]
+    );
    
 
 }));

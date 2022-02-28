@@ -206,7 +206,7 @@
 						
 						<label>
 							<div class="input-label" id="notification-label">
-								Email
+								Email *
 							</div>
 							<input id="notification" type="text" placeholder="Enter your email" />
 						</label>
@@ -247,6 +247,12 @@
 						flex: 1 1 auto;
 					}
 					
+					#datetime-results {
+						display: flex;
+						flex-direction: column;
+						align-items: start;
+					}
+					
 					.datetime-filter-group {
 						margin-bottom: 1.5rem;
 						line-height: 180%;
@@ -254,6 +260,7 @@
 					
 					.datetime-result {
 						padding: 1rem;
+						margin: 1rem;
 					}
 					
 					.datetime-result-details {
@@ -366,8 +373,10 @@
 						<h1 id="selected-location"></h1>
 						<p>Select a time for your appointment:</p>
 						<div id="datetime-appointment-times"></div>
-						<button id="confirm-appointment">Confirm</button>
-						<button unfilled close-modal>Back</button>
+						<div centered>
+							<button unfilled close-modal>Back</button>
+							<button disabled id="confirm-appointment" onclick="confirmAppt(event)">Confirm</button>
+						</div>
 					</div>
 				</div>
 				

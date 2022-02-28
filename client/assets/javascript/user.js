@@ -79,10 +79,10 @@ window.addEventListener("load", () => {
 	}
 	
 	id("email-or-phone").addEventListener("change", () => {
-		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email *" : "Phone Number *";
 		id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 	})
-	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email *" : "Phone Number *";
 	id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 })
 
@@ -115,6 +115,7 @@ function validatePersonalInfo() {
 		"city": "city",
 		"state-input": "state",
 		"email-or-phone": "notification preference",
+		"notification": id("email-or-phone").value === "email" ? "email" : "phone number",
 	}
 	
 	for(const fieldId in infoFields) {
@@ -237,17 +238,60 @@ function displayTimeSelectModal(date, data) {
 	id("selected-location").style.display = date ? "initial" : "none";
 	id("selected-location").textContent = data.name + " - " + data.address + ", " + data.city;
 	
-	id("datetime-appointment-times").innerHTML = "";
+	// disable the confirm button until the user has made a selection
+	id("confirm-appointment").setAttribute("disabled", "true");
+	
+	const container = id("datetime-appointment-times");
+	container.innerHTML = "";
 	for(const appt of appts) {
-		const container = id("datetime-appointment-times");
 		const input = container.appendChild(element("input", {
 			type: "radio",
 			name: "appointment-time",
 			value: appt.appointmentID,
 			style: "display: none;"
-		}));
+		}))
+		
+		// enable the confirm button when the user selects an option
+		input.onclick = () => id("confirm-appointment").removeAttribute("disabled");
+		
+		// make a button that clicks the corresponding input when clicked
 		container.appendChild(element("button", { "unfilled": true },
-			appt.date.toLocaleString())
+			formatDate(appt.date))
 		).onclick = () => input.click();
 	}
+}
+
+// date -> a format like "March 1, 12:30 PM"
+function formatDate(d) {
+	let hour = d.getHours();
+	let pm = false;
+	if(hour >= 12) {
+		hour -= 12;
+		pm = true;
+	}
+	if(hour === 0) {
+		hour = 12;
+	}
+	
+	let minutes = d.getMinutes().toString();
+	if(minutes.length < 2) {
+		minutes = "0" + minutes;
+	}
+	
+	return months[d.getMonth()] + " " +
+		d.getDate() + ", " +
+		hour + ":" +
+		minutes +
+		(pm ? " PM" : " AM");
+}
+
+function confirmAppt(e) {
+	const appointment = q("input[name=appointment-time]:checked");
+	if(!appointment) {
+		return e.preventDefault();
+	}
+	
+	const apptId = parseInt(appoitnment.value);
+	
+	// submit the appointment
 }

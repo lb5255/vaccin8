@@ -181,9 +181,10 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
         await connection.beginTransaction();
         //first query, insert patient data into patient table
         var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
+
         const [result] = await connection.execute(
-            "INSERT INTO patient(firstName,lastName,dateOfBirth,sex,race,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, dob, req.body.sex, req.body.race, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
+            "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
         );
         //2rd query, update the chosen timeslot with patient info.
         await connection.execute(

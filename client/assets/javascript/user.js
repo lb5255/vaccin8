@@ -285,13 +285,49 @@ function formatDate(d) {
 		(pm ? " PM" : " AM");
 }
 
-function confirmAppt(e) {
+async function confirmAppt() {
 	const appointment = q("input[name=appointment-time]:checked");
 	if(!appointment) {
-		return e.preventDefault();
+		return;
+	}
+	const btn = id("confirm-appointment");
+	
+	const apptId = parseInt(appointment.value);
+	
+	const body = {
+		fName: id("first-name").value,
+		lName: id("last-name").value,
+		dob: id("date-of-birth").value,
+		email: id("email-or-phone").value === "email" ? id("notification").value : null,
+		phone: id("email-or-phone").value === "text" ? id("notification").value : null,
+		city: id("city").value,
+		state: id("state-input").value,
+		address: id("address").value,
+		zip: id("zipcode").value,
+		insuranceProvider: id("primary-care").value || null,
+		insuranceNum: id("insurance-id").value || null,
+		campaignVaccID: parseInt(id("vaccine-select-dropdown").value),
+		appointmentID: apptId
 	}
 	
-	const apptId = parseInt(appoitnment.value);
-	
+	btn.textContent = "Submitting...";
 	// submit the appointment
+	try {
+		const res = await apiPost("/api/recipient/vaccineAppts", body);
+		if(!res.ok) {
+			btn.textContent = "Error";
+			return;
+		}
+	} catch(err) {
+		console.error("Error signing up for an appointment", err);
+		btn.textContent = "Error";
+		return;
+	}
+	
+	// reset it
+	btn.textContent = "Confirm";
+	
+	// close the modal
+	q("#datetime-modal .modal-close").click();
+	nextPage();
 }

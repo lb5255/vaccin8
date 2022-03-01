@@ -86,6 +86,10 @@ window.addEventListener("load", () => {
 	id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 })
 
+/**
+ * Validators
+ */
+
 function validateVaccineType() {
 	if(id("vaccine-select-dropdown").value === "") {
 		return "Please select an immunization";
@@ -154,19 +158,11 @@ function loadDateTimePage() {
 			}
 		}
 		
-		showDateTimeResults(locations);
+		id("datetime-results").innerHTML = "";
+		for(const locationId in locations) {
+			createDateTimeResult(locations[locationId]);
+		}
 	});
-}
-
-function showDateTimeResults(locations) {
-	clearDateTimeResults();
-	for(const locationId in locations) {
-		createDateTimeResult(locations[locationId]);
-	}
-}
-
-function clearDateTimeResults() {
-	id("datetime-results").innerHTML = "";
 }
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -231,9 +227,8 @@ function isSameDay(date1, date2) {
 	)
 }
 
+// creates buttons for each time slot available in the selected day
 function displayTimeSelectModal(date, data) {
-	console.log("data is", data)
-	console.log("modal selected")
 	const appts = date ? data.appts.filter(n => isSameDay(n.date, date)) : data.appts;
 	
 	id("selected-location").style.display = date ? "initial" : "none";
@@ -252,8 +247,18 @@ function displayTimeSelectModal(date, data) {
 			style: "display: none;"
 		}))
 		
-		// enable the confirm button when the user selects an option
-		input.onclick = () => id("confirm-appointment").removeAttribute("disabled");
+		input.onclick = () => {
+			// enable the confirm button when the user selects an option
+			id("confirm-appointment").removeAttribute("disabled");
+			
+			// fill in the details on the confirm page
+			console.log("appt is", appt);
+			id("appt-site-address").textContent = appt.locationAddr;
+			id("appt-site-city").textContent = appt.locationCity + ", " + appt.locationState + " " + appt.locationZip;
+			
+			id("appt-site-date").textContent = months[appt.date.getMonth()] + " " + appt.date.getDate();
+			id("appt-site-time").textContent = formatTime(appt.date);
+		}
 		
 		// make a button that clicks the corresponding input when clicked
 		container.appendChild(element("button", { "unfilled": true },
@@ -264,6 +269,13 @@ function displayTimeSelectModal(date, data) {
 
 // date -> a format like "March 1, 12:30 PM"
 function formatDate(d) {
+	return months[d.getMonth()] + " " +
+		d.getDate() + ", " +
+		formatTime(d);
+}
+
+// date -> a format like "12:30 PM"
+function formatTime(d) {
 	let hour = d.getHours();
 	let pm = false;
 	if(hour >= 12) {
@@ -279,9 +291,7 @@ function formatDate(d) {
 		minutes = "0" + minutes;
 	}
 	
-	return months[d.getMonth()] + " " +
-		d.getDate() + ", " +
-		hour + ":" +
+	return hour + ":" +
 		minutes +
 		(pm ? " PM" : " AM");
 }

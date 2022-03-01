@@ -125,8 +125,6 @@ function validatePersonalInfo() {
 	}
 }
 
-const locations = {};
-
 function loadDateTimePage() {
 	const vaccineName = q("#vaccine-select-dropdown>:checked")?.textContent || "unknown vaccine";
 	qa(".vaccine-name").forEach(n => n.textContent = vaccineName);
@@ -135,6 +133,8 @@ function loadDateTimePage() {
 	id("zipcode-search").value = id("zipcode-search").value || id("zipcode").value;
 	
 	apiGet("/api/recipient/vaccineAppts").then(results => {
+		const locations = {};
+		
 		// sort the results by location
 		for(const result of results) {
 			// parse the date
@@ -154,11 +154,11 @@ function loadDateTimePage() {
 			}
 		}
 		
-		showDateTimeResults();
+		showDateTimeResults(locations);
 	});
 }
 
-function showDateTimeResults() {
+function showDateTimeResults(locations) {
 	clearDateTimeResults();
 	for(const locationId in locations) {
 		createDateTimeResult(locations[locationId]);
@@ -232,6 +232,7 @@ function isSameDay(date1, date2) {
 }
 
 function displayTimeSelectModal(date, data) {
+	console.log("data is", data)
 	console.log("modal selected")
 	const appts = date ? data.appts.filter(n => isSameDay(n.date, date)) : data.appts;
 	

@@ -25,21 +25,26 @@ function element(tag, attr = {}, ...children) {
 }
 
 async function apiGet(path) {
-	return await (await fetch(path)).json();
+	const res = await fetch(path);
+	if(!res.ok) {
+		throw new Error(res);
+	}
+	return await res.json();
 }
 
-async function apiPost(path, data, ignoreResult = true) {
+async function apiPost(path, data, method = "POST", json = true) {
 	const res = await fetch(path, {
-		method: "POST",
+		method,
 		body: JSON.stringify(data),
 		headers: {
 			'Content-Type': "application/json",
 		}
 	});
 	
-	if(!ignoreResult) {
+	if(!res.ok) {
+		throw new Error(res);
+	}
+	if(json) {
 		return await res.json();
-	} else {
-		return res;
 	}
 }

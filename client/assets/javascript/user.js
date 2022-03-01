@@ -313,11 +313,7 @@ async function confirmAppt() {
 	btn.textContent = "Submitting...";
 	// submit the appointment
 	try {
-		const res = await apiPost("/api/recipient/vaccineAppts", body);
-		if(!res.ok) {
-			btn.textContent = "Error";
-			return;
-		}
+		await apiPost("/api/recipient/vaccineAppts", body, "POST", false);
 	} catch(err) {
 		console.error("Error signing up for an appointment", err);
 		btn.textContent = "Error";
@@ -327,7 +323,35 @@ async function confirmAppt() {
 	// reset it
 	btn.textContent = "Confirm";
 	
+	// set the confirmation number
+	id("confirmation_number").textContent = apptId;
+	
 	// close the modal
 	q("#datetime-modal .modal-close").click();
 	nextPage();
+}
+
+async function cancelAppt(e) {
+	const apptIdStr = id("confirmation_number").textContent;
+	if(!apptIdStr) {
+		e.target.textContent = "Error";
+		return;
+	}
+	
+	const apptId = parseInt(apptIdStr);
+	
+	try {
+		await apiPost("/api/recipient/vaccineAppts", {appointmentID: apptId}, "DELETE", false);
+	} catch(err) {
+		console.error(err);
+		e.target.textContent = "Error";
+		return;
+	}
+	
+	// reset the text
+	e.target.textContent = "Yes, cancel";
+	
+	q("#cancelAppUserModal .modal-close").click();
+	goToPageIndex(0); // go back to the beginning
+	toast("Appointment cancelled");
 }

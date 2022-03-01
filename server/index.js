@@ -67,6 +67,9 @@ const authMiddleware = function(role){ return async (req, res, next) => {
     }  
 } // End of authMiddleware
 
+/**
+ * @param {(req: express.Request, res: express.Response) => void} func
+ */
 const handleErrors = func => async (req, res) => {
     try{
         const r = func(req, res);
@@ -209,7 +212,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
 
 //Api call to cancel their appointment, and putting it back into the available list of vaccines.
 //Takes in the appointmentID they selected
-app.put("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
+app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result] = await conn.execute(
         "UPDATE appointment SET campaignVaccID = NULL, patientID = NULL, apptStatus = 'O', perferredContact = NULL WHERE appointmentID = ?",

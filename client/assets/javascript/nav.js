@@ -91,6 +91,7 @@ function goToPageIndex(index) {
 		qa(".page.active").forEach(n => n.classList.remove("active"));
 		pages[index].classList.add("active");
 	}
+	updateTimeline();
 }
 
 window.addEventListener("load", () => {

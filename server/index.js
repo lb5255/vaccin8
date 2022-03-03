@@ -12,6 +12,9 @@ const admin = "Admin";
 const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
+const email = require("./emailBuilder.js");
+
+
 
 // load the database
 const connProm = require("./load-db.js");
@@ -20,6 +23,7 @@ const { query } = require("express");
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
+const email = require("./email.js");
 const e = require("express");
 
 
@@ -169,8 +173,10 @@ app.get("/api/recipient/vaccineAppts", handleErrors(async (req, res) => {
 }));
 
 //api call to put user info into patient table and to update the timeslot they selected.
-app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
+app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     const conn = await connProm;
+    
+
     const connection = await conn.getConnection(); //Need to get a new connection in order for a transaction to work.
     //req.body.<input> gets info on each field.
     //query for entering user info into patient table based on what they entered, and also schedules them for their selected timeslot.
@@ -180,20 +186,23 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
-        var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
+        //var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
 
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
+            [req.body.fName, req.body.lName, req.body.dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum].map(n => n === undefined ? null : n)
         );
         //2rd query, update the chosen timeslot with patient info.
         await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
-            [req.body.campaignVaccID, result.insertId, req.body.appointmentID]
+            [req.body.campaignVaccID, result.insertId, req.body.appointmentID].map(n => n === undefined ? null : n)
         );
         await connection.commit();//Commit the changes
 
         //Send confirmation email
+        if (req.body.email != null) {
+            email.main(req.body.email, apptConfirmation, apptMessage)
+        }
         res.send("");
     } 
     catch(e) {
@@ -204,7 +213,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, 
     finally {
         if (connection) connection.release(); 
     }
-})); //End of app.post
+}); //End of app.post
 
 
 //Api call to cancel their appointment, and putting it back into the available list of vaccines.

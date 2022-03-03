@@ -6,6 +6,7 @@
 		<title>Vaccin8</title>
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/index.js"></script>
 	</head>
 	<body>
 		<header>
@@ -23,10 +24,23 @@
                 <input type="password" placeholder="Enter Password" name="psw" required>
                   
                 <section centered>
-                    <button unfilled prev type="submit" onclick="history.back()">Back</button>
+                    <button unfilled type="submit" onclick="history.back()">Back</button>
                     <button type="submit">Login</button>
                 </section>
             </form>
         </div>
+        
+        <script>
+            q("form").onsubmit = async function(ev) {
+                ev.preventDefault();
+                
+                if(await logIn(byname("uname").value, byname("psw").value, "Admin")) {
+                    // redirect to admin page
+                    location.href = "adminmain.html";
+                } else {
+                    console.log("error in log in");
+                }
+            }
+        </script>
     </body>
 </html>

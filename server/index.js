@@ -86,10 +86,9 @@ const handleErrors = func => async (req, res) => {
     }
 }
 
-
 //Login
 //Takes a JSON string with username, password, and position.
-app.get("/api/login", encodedParser, handleErrors(async (req, res) => {
+app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
     //console.log(req.body); //username password, and position come in from user.
 

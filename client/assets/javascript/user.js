@@ -79,12 +79,16 @@ window.addEventListener("load", () => {
 	}
 	
 	id("email-or-phone").addEventListener("change", () => {
-		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+		id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email *" : "Phone Number *";
 		id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 	})
-	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email" : "Phone Number";
+	id("notification-label").textContent = id("email-or-phone").value === "email" ? "Email *" : "Phone Number *";
 	id("notification").setAttribute("placeholder", id("email-or-phone").value === "email" ? "Enter your email" : "Enter your phone Number");
 })
+
+/**
+ * Validators
+ */
 
 function validateVaccineType() {
 	if(id("vaccine-select-dropdown").value === "") {
@@ -115,6 +119,7 @@ function validatePersonalInfo() {
 		"city": "city",
 		"state-input": "state",
 		"email-or-phone": "notification preference",
+		"notification": id("email-or-phone").value === "email" ? "email" : "phone number",
 	}
 	
 	for(const fieldId in infoFields) {
@@ -124,8 +129,6 @@ function validatePersonalInfo() {
 	}
 }
 
-const locations = {};
-
 function loadDateTimePage() {
 	const vaccineName = q("#vaccine-select-dropdown>:checked")?.textContent || "unknown vaccine";
 	qa(".vaccine-name").forEach(n => n.textContent = vaccineName);
@@ -134,6 +137,8 @@ function loadDateTimePage() {
 	id("zipcode-search").value = id("zipcode-search").value || id("zipcode").value;
 	
 	apiGet("/api/recipient/vaccineAppts").then(results => {
+		const locations = {};
+		
 		// sort the results by location
 		for(const result of results) {
 			// parse the date
@@ -153,19 +158,11 @@ function loadDateTimePage() {
 			}
 		}
 		
-		showDateTimeResults();
+		id("datetime-results").innerHTML = "";
+		for(const locationId in locations) {
+			createDateTimeResult(locations[locationId]);
+		}
 	});
-}
-
-function showDateTimeResults() {
-	clearDateTimeResults();
-	for(const locationId in locations) {
-		createDateTimeResult(locations[locationId]);
-	}
-}
-
-function clearDateTimeResults() {
-	id("datetime-results").innerHTML = "";
 }
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -230,24 +227,142 @@ function isSameDay(date1, date2) {
 	)
 }
 
+// creates buttons for each time slot available in the selected day
 function displayTimeSelectModal(date, data) {
-	console.log("modal selected")
 	const appts = date ? data.appts.filter(n => isSameDay(n.date, date)) : data.appts;
 	
 	id("selected-location").style.display = date ? "initial" : "none";
 	id("selected-location").textContent = data.name + " - " + data.address + ", " + data.city;
 	
-	id("datetime-appointment-times").innerHTML = "";
+	// disable the confirm button until the user has made a selection
+	id("confirm-appointment").setAttribute("disabled", "true");
+	
+	const container = id("datetime-appointment-times");
+	container.innerHTML = "";
 	for(const appt of appts) {
-		const container = id("datetime-appointment-times");
 		const input = container.appendChild(element("input", {
 			type: "radio",
 			name: "appointment-time",
 			value: appt.appointmentID,
 			style: "display: none;"
-		}));
+		}))
+		
+		input.onclick = () => {
+			// enable the confirm button when the user selects an option
+			id("confirm-appointment").removeAttribute("disabled");
+			
+			// fill in the details on the confirm page
+			console.log("appt is", appt);
+			id("appt-site-address").textContent = appt.locationAddr;
+			id("appt-site-city").textContent = appt.locationCity + ", " + appt.locationState + " " + appt.locationZip;
+			
+			id("appt-site-date").textContent = months[appt.date.getMonth()] + " " + appt.date.getDate();
+			id("appt-site-time").textContent = formatTime(appt.date);
+		}
+		
+		// make a button that clicks the corresponding input when clicked
 		container.appendChild(element("button", { "unfilled": true },
-			appt.date.toLocaleString())
+			formatDate(appt.date))
 		).onclick = () => input.click();
 	}
+}
+
+// date -> a format like "March 1, 12:30 PM"
+function formatDate(d) {
+	return months[d.getMonth()] + " " +
+		d.getDate() + ", " +
+		formatTime(d);
+}
+
+// date -> a format like "12:30 PM"
+function formatTime(d) {
+	let hour = d.getHours();
+	let pm = false;
+	if(hour >= 12) {
+		hour -= 12;
+		pm = true;
+	}
+	if(hour === 0) {
+		hour = 12;
+	}
+	
+	let minutes = d.getMinutes().toString();
+	if(minutes.length < 2) {
+		minutes = "0" + minutes;
+	}
+	
+	return hour + ":" +
+		minutes +
+		(pm ? " PM" : " AM");
+}
+
+async function confirmAppt() {
+	const appointment = q("input[name=appointment-time]:checked");
+	if(!appointment) {
+		return;
+	}
+	const btn = id("confirm-appointment");
+	
+	const apptId = parseInt(appointment.value);
+	
+	const body = {
+		fName: id("first-name").value,
+		lName: id("last-name").value,
+		dob: id("date-of-birth").value,
+		email: id("email-or-phone").value === "email" ? id("notification").value : null,
+		phone: id("email-or-phone").value === "text" ? id("notification").value : null,
+		city: id("city").value,
+		state: id("state-input").value,
+		address: id("address").value,
+		zip: id("zipcode").value,
+		insuranceProvider: id("primary-care").value || null,
+		insuranceNum: id("insurance-id").value || null,
+		campaignVaccID: parseInt(id("vaccine-select-dropdown").value),
+		appointmentID: apptId
+	}
+	
+	btn.textContent = "Submitting...";
+	// submit the appointment
+	try {
+		await apiPost("/api/recipient/vaccineAppts", body, "POST", false);
+	} catch(err) {
+		console.error("Error signing up for an appointment", err);
+		btn.textContent = "Error";
+		return;
+	}
+	
+	// reset it
+	btn.textContent = "Confirm";
+	
+	// set the confirmation number
+	id("confirmation_number").textContent = apptId;
+	
+	// close the modal
+	q("#datetime-modal .modal-close").click();
+	nextPage();
+}
+
+async function cancelAppt(e) {
+	const apptIdStr = id("confirmation_number").textContent;
+	if(!apptIdStr) {
+		e.target.textContent = "Error";
+		return;
+	}
+	
+	const apptId = parseInt(apptIdStr);
+	
+	try {
+		await apiPost("/api/recipient/vaccineAppts", {appointmentID: apptId}, "DELETE", false);
+	} catch(err) {
+		console.error(err);
+		e.target.textContent = "Error";
+		return;
+	}
+	
+	// reset the text
+	e.target.textContent = "Yes, cancel";
+	
+	q("#cancelAppUserModal .modal-close").click();
+	goToPageIndex(0); // go back to the beginning
+	toast("Appointment cancelled");
 }

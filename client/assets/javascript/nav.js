@@ -85,6 +85,15 @@ function prevPage() {
 	updateTimeline();
 }
 
+function goToPageIndex(index) {
+	const pages = getPages();
+	if(pages[index]) {
+		qa(".page.active").forEach(n => n.classList.remove("active"));
+		pages[index].classList.add("active");
+	}
+	updateTimeline();
+}
+
 window.addEventListener("load", () => {
 	qa("[next]").forEach(n => n.onclick = nextPage);
 	qa("[prev]").forEach(n => n.onclick = prevPage);
@@ -136,4 +145,15 @@ function openModal(modal) {
 	
 	window.addEventListener("click", onclick);
 	onclose.push(() => window.removeEventListener("click", onclick));
+}
+
+function toast(message, timeout = 5000) {
+	const el = document.body.appendChild(
+		element("div", { class: "toast" }, message)
+	);
+	
+	setTimeout(() => {
+		el.classList.add("toast-exiting");
+		setTimeout(() => el.remove(), 2000);
+	}, timeout);
 }

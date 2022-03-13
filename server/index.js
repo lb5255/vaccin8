@@ -12,19 +12,16 @@ const admin = "Admin";
 const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
-const email = require("./emailBuilder.js");
 
 
 
 // load the database
 const connProm = require("./load-db.js");
-const { query } = require("express");
 
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
 const email = require("./email.js");
-const e = require("express");
 
 
 // statically serve the client on /

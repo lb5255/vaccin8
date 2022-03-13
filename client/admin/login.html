@@ -19,13 +19,15 @@
             <form>
                 <label for="uname" class="loginbbby">Username</label>
                 <input type="text" placeholder="Enter Username" name="uname" required>
-                            
+                <br />
+                
                 <label for="psw" class="loginbbby">Password</label>
                 <input type="password" placeholder="Enter Password" name="psw" required>
-                  
+                
                 <section centered>
-                    <button unfilled type="submit" onclick="history.back()">Back</button>
+                    <button unfilled type="button" onclick="history.back()">Back</button>
                     <button type="submit">Login</button>
+                    <div id="error-message" style="display: none;">There was an error logging in</div>
                 </section>
             </form>
         </div>
@@ -33,12 +35,15 @@
         <script>
             q("form").onsubmit = async function(ev) {
                 ev.preventDefault();
+                id("error-message").style.display = "none";
                 
                 if(await logIn(byname("uname").value, byname("psw").value, "Admin")) {
                     // redirect to admin page
                     location.href = "adminmain.html";
                 } else {
                     console.log("error in log in");
+                    // show the error message
+                    id("error-message").style.display = "";
                 }
             }
         </script>

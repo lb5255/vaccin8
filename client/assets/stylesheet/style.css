@@ -137,6 +137,20 @@ section {
 	column-count: 2;
 }
 
+.sitemanagerdashboard {
+    border: 2px solid var(--neutral2);
+	max-width: 40rem;
+	margin: auto;
+}
+
+.sitemanagerdashboard>a {
+	display: inline-block;
+	color: inherit;
+	margin: 1rem;
+	width: 16rem;
+	text-align: center;
+}
+
 @media (max-width: 50rem) {
 	main {
 		padding: 1rem;

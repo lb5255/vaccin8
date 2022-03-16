@@ -117,8 +117,10 @@ section {
 }
 
 .loginSetup {
+	margin: auto;
 	margin-top: 6rem;
-	padding: 2rem 20rem;
+	max-width: 40rem;
+	text-align: center;
 }
 
 .loginbbby{
@@ -128,7 +130,6 @@ section {
 
 .formlogin{
 	margin: auto;
-    max-width: 15rem;
     margin-bottom: 3rem;
 }
 

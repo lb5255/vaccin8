@@ -15,7 +15,7 @@
         <div class="loginSetup">
             <h1>Nurse Login</h1>
 
-            <form>
+            <form class="formlogin"> 
                 <label for="uname" class="loginbbby">Username</label>
                 <input type="text" placeholder="Enter Username" name="uname" required>
                 <br />
@@ -23,12 +23,12 @@
                 <label for="psw" class="loginbbby">Password</label>
                 <input type="password" placeholder="Enter Password" name="psw" required>
                   
+            </form>
                 <section centered>
                     <button unfilled type="button" onclick="history.back()">Back</button>
                     <button type="submit">Login</button>
                     <div id="error-message" style="display: none;">There was an error logging in</div>
                 </section>
-            </form>
         </div>
         <script>
             q("form").onsubmit = async function(ev) {

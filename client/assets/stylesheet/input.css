@@ -39,11 +39,6 @@ button[disabled] {
 	cursor: not-allowed;
 }
 
-/* button[unfilled]:hover {
-	color: white;
-	background-color: var(--neutral2);
-} */
-
 .PickSignIn {
 	border-radius: 0.25rem;
 	background-color: white;

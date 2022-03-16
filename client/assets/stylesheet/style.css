@@ -126,6 +126,12 @@ section {
 	font-size: 12px
 }
 
+.formlogin{
+	margin: auto;
+    max-width: 15rem;
+    margin-bottom: 3rem;
+}
+
 .two-column {
 	column-count: 2;
 }

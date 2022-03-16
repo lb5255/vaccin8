@@ -57,6 +57,12 @@ button[disabled] {
 	margin-top: 2rem;
 }
 
+.SMinput-label {
+	margin-bottom: 0.5rem;
+	margin-top: 2rem;
+	font-size: 12px;
+}
+
 label:not([thin]) {
 	display: inline-block;
 }

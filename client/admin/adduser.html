@@ -9,7 +9,7 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
 		<script src="../assets/javascript/nav.js"></script>
 		<script src="../assets/javascript/index.js"></script>
-		<script src="../assets/javascript/user.js"></script>
+		<script src="../assets/javascript/adduser.js"></script>
 	</head>
 	<body>
 		<header>
@@ -22,12 +22,12 @@
 			<section fullwidth centered>
 				<div class="timeline">
 					<div class="timeline-point done">Personal info</div>
-					<div class="timeline-point">Permissions</div>
+					<div class="timeline-point">Locations</div>
 					<div class="timeline-point">Confirmation</div>
 				</div>
 			</section>
 			
-			<div class="page active" data-timeline="1" validate="validateVaccineType()">
+			<div class="page active" data-timeline="1" validate="validateInfo()">
 				<h1>Add User - Personal Info</h1>
 				
 				<section>
@@ -114,15 +114,11 @@
 							</div>
 							<select id="role-input">
 								<option value="" selected disabled>Enter employee's role</option>
-								<!-- what are the roles -->
+								<option value="Admin">Admin</option>
+								<option value="Site Manager">Site Manager</option>
+								<option value="Nurse">Nurse</option>
+								<option value="Staff">Front Desk Staff</option>
 							</select>
-						</label>
-						
-						<label>
-							<div class="input-label">
-								Location of employment
-							</div>
-							<input id="emp-location" type="text" placeholder="Enter employee's location" />
 						</label>
 					</div>
 				</section>
@@ -132,194 +128,47 @@
 				</section>
 			</div>
 			
-			<div class="page" data-timeline="3" onload="loadDateTimePage()">
-				<h1>Select a Date and Time</h1>
+			<div class="page" data-timeline="2" onload="loadLocationPage()">
+				<h1>Assign Locations</h1>
 				
-				<style>
-					#datetime-display {
-						display: flex;
-						flex-direction: row;
-						flex-wrap: wrap;
-					}
-					
-					#datetime-filter, #datetime-results-container {
-						flex: 1 1 auto;
-					}
-					
-					#datetime-results {
-						display: flex;
-						flex-direction: column;
-						align-items: start;
-					}
-					
-					.datetime-filter-group {
-						margin-bottom: 1.5rem;
-						line-height: 180%;
-					}
-					
-					.datetime-result {
-						padding: 1rem;
-						margin: 1rem;
-					}
-					
-					.datetime-result-details {
-						width: 12rem;
-					}
-					
-					.datetime-result-title {
-						font-weight: bold;
-						margin-top: 0;
-					}
-					
-					.datetime-more {
-						display: block;
-						text-align: right;
-						text-decoration: none;
-						color: inherit;
-						margin-right: 0.5rem;
-						cursor: pointer;
-					}
-					
-					.datetime-result {
-						border: 1px solid black;
-						display: inline-flex;
-						flex-direction: row;
-						flex-wrap: wrap;
-					}
-					
-					.datetime-date {
-						width: 12rem;
-						margin: 0 0 0.5rem 0.5rem;
-						display: block;
-						background-color: transparent;
-						border: 2px solid var(--primary);
-						color: var(--primary);
-					}
-					
-					.datetime-date:hover {
-						background-color: var(--neutral3);
-						color: white;
-						border: 2px solid var(--neutral3);
-					}
-				</style>
-				<div id="datetime-display">
-					<div id="datetime-filter">
-						<label>
-							<div class="input-label">
-								What is your zip code?
-							</div>
-							<input id="zipcode-search" type="text" placeholder="Enter zip code" />
-						</label>
-						
-						<div class="datetime-filter-group">
-							Day of Week:<br />
-							<input type="checkbox" /> Weekdays<br />
-							<input type="checkbox" /> Weekends<br />
-						</div>
-						
-						<div class="datetime-filter-group">
-							Time of Day:<br />
-							<input type="checkbox" /> Morning (before 12:00pm)<br />
-							<input type="checkbox" /> Afternoon (12:00pm-5:00pm)<br />
-							<input type="checkbox" /> Evening (after 5:00pm)<br />
-						</div>
-						
-						<div class="datetime-filter-group">
-							Sort by:<br />
-							<input type="radio" name="datetime-filter-sort" value="distance" /> Distance<br />
-							<input type="radio" name="datetime-filter-sort" value="available" /> Next Available<br />
-							<input type="radio" name="datetime-filter-sort" value="appointments" /> Number of Appointments<br />
-						</div>
+				<section>
+					<style>
+						#location-select {
+							text-align: center;
+						}
+						#location-select input {
+							display: none;
+						}
+						#location-select input:checked+button {
+							background-color: var(--neutral2);
+							color: white;
+						}
+					</style>
+					<div id="location-select">
+						<button unfilled>Pittsford</button>
+						<input type="checkbox" checked />
+						<button unfilled>Penfield Rd</button>
+						<button unfilled>Geneva</button>
+						<button unfilled>Wescott St</button>
+						<button unfilled>South Bank</button>
+						<button unfilled>John St</button>
+						<button unfilled>Henrietta</button>
+						<button unfilled>Scottsville Rd</button>
+						<button unfilled>Beckwith Rd</button>
 					</div>
-					
-					<div id="datetime-results-container">
-						<p>
-							All available locations for the <span class="vaccine-name"></span> vaccine:
-						</p>
-						
-						<template id="datetime-result-template">
-							<div class="datetime-result">
-								<div class="datetime-result-details">
-									<p class="datetime-result-title"></p>
-									<p>
-										<span class="datetime-result-address"></span><br />
-										<span class="datetime-result-city"></span>
-									</p>
-									<p class="datetime-result-dist"></p>
-								</div>
-								<div class="datetime-result-dates">
-									<div class="datetime-result-date-buttons"></div>
-									<a class="datetime-more">More dates ></a>
-								</div>
-							</div>
-						</template>
-						
-						<div id="datetime-results">
-						</div>
-					</div>
-				</div>
-				
-				<style>
-					#datetime-appointment-times>input:checked+button {
-						background-color: var(--primary);
-						color: white;
-						border: 2px solid var(--primary);
-					}
-				</style>
-				<div id="datetime-modal" class="modal">
-					<div class="modal-content">
-						<span class="modal-close">&times;</span>
-						<h1 id="selected-location"></h1>
-						<p>Select a time for your appointment:</p>
-						<div id="datetime-appointment-times"></div>
-						<div centered>
-							<button unfilled close-modal>Back</button>
-							<button disabled id="confirm-appointment" onclick="confirmAppt()">Confirm</button>
-						</div>
-					</div>
-				</div>
+				</section>
 				
 				<section centered>
 					<button unfilled prev>Back</button>
+					<button next>Next</button>
 				</section>
 			</div>
 			
-			<div class="page" data-timeline="4">
-				<h1>
-					<span class="vaccine-name"></span> Vaccine Appointment Confirmed
-				</h1>
+			<div class="page" data-timeline="3">
+				<h1>Confirmation</h1>
 				
-				<section centered>
-					<div><strong>Confirmation #: <span id="confirmation_number"></span></strong></div>
+				<section>
 					
-					<div class="two-column" style="text-align: left;">
-						<div>
-							<strong>Site Location</strong><br />
-							<span id="appt-site-address"></span><br />
-							<span id="appt-site-city"></span>
-						</div>
-						<div>
-							<strong>Date and Time</strong><br />
-							<span id="appt-site-date"></span><br />
-							<span id="appt-site-time"></span>
-						</div>
-					</div>
-					
-					<div>You have been sent a confirmation email or text message.</div>
-					<br>
-					<button>Change Appointment</button>
-
-					<button id="cancelAppUserButton" modal-button="cancelAppUserModal">Cancel Appointment</button>
-					<div id="cancelAppUserModal" class="modal">
-						<!-- Modal content -->
-						<div class="modal-content">
-						  <span class="modal-close">&times;</span>
-						  <h1> Are you sure you want to cancel your appointment? </h1>
-						  <br>
-						  <button onclick="cancelAppt(event)">Yes, cancel</button>
-						  <button unfilled close-modal>No, go back</button>
-						</div>
-					  </div>
 				</section>
 			</div>
 		</main>

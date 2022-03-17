@@ -474,6 +474,7 @@ app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErro
     const [result, _fields] = await conn.execute(
         "SELECT * from location;"
     );
+    res.json(result);
 }));
 
 //api call to add a location
@@ -507,11 +508,12 @@ app.delete("/api/admin/locations", encodedParser, authMiddleware(admin), handleE
 }));
 
 //api call to get all locations at the currently active campaign
-app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT * from campaignlocation JOIN location ON location.locationID = campaignlocation.locationID INNER JOIN campaign ON campaignlocation.campaignID = campaign.campaignID WHERE campaignStatus = 'a';"
     );
+    res.json(result);
 }));
 
 //api call to add a location to a campaign

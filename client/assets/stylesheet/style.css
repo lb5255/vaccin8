@@ -178,7 +178,6 @@ section {
 }
 
 #reporttable {
-	font-family: Arial, Helvetica, sans-serif;
 	border-collapse: collapse;
 	width: 100%;
   }
@@ -201,5 +200,5 @@ section {
 	padding-bottom: 12px;
 	text-align: center;
 	background-color: #B7D8FF;
-	color: white;
+	color: black;
 }

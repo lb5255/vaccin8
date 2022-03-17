@@ -12,6 +12,10 @@
 	<body>
 		<header>
 			<div id="header-title">VACCIN8</div>
+			<div id="header-links">
+				<a href="../RAR.html">Report Adverse Reaction</a>
+				<a href="#">Joe Simpson</a>
+			</div>
 		</header>
 		<main>
 			<div class="page active" style="margin-top: 6rem;">
@@ -74,25 +78,44 @@
 					  <td>Tetanus</td>
 					  <td>Sanofi</td>
 					  <td>312</td>
-					  <td>01/26/20</td>
+					  <td>01/26/2020</td>
 					</tr>
 					<tr>
 					  <td>Hepatitis B</td>
 					  <td>Merck</td>
 					  <td>506</td>
-					  <td>10/15/19</td>
+					  <td>10/15/2019</td>
 					</tr>
 					<tr>
 						<td>Influenza</td>
 						<td>Sanofi</td>
 						<td>684</td>
-						<td>01/18/18</td>
+						<td>01/18/2018</td>
 					  </tr>
 				</table>
 				<button next>Enter new vaccination</button>
 			</div>
 			<div class="page">
 				<h1>Enter New Vaccination</h1>
+				<section>
+					<label>
+						<div class="input-label">
+							Batch #
+						</div>
+						<input id="batch" type="text" placeholder="Enter the batch number" />
+					</label>
+					<br />
+					<label>
+						<div class="input-label">
+							Date
+						</div>
+						<input type="date" id="date" placeholder="Enter the date" />
+					</label>
+				</section>
+				<section centered>
+					<button unfilled prev>Back</button>
+					<button next>Enter Vaccination</button>
+				</section>
 			</div>
 		</main>
     </body>

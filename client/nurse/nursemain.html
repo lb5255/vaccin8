@@ -6,39 +6,58 @@
 		<title>Vaccin8</title>
         <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
 	</head>
 	<body>
 		<header>
 			<div id="header-title">VACCIN8</div>
 		</header>
-
-        <div style="margin-top: 6rem;">
-			<h1>Find Vaccine Patient</h1>
-			<section>
-				<label>
-					<div class="input-label">
-						First name
-					</div>
-					<input id="first-name" type="text" placeholder="Enter the patient's first name" />
-				</label>
-				
-				<label>
-					<div class="input-label">
-						Last name
-					</div>
-					<input id="last-name" type="text" placeholder="Enter the patient's last name" />
-				</label>
-				
-				<label>
-					<div class="input-label">
-						Patient's Date of Birth
-					</div>
-					<input type="date" id="date-of-birth" />
-				</label>
-			</section>
-			<section centered>
-				<button next>Find Patient</button>
-			</section>
-        </div>
+		<main>
+			<div class="page active" style="margin-top: 6rem;">
+				<h1>Find Vaccine Patient</h1>
+				<section>
+					<label>
+						<div class="input-label">
+							First name
+						</div>
+						<input id="first-name" type="text" placeholder="Enter the patient's first name" />
+					</label>
+					
+					<label>
+						<div class="input-label">
+							Last name
+						</div>
+						<input id="last-name" type="text" placeholder="Enter the patient's last name" />
+					</label>
+					
+					<label>
+						<div class="input-label">
+							Patient's Date of Birth
+						</div>
+						<input type="date" id="date-of-birth" />
+					</label>
+				</section>
+				<section centered>
+					<button next>Find Patient</button>
+				</section>
+			</div>
+			<div class="page">
+				<h1>Patient Name: Ben Park</h1>
+				<h2 style="text-align: center;">Personal Information</h2>
+				<p>Full Name:</p>
+				<p>Address:</p>
+				<p>City/State/Zip:</p>
+				<p>DOB:</p>
+				<p>Phone:</p>
+				<p>Email:</p>
+				<h2 style="text-align: center;">Insurance Carrier</h2>
+				<p>Company:</p>
+				<p>Employer:</p>
+				<p>ID #:</p>
+				<p>Group #:</p>
+				<h2 style="text-align: center;">Previous Vaccinations</h2>
+			</div>
+		</main>
     </body>
 </html>

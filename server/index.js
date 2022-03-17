@@ -480,7 +480,7 @@ app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErro
 app.post("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "INSERT INTO location (locationName, locationCity, locationState, locationAddr, locationZip VALUES (?,?,?,?,?);",
+        "INSERT INTO location (locationName, locationCity, locationState, locationAddr, locationZip) VALUES (?,?,?,?,?);",
         [req.body.locationName, req.body.locationCity, req.body.locationState, req.body.locationAddr, req.body.locationZip]
     );
     res.send("Entered new location.");

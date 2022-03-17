@@ -49,69 +49,79 @@
 			<div class="page">
 				<a href="nursemain.html">&#8249; Back to patient search</a>
 				<h1>Patient Name: Ben Park</h1>
-				<h2 style="text-align: center;">Personal Information</h2>
-				<p>Full Name:</p>
-				<p>Address:</p>
-				<p>City/State/Zip:</p>
-				<p>DOB:</p>
-				<p>Phone:</p>
-				<p>Email:</p>
-				<h2 style="text-align: center;">Insurance Carrier</h2>
-				<p>Company:</p>
-				<p>Employer:</p>
-				<p>ID #:</p>
-				<p>Group #:</p>
-				<h2 style="text-align: center;">Previous Vaccinations</h2>
-				<table id="reporttable">
+				<section>
+					<h2 style="text-align: center;">Personal Information</h2>
+					<p>Full Name:</p>
+					<p>Address:</p>
+					<p>City/State/Zip:</p>
+					<p>DOB:</p>
+					<p>Phone:</p>
+					<p>Email:</p>
+				</section>
+				<section>
+					<h2 style="text-align: center;">Insurance Carrier</h2>
+					<p>Company:</p>
+					<p>Employer:</p>
+					<p>ID #:</p>
+					<p>Group #:</p>
+				</section>
+				<section>
+					<h2 style="text-align: center;">Previous Vaccinations</h2>
+					<table id="reporttable">
 					<tr>
-					  <th>Vaccine Type</th>
-					  <th>Manufacturer</th>
-					  <th>Batch #</th>
-					  <th>Date</th>
+						<th>Vaccine Type</th>
+						<th>Manufacturer</th>
+						<th>Batch #</th>
+						<th>Date</th>
 					</tr>
 					<tr>
-					  <td>COVID-19</td>
-					  <td>Pfizer</td>
-					  <td>1015</td>
-					  <td>05/24/2021</td>
+						<td>COVID-19</td>
+						<td>Pfizer</td>
+						<td>1015</td>
+						<td>05/24/2021</td>
 					</tr>
 					<tr>
-					  <td>Tetanus</td>
-					  <td>Sanofi</td>
-					  <td>312</td>
-					  <td>01/26/2020</td>
+						<td>Tetanus</td>
+						<td>Sanofi</td>
+						<td>312</td>
+						<td>01/26/2020</td>
 					</tr>
 					<tr>
-					  <td>Hepatitis B</td>
-					  <td>Merck</td>
-					  <td>506</td>
-					  <td>10/15/2019</td>
+						<td>Hepatitis B</td>
+						<td>Merck</td>
+						<td>506</td>
+						<td>10/15/2019</td>
 					</tr>
 					<tr>
 						<td>Influenza</td>
 						<td>Sanofi</td>
 						<td>684</td>
 						<td>01/18/2018</td>
-					  </tr>
+					</tr>
 				</table>
 				<button next>Enter new vaccination</button>
+			</section>
 			</div>
 			<div class="page">
 				<h1>Enter New Vaccination</h1>
 				<section>
-					<label>
-						<div class="input-label">
-							Batch #
-						</div>
-						<input id="batch" type="text" placeholder="Enter the batch number" />
-					</label>
-					<br />
-					<label>
-						<div class="input-label">
-							Date
-						</div>
-						<input type="date" id="date" placeholder="Enter the date" />
-					</label>
+					<div style="margin: auto;
+					width: 60%;
+					padding: 10px;">
+						<label>
+							<div class="input-label">
+								Batch #
+							</div>
+							<input id="batch" type="text" placeholder="Enter the batch number" />
+						</label>
+						<br />
+						<label>
+							<div class="input-label">
+								Date
+							</div>
+							<input type="date" id="date" placeholder="Enter the date" />
+						</label>
+					</div>
 				</section>
 				<section centered>
 					<button unfilled prev>Back</button>

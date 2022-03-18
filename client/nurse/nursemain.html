@@ -21,26 +21,29 @@
 			<div class="page active" style="margin-top: 6rem;">
 				<h1>Find Vaccine Patient</h1>
 				<section>
+					<div style="margin: auto;
+					width: 50%;">
 					<label>
 						<div class="input-label">
 							First name
 						</div>
 						<input id="first-name" type="text" placeholder="Enter the patient's first name" />
 					</label>
-					
+					<br />
 					<label>
 						<div class="input-label">
 							Last name
 						</div>
 						<input id="last-name" type="text" placeholder="Enter the patient's last name" />
 					</label>
-					
+					<br />
 					<label>
 						<div class="input-label">
 							Patient's Date of Birth
 						</div>
 						<input type="date" id="date-of-birth" />
 					</label>
+				</div>
 				</section>
 				<section centered>
 					<button next>Find Patient</button>
@@ -99,14 +102,16 @@
 						<td>01/18/2018</td>
 					</tr>
 				</table>
-				<button next>Enter new vaccination</button>
+				<section centered>
+					<button next>Enter new vaccination</button>
+				</section>
 			</section>
 			</div>
 			<div class="page">
 				<h1>Enter New Vaccination</h1>
 				<section>
 					<div style="margin: auto;
-					width: 60%;
+					width: 50%;
 					padding: 10px;">
 						<label>
 							<div class="input-label">
@@ -136,6 +141,62 @@
 					<button unfilled onclick="document.location='nursemain.html'">Return to Search</button>
 				</section>
 			</div>
+			<div class="page">
+				<template id="datetime-result-template">
+					<div class="datetime-result">
+						<div class="datetime-result-details">
+							<p class="datetime-result-title"></p>
+							<p>
+								<span class="datetime-result-address"></span><br />
+								<span class="datetime-result-city"></span>
+							</p>
+							<p class="datetime-result-dist"></p>
+						</div>
+						<div class="datetime-result-dates">
+							<div class="datetime-result-date-buttons"></div>
+							<a class="datetime-more">More dates ></a>
+						</div>
+					</div>
+				</template>
+			</div>
+			<!-- <div class="page" data-timeline="4">
+				<h1>
+					<span class="vaccine-name"></span> Vaccine Appointment Confirmed
+				</h1>
+				
+				<section centered>
+					<div><strong>Confirmation #: <span id="confirmation_number"></span></strong></div>
+					
+					<div class="two-column" style="text-align: left;">
+						<div>
+							<strong>Site Location</strong><br />
+							<span id="appt-site-address"></span><br />
+							<span id="appt-site-city"></span>
+						</div>
+						<div>
+							<strong>Date and Time</strong><br />
+							<span id="appt-site-date"></span><br />
+							<span id="appt-site-time"></span>
+						</div>
+					</div>
+					
+					<div>You have been sent a confirmation email or text message.</div>
+					<br>
+					<button>Change Appointment</button>
+
+					<button id="cancelAppUserButton" modal-button="cancelAppUserModal">Cancel Appointment</button>
+					<div id="cancelAppUserModal" class="modal">
+						Modal content -->
+						<!-- <div class="modal-content">
+						  <span class="modal-close">&times;</span>
+						  <h1> Are you sure you want to cancel your appointment? </h1>
+						  <br>
+						  <button onclick="cancelAppt(event)">Yes, cancel</button>
+						  <button unfilled close-modal>No, go back</button>
+						</div>
+					  </div>
+				</section>
+			</div> -->
 		</main>
     </body>
 </html>

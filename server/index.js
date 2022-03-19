@@ -12,7 +12,8 @@ const admin = "Admin";
 const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
-const email = require("./emailBuilder.js");
+const emailBuilder = require("./emailBuilder.js");
+const apptConfirm = "Vaccine Appointment Confirmation";
 
 
 
@@ -23,8 +24,8 @@ const { query } = require("express");
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
-const email = require("./email.js");
-const e = require("express");
+
+
 
 
 // statically serve the client on /
@@ -95,7 +96,7 @@ app.get("/api/login", encodedParser, handleErrors(async (req, res) => {
 
     //get user info from db
     const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
+        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.params.username, req.params.position]
         );
     //console.log(result[0].password); //gets the password
     //If the user does not exist i.e 0 rows returned
@@ -189,22 +190,29 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
-        //var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
+        var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
 
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum]
+            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum].map(n => n === undefined ? null : n)
         );
-        //2rd query, update the chosen timeslot with patient info.
+        //2nd query, update the chosen timeslot with patient info.
         await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
             [req.body.campaignVaccID, result.insertId, req.body.appointmentID].map(n => n === undefined ? null : n)
         );
+        //Probably gonna need another query here to get information to be used in email.
+
+
         await connection.commit();//Commit the changes
 
         //Send confirmation email
         if (req.body.email != null) {
-            email.main(req.body.email, apptConfirmation, apptMessage)
+            //Build Email message
+            var apptMessage = await emailBuilder.buildConfAppt("Test","Testy","Testeroni");
+            //Send email
+            const email = require("./email.js");
+            email.main(req.body.email, apptConfirm, apptMessage);
         }
         res.send("");
     } 
@@ -240,7 +248,7 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), hand
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.body.accountID]
+        [req.params.accountID]
     );
     res.json(result);
 }));
@@ -251,12 +259,12 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
     const conn = await connProm;
     
     //Convert MM/DD/YYYY to YYYY-MM-DD for Mysql
-    const startDate = dateFormat.mysqlFormat(req.body.startDate);
-    const endDate = dateFormat.mysqlFormat(req.body.endDate);
+    //const startDate = dateFormat.mysqlFormat(req.body.startDate);
+    //const endDate = dateFormat.mysqlFormat(req.body.endDate);
 
     const [result, _fields] = await conn.execute(
         "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
-        [req.body.locationID, startDate, endDate]
+        [req.params.locationID, req.params.startDate, req.params.endDate]
     );
     res.json(result);
 }));
@@ -303,11 +311,11 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
     const conn = await connProm;
 
     //Format mm/dd/yyyy to yyyy-mm-dd for mysql
-    const dob = convertDate.mysqlFormat(req.body.dob);
-    console.log(dob);
+    //const dob = convertDate.mysqlFormat(req.body.dob);
+    //console.log(dob);
     const [result, _fields] = await conn.execute(
         "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
-        [req.body.firstName, req.body.lastName, dob]
+        [req.params.firstName, req.params.lastName, req.params.dob]
     );
     return res.json(result);
 }));
@@ -318,7 +326,7 @@ app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleE
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
-        [req.body.appointmentID]
+        [req.params.patientID]
     );
     return res.json(result);
 }));
@@ -374,7 +382,7 @@ app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), asyn
     try {
         const [result, _fields] = await conn.execute(
             "select * from account where firstName = ? AND LastName = ?;",
-            [req.body.firstName, req.body.lastName]
+            [req.params.firstName, req.params.lastName]
         );
         return res.json(result);
     }
@@ -550,7 +558,7 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.body.accountID]
+        [req.params.accountID]
     );
     return res.json(result);
 }));
@@ -561,7 +569,7 @@ app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemg
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
-        [req.body.locationID]
+        [req.params.locationID]
     );
     return res.json(result);
 }));

@@ -1,13 +1,13 @@
-function buildConfAppt(location, date, time, vaccine) {
+async function buildConfAppt(date, time, vaccine) {
     var confString = "Your vaccine appointment has been scheduled. \n" + 
-                     "Location: " + location + "\n" + 
+                     "Location: " + "\n" + 
                      "Vaccine: " + vaccine + "\n" + 
                      "Date: " + date + "\n" +
                      "Time: " + time + "\n";
     return confString; 
 }
 
-function buildCancelAppt() {
+async function buildCancelAppt() {
     var cancelString = "Your vaccine appointment has been cancelled.";
     return cancelString;
 }

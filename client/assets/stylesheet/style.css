@@ -117,8 +117,10 @@ section {
 }
 
 .loginSetup {
+	margin: auto;
 	margin-top: 6rem;
-	padding: 2rem 20rem;
+	max-width: 40rem;
+	text-align: center;
 }
 
 .loginbbby{
@@ -126,8 +128,27 @@ section {
 	font-size: 12px
 }
 
+.formlogin{
+	margin: auto;
+    margin-bottom: 3rem;
+}
+
 .two-column {
 	column-count: 2;
+}
+
+.sitemanagerdashboard {
+    border: 2px solid var(--neutral2);
+	max-width: 40rem;
+	margin: auto;
+}
+
+.sitemanagerdashboard>a {
+	display: inline-block;
+	color: inherit;
+	margin: 1rem;
+	width: 16rem;
+	text-align: center;
 }
 
 @media (max-width: 50rem) {
@@ -154,4 +175,31 @@ section {
 
 .error-button {
 	border-color: #f00;
+}
+
+#reporttable {
+	border-collapse: collapse;
+	width: 100%;
+  }
+  
+#reporttable td, #reporttable th {
+	border: 1px solid #000;
+	padding: 8px;
+}
+  
+#reporttable tr:nth-child(even){
+	background-color: #f2f2f2;
+}
+  
+#reporttable tr:hover {
+	background-color: #ddd;
+}
+  
+#reporttable th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	padding-left: 12px;
+	text-align: left;
+	background-color: #B7D8FF;
+	color: black;
 }

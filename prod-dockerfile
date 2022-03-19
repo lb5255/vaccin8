@@ -1,14 +1,13 @@
 FROM node:lts
 RUN npm i -g nodemon
+
+COPY --chown=node:node ./server /code
+COPY --chown=node:node ./client /client
+
+USER node
 WORKDIR /code
 
-COPY ./server /code
-COPY ./client /client
-
-RUN npm i
-
-RUN useradd -m user
-USER user
+RUN npm i --no-audit --no-fund
 
 ENTRYPOINT ["npm"]
 CMD ["start"]

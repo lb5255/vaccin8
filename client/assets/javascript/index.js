@@ -8,6 +8,9 @@ function q(q) {
 function qa(q) {
 	return document.querySelectorAll(q);
 }
+function byname(name) {
+	return document.getElementsByName(name)[0];
+}
 
 // short function to create an element with attributes and children
 function element(tag, attr = {}, ...children) {
@@ -46,5 +49,18 @@ async function apiPost(path, data, method = "POST", json = true) {
 	}
 	if(json) {
 		return await res.json();
+	}
+}
+
+async function logIn(username, password, position) {
+	try {
+		await apiPost("/api/login", {
+			username,
+			password,
+			position,
+		}, "POST", false);
+		return true;
+	} catch(err) {
+		return false;
 	}
 }

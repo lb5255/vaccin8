@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+        <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+	</head>
+	<body>
+		<header>
+			<div id="header-title">VACCIN8</div>
+		</header>
+
+        <div style="margin-top: 6rem;">
+			<h1>Reports</h1>
+
+			<section centered>
+				<label>
+					<div class="SMinput-label">
+						Type of report
+					</div>
+					<select id="report-select-dropdown">
+						<option value="0" selected disabled>Choose an report type</option>
+						<option value="1">Appointment Information</option>
+						<option value="2">Vaccination Information</option>
+						<option value="3">Adverse Reaction</option>
+					</select>
+				</label>
+			</section>
+
+			<section centered>
+
+				<button unfilled type="button" onclick="history.back()">Return to dashboard</button>
+			</section>
+
+        </div>
+    </body>
+</html>

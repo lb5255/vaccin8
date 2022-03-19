@@ -12,20 +12,21 @@ const admin = "Admin";
 const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
-const emailBuilder = require("./emailBuilder.js");
-const apptConfirm = "Vaccine Appointment Confirmation";
+
+// const emailBuilder = require("./emailBuilder.js");
+// const apptConfirm = "Vaccine Appointment Confirmation";
+
+
 
 
 
 // load the database
 const connProm = require("./load-db.js");
-const { query } = require("express");
 
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
-
-
+const email = require("./email.js");
 
 
 // statically serve the client on /
@@ -87,10 +88,9 @@ const handleErrors = func => async (req, res) => {
     }
 }
 
-
 //Login
 //Takes a JSON string with username, password, and position.
-app.get("/api/login", encodedParser, handleErrors(async (req, res) => {
+app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
     //console.log(req.body); //username password, and position come in from user.
 
@@ -486,13 +486,14 @@ app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErro
     const [result, _fields] = await conn.execute(
         "SELECT * from location;"
     );
+    res.json(result);
 }));
 
 //api call to add a location
 app.post("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "INSERT INTO location (locationName, locationCity, locationState, locationAddr, locationZip VALUES (?,?,?,?,?);",
+        "INSERT INTO location (locationName, locationCity, locationState, locationAddr, locationZip) VALUES (?,?,?,?,?);",
         [req.body.locationName, req.body.locationCity, req.body.locationState, req.body.locationAddr, req.body.locationZip]
     );
     res.send("Entered new location.");
@@ -519,11 +520,12 @@ app.delete("/api/admin/locations", encodedParser, authMiddleware(admin), handleE
 }));
 
 //api call to get all locations at the currently active campaign
-app.get("/api/admin/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/admin/campaign/locations", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT * from campaignlocation JOIN location ON location.locationID = campaignlocation.locationID INNER JOIN campaign ON campaignlocation.campaignID = campaign.campaignID WHERE campaignStatus = 'a';"
     );
+    res.json(result);
 }));
 
 //api call to add a location to a campaign

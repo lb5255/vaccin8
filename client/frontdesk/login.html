@@ -15,18 +15,38 @@
         <div class="loginSetup">
             <h1>Front Desk Login</h1>
 
-            <div>
-                <label for="uname" class="loginbbby">Username</label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
-                            
-                <label for="psw" class="loginbbby">Password</label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
-                  
+            <form>
+                <div class="formlogin">
+                    <label for="uname" class="loginbbby">Username</label>
+                    <input type="text" placeholder="Enter Username" name="uname" required>
+                    <br />
+                    
+                    <label for="psw" class="loginbbby">Password</label>
+                    <input type="password" placeholder="Enter Password" name="psw" required>
+                </div>
+                
                 <section centered>
-                    <button unfilled prev type="submit" onclick="history.back()">Back</button>
+                    <button unfilled type="button" onclick="history.back()">Back</button>
                     <button type="submit">Login</button>
+                    <div id="error-message" style="display: none;">There was an error logging in</div>
                 </section>
-            </div>
+            </form>
         </div>
+        
+        <script>
+            q("form").onsubmit = async function(ev) {
+                ev.preventDefault();
+                id("error-message").style.display = "none";
+                
+                if(await logIn(byname("uname").value, byname("psw").value, "Staff")) {
+                    // redirect
+                    location.href = "frontdeskmain.html";
+                } else {
+                    console.log("error in log in");
+                    // show the error message
+                    id("error-message").style.display = "";
+                }
+            }
+        </script>
     </body>
 </html>

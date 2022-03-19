@@ -142,30 +142,11 @@
 				</section>
 			</div>
 			<div class="page">
-				<template id="datetime-result-template">
-					<div class="datetime-result">
-						<div class="datetime-result-details">
-							<p class="datetime-result-title"></p>
-							<p>
-								<span class="datetime-result-address"></span><br />
-								<span class="datetime-result-city"></span>
-							</p>
-							<p class="datetime-result-dist"></p>
-						</div>
-						<div class="datetime-result-dates">
-							<div class="datetime-result-date-buttons"></div>
-							<a class="datetime-more">More dates ></a>
-						</div>
-					</div>
-				</template>
-			</div>
-			<!-- <div class="page" data-timeline="4">
 				<h1>
 					<span class="vaccine-name"></span> Vaccine Appointment Confirmed
 				</h1>
 				
 				<section centered>
-					<div><strong>Confirmation #: <span id="confirmation_number"></span></strong></div>
 					
 					<div class="two-column" style="text-align: left;">
 						<div>
@@ -180,23 +161,23 @@
 						</div>
 					</div>
 					
-					<div>You have been sent a confirmation email or text message.</div>
 					<br>
-					<button>Change Appointment</button>
+					<button unfilled>Change Appointment</button>
 
-					<button id="cancelAppUserButton" modal-button="cancelAppUserModal">Cancel Appointment</button>
+					<button unfilled id="cancelAppUserButton" modal-button="cancelAppUserModal">Cancel Appointment</button>
 					<div id="cancelAppUserModal" class="modal">
-						Modal content -->
-						<!-- <div class="modal-content">
+						<!-- Modal content -->
+						<div class="modal-content">
 						  <span class="modal-close">&times;</span>
 						  <h1> Are you sure you want to cancel your appointment? </h1>
 						  <br>
 						  <button onclick="cancelAppt(event)">Yes, cancel</button>
 						  <button unfilled close-modal>No, go back</button>
 						</div>
-					  </div>
+					</div>
+					<button onclick="document.location='nursemain.html'">Search for another patient</button>
 				</section>
-			</div> -->
+			</div>
 		</main>
     </body>
 </html>

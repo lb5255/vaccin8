@@ -79,7 +79,15 @@ FROM appointment
 WHERE apptStatus = 'C';
 
 --Get Total patients processed for each vaccine manufacturer given a date range and location. Subtotaled by date
-
+SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", COUNT(*) AS 'Completed Appointments' 
+FROM appointment
+INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
+WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
+GROUP BY apptDate, campaignvaccines.manufacturer
+UNION
+SELECT 'Total', '-------', COUNT(*)
+FROM appointment
+WHERE apptStatus = 'C';
 
 
 --Get Total patients processed for each shot type given a date range and location. Subtotaled by date

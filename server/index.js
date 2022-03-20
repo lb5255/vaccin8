@@ -683,8 +683,7 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 //Reports
 
 //Activity by Location (Subtotaled by date).
-//Get Total patient's processed, Total for each vaccine manufacturer, total for each shot type, 
-//and total adverse reactions.
+//Get Total patient's processed, 
 app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -696,10 +695,37 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
         SELECT 'Total', COUNT(*)
         FROM appointment
         WHERE apptStatus = 'C';`,
-        [res.params.startDate,res.params.endDate,res.params.locationID]
+        [res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
 })));
+
+
+//Total for each vaccine manufacturer, subtotaled by date
+app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", COUNT(*) AS 'Completed Appointments' 
+        FROM appointment
+        INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
+        GROUP BY apptDate, campaignvaccines.manufacturer
+        UNION
+        SELECT 'Total', '-------', COUNT(*)
+        FROM appointment
+        WHERE apptStatus = 'C'`,
+        [res.params.startDate, res.params.endDate, res.params.locationID]
+    );
+    return res.json(result);
+})));
+
+
+//total for each shot type, 
+
+//total adverse reactions.
+
+
+
 
 //  app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
 //     const conn = await connProm;

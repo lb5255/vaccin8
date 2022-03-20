@@ -680,6 +680,57 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 
 }));
 
+//Reports
+
+//Activity by Location (Subtotaled by date).
+//Get Total patient's processed, Total for each vaccine manufacturer, total for each shot type, 
+//and total adverse reactions.
+// app.get("/api/admin/reports/activityByLocation", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+//     const conn = await connProm;
+//     const [result, _fields] = await conn.execute(
+//         "",
+//         []
+//     );
+//     return res.json(result);
+// })));
+
+// app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+//     const conn = await connProm;
+//     const [result, _fields] = await conn.execute(
+//         "",
+//         []
+//     );
+//     return res.json(result);
+// })));
+
+// app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+//     const conn = await connProm;
+//     const [result, _fields] = await conn.execute(
+//         "",
+//         []
+//     );
+//     return res.json(result);
+// })));
+
+app.get("/api/admin/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignVaccines.vaccineType AS "Vaccine", campaignVaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
+        FROM appointment
+        INNER JOIN patient ON appointment.patientID = patient.patientID
+        INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
+        INNER JOIN location ON campaignLocation.locationID = location.locationID
+        INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
+        WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;`,
+        [req.params.startDate, req.params.endDate, req.params.locationID, req.params.batchNum]
+    );
+    return res.json(result);
+}));
+
+
+
+
+
 
 
 app.listen(8080, () => console.log("Listening on port 8080"));

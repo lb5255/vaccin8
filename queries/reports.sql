@@ -62,3 +62,23 @@ WHERE status = "Active";
 -- View a list of all accounts in the system
 
 select accountID, username, firstName, lastName, position, email, phone from account; 
+
+
+-- Activity by Location (Subtotaled by date).
+-- Get Total patient's processed, Total for each vaccine manufacturer, total for each shot type, 
+-- and total adverse reactions.
+
+
+
+
+
+-- Batch Report: List all patients by date and location 
+-- who recieved shots from a particular batch of vaccine.
+
+SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignVaccines.vaccineType AS "Vaccine", campaignVaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
+FROM appointment
+INNER JOIN patient ON appointment.patientID = patient.patientID
+INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
+INNER JOIN location ON campaignLocation.locationID = location.locationID
+INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
+WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;

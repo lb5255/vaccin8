@@ -38,39 +38,44 @@ app.use(cookieParser());
 
 
 //Authentication code
-const authMiddleware = function(role){ return async (req, res, next) => {
-    const conn = await connProm;
-    try {
-        if (!req.cookies.token) {
-            return res.status(401).send("Unauthorized.");
-        }
-        else {
-            //Query to get userID and their role
-            const [result, _fields] = await conn.execute(
-                "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
-            );
-            
-            req.userID = result[0].accountID;
-            req.position = result[0].position;
-            //console.log(result);
-        }
-        if(!req.userID) {
-            return res.status(401).send("Unauthorized");
-        }
-        //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
-        else if(req.position != role) {
-            return res.status(401).send("Unauthorized");
-        }
-        
-        
-        next(); //forwards to the api that was called
-
-    }   
-    catch (e) {
-        return res.status(500).send("Internal server error");
+const authMiddleware = function(role = []){
+    if(!Array.isArray(role)) {
+        role = [role];
     }
+    
+    return async (req, res, next) => {
+        const conn = await connProm;
+        try {
+            if (!req.cookies.token) {
+                return res.status(401).send("Unauthorized.");
+            }
+            else {
+                //Query to get userID and their role
+                const [result, _fields] = await conn.execute(
+                    "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
+                );
+                
+                req.userID = result[0].accountID;
+                req.position = result[0].position;
+                //console.log(result);
+            }
+            if(!req.userID) {
+                return res.status(401).send("Unauthorized");
+            }
+            //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
+            else if(role.includes(req.position)) {
+                return res.status(401).send("Unauthorized");
+            }
+            
+            
+            next(); //forwards to the api that was called
 
-    }  
+        }   
+        catch (e) {
+            return res.status(500).send("Internal server error");
+        }
+
+    }
 } // End of authMiddleware
 
 /**
@@ -632,7 +637,7 @@ app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleE
 
 //api call to assign an account to be active at a location.
 //Takes in the location ID, and campaign ID.
-app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm; 
     const connection = await conn.getConnection();
     try {

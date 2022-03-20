@@ -409,7 +409,9 @@ app.post("/api/admin/accounts", encodedParser, authMiddleware(admin), handleErro
         "INSERT INTO account(username, password, firstName, lastName, position, email, phone) VALUES (?,?,?,?,?,?,?);",
         [req.body.username, hashedPassword, req.body.firstName, req.body.lastName, req.body.position, req.body.email, req.body.phone]
     );
-    res.send("New account created."); 
+    res.json({
+        accountID: result.insertId
+    });
 
 }));
 
@@ -647,7 +649,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
             [req.body.accountID, req.body.locationID]
         ); 
         //If the account doesn't exist, insert it into the account
-        if (!result[0].accountID) {
+        if (!result.length || !result[0].accountID) {
             await conn.execute(
                 "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N')",
                 [req.body.accountID, req.body.locationID]
@@ -660,7 +662,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
                 [req.body.accountID, req.body.locationID]
             );  
         }
-
+        res.send("Added user to location");
     }
     catch (e) {
         console.log("An error has occurred with this transaction.", e);

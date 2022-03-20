@@ -21,7 +21,7 @@ async function validateInfo() {
 	
 	// register the employee
 	try {
-		await apiPost("/api/admin/accounts", {
+		const res = await apiPost("/api/admin/accounts", {
 			username: id("emp-username").value,
 			password: id("emp-password").value,
 			firstName: id("emp-first-name").value,
@@ -29,7 +29,13 @@ async function validateInfo() {
 			position: id("role-input").value,
 			email: id("emp-email").value,
 			phone: id("emp-phone").value,
-		}, "POST", false); // don't parse the result as json
+		});
+		accountID = res.accountID;
+		id("acct-id").textContent = accountID;
+		id("acct-name").textContent = id("emp-first-name").value + " " + id("emp-last-name").value;
+		id("acct-username").textContent = id("emp-username").value;
+		id("acct-pass").textContent = id("emp-password").value;
+		id("acct-role").textContent = id("role-input").value;
 		toast("Created account " + id("emp-username").value);
 	} catch(err) {
 		console.log("Failed to create account:", err);
@@ -37,8 +43,11 @@ async function validateInfo() {
 	}
 }
 
+let accountID;
+let locations;
+
 async function loadLocationPage() {
-	const locations = await apiGet("/api/admin/locations");
+	locations = await apiGet("/api/admin/locations");
 	
 	const container = id("location-select");
 	container.innerHTML = "";
@@ -56,6 +65,34 @@ async function loadLocationPage() {
 	}
 }
 
+function commas(list) {
+	switch(list.length) {
+		case 0: return "";
+		case 1: return list[0];
+		case 2: return list[0] + " and " + list[1];
+		default: {
+			return list.slice(0, list.length - 1).join(", ") + ", and " + list[list.length - 1];
+		}
+	}
+}
+
 async function setLocations() {
+	const locs = [].map.call(qa("input[name=location]:checked"), n => parseInt(n.dataset.value));
+	console.log("locations:", locs);
 	
+	const locnames = locs.map(n => locations.find(l => l.locationID == n)).map(n => n.locationName);
+	
+	// add the locations to the user
+	for(const loc of locs) {
+		try {
+			await apiPost("/api/sitemgr/locations/accounts", {
+				accountID,
+				locationID: loc,
+			}, "POST", false);
+		} catch(err) {
+			return "Failed to set user at location";
+		}
+	}
+	
+	id("acct-locations").textContent = commas(locnames);
 }

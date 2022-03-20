@@ -1,12 +1,11 @@
-function validateInfo() {
+async function validateInfo() {
 	const infoFields = {
-		"emp-name": "name",
-		"address": "address",
-		"emp-id": "ID #",
-		"emp-city": "city",
-		"emp-zipcode": "ZIP code",
-		"state-input": "state",
+		"emp-first-name": "first name",
+		"emp-last-name": "last name",
+		"emp-username": "username",
+		"emp-password": "password",
 		"emp-email": "email",
+		"emp-phone": "phone number",
 		"role-input": "role"
 	}
 	
@@ -14,6 +13,27 @@ function validateInfo() {
 		if(id(fieldId).value === "") {
 			return "Please enter the employee's " + infoFields[fieldId];
 		}
+	}
+	
+	if(id("emp-password-confirm").value !== id("emp-password").value) {
+		return "Passwords do not match!";
+	}
+	
+	// register the employee
+	try {
+		await apiPost("/api/admin/accounts", {
+			username: id("emp-username").value,
+			password: id("emp-password").value,
+			firstName: id("emp-first-name").value,
+			lastName: id("emp-last-name").value,
+			position: id("role-input").value,
+			email: id("emp-email").value,
+			phone: id("emp-phone").value,
+		}, "POST", false); // don't parse the result as json
+		toast("Created account " + id("emp-username").value);
+	} catch(err) {
+		console.log("Failed to create account:", err);
+		return "Failed to create account";
 	}
 }
 
@@ -26,7 +46,7 @@ async function loadLocationPage() {
 		const input = container.appendChild(element("input", {
 			type: "checkbox",
 			name: "location",
-			value: loc.locationID
+			"data-value": loc.locationID
 		}))
 		
 		// make a button that clicks the corresponding input when clicked
@@ -34,4 +54,8 @@ async function loadLocationPage() {
 			loc.locationName)
 		).onclick = () => input.click();
 	}
+}
+
+async function setLocations() {
+	
 }

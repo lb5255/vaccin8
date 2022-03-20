@@ -368,33 +368,23 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), hand
 
 //api call to get all accounts
 
-app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), async(req, res) => {
+app.get("/api/admin/accounts", encodedParser, authMiddleware(admin), handleErrors(async(req, res) => {
     const conn = await connProm;
-    try {
-        const [result, _fields] = await conn.execute(
-            "select * from account;"
-        );
-        return res.json(result);
-    }
-    catch (e) {
-        return res.status(500).send("Internal server error");
-    }
-});
+    const [result, _fields] = await conn.execute(
+        "select accountID, username, firstName, lastName, position, email, phone from account;"
+    );
+    return res.json(result);
+}));
 
 //api call to get all accounts by searching first/last name.
-app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), async(req, res) => {
+app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), handleErrors(async(req, res) => {
     const conn = await connProm;
-    try {
-        const [result, _fields] = await conn.execute(
-            "select * from account where firstName = ? AND LastName = ?;",
-            [req.params.firstName, req.params.lastName]
-        );
-        return res.json(result);
-    }
-    catch (e) {
-        return res.status(500).send("Internal server error");
-    }
-});
+    const [result, _fields] = await conn.execute(
+        "select accountID, username, firstName, lastName, position, email, phone from account where firstName = ? AND LastName = ?;",
+        [req.params.firstName, req.params.lastName]
+    );
+    return res.json(result);
+}));
 
 
 //api call to add an account

@@ -31,5 +31,4 @@ async function main(reciever, header, message) {
 }
 
 
-
-main().catch(console.error);
+module.exports.main = main;

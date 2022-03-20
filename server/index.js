@@ -684,7 +684,7 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 
 //Activity by Location (Subtotaled by date).
 //Get Total patient's processed, 
-app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
@@ -698,11 +698,11 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
         [res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
-})));
+}));
 
 
 //Total for each vaccine manufacturer, subtotaled by date
-app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", COUNT(*) AS 'Completed Appointments' 
@@ -717,7 +717,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         [res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
-})));
+}));
 
 
 //total for each shot type, 

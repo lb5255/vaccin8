@@ -68,6 +68,26 @@ select accountID, username, firstName, lastName, position, email, phone from acc
 -- Get Total patient's processed, Total for each vaccine manufacturer, total for each shot type, 
 -- and total adverse reactions.
 
+--Get Total Completed Appointments given a date range and location. Subtotaled by date
+SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
+FROM appointment
+WHERE apptStatus = 'C' WHERE apptDate BETWEEN ? AND ? AND locationID = ?
+GROUP BY apptDate
+UNION
+SELECT 'Total', COUNT(*)
+FROM appointment
+WHERE apptStatus = 'C';
+
+--Get Total patients processed for each vaccine manufacturer given a date range and location. Subtotaled by date
+
+
+
+--Get Total patients processed for each shot type given a date range and location. Subtotaled by date
+
+--Get Total patients processed that had adverse reactions. Subtotaled by date
+
+
+
 
 
 

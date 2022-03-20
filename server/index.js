@@ -685,16 +685,23 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 //Activity by Location (Subtotaled by date).
 //Get Total patient's processed, Total for each vaccine manufacturer, total for each shot type, 
 //and total adverse reactions.
-// app.get("/api/admin/reports/activityByLocation", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
-//     const conn = await connProm;
-//     const [result, _fields] = await conn.execute(
-//         "",
-//         []
-//     );
-//     return res.json(result);
-// })));
+app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
+        FROM appointment
+        WHERE apptStatus = 'C' WHERE apptDate BETWEEN ? AND ? AND locationID = ?
+        GROUP BY apptDate
+        UNION
+        SELECT 'Total', COUNT(*)
+        FROM appointment
+        WHERE apptStatus = 'C';`,
+        [res.params.startDate,res.params.endDate,res.params.locationID]
+    );
+    return res.json(result);
+})));
 
-// app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+//  app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
 //     const conn = await connProm;
 //     const [result, _fields] = await conn.execute(
 //         "",
@@ -712,7 +719,7 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 //     return res.json(result);
 // })));
 
-app.get("/api/admin/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignVaccines.vaccineType AS "Vaccine", campaignVaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"

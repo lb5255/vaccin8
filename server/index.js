@@ -63,7 +63,7 @@ const authMiddleware = function(role = []){
                 return res.status(401).send("Unauthorized");
             }
             //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
-            else if(role.includes(req.position)) {
+            else if(!role.includes(req.position)) {
                 return res.status(401).send("Unauthorized");
             }
             

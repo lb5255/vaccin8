@@ -729,7 +729,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 //         []
 //     );
 //     return res.json(result);
-// })));
+// }));
 
 app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
@@ -738,7 +738,7 @@ app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(adm
         []
     );
     return res.json(result);
-})));
+}));
 
 app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;

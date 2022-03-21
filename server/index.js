@@ -212,13 +212,13 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
         await connection.commit();//Commit the changes
 
         //Send confirmation email
-        if (req.body.email != null) {
-            //Build Email message
-            var apptMessage = await emailBuilder.buildConfAppt("Test","Testy","Testeroni");
-            //Send email
-            const email = require("./email.js");
-            email.main(req.body.email, apptConfirm, apptMessage);
-        }
+        // if (req.body.email != null) {
+        //     //Build Email message
+        //     var apptMessage = await emailBuilder.buildConfAppt("Test","Test","Test");
+        //     //Send email
+        //     const email = require("./email.js");
+        //     email.main(req.body.email, apptConfirm, apptMessage);
+        // }
         res.send("");
     } 
     catch(e) {
@@ -263,7 +263,7 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), hand
 app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     
-    //Convert MM/DD/YYYY to YYYY-MM-DD for Mysql
+    //Date range is in YYYY-MM-DD format when it's sent back
     //const startDate = dateFormat.mysqlFormat(req.body.startDate);
     //const endDate = dateFormat.mysqlFormat(req.body.endDate);
 
@@ -681,43 +681,41 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 
 //Activity by Location (Subtotaled by date).
 //Get Total patient's processed, 
-app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
         FROM appointment
-        WHERE apptStatus = 'C' WHERE apptDate BETWEEN ? AND ? AND locationID = ?
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
         GROUP BY apptDate
         UNION
-        SELECT 'Total', COUNT(*)
+        SELECT 'Total:', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C';`,
-        [res.params.startDate, res.params.endDate, res.params.locationID]
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1`,
+        [res.params.startDate, res.params.endDate, res.params.locationID, res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
 }));
 
 
-//Total for each vaccine manufacturer, subtotaled by date
-app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+//Total for each vaccine manufacturer + shot type subtotaled by date
+app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", COUNT(*) AS 'Completed Appointments' 
+        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
         FROM appointment
         INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
-        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
-        GROUP BY apptDate, campaignvaccines.manufacturer
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
+        GROUP BY apptDate, appointment.campaignVaccID
         UNION
-        SELECT 'Total', '-------', COUNT(*)
+        SELECT 'Total:', '-------', '-------', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C'`,
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
+        `,
         [res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
 }));
-
-
-//total for each shot type, 
 
 //total adverse reactions.
 
@@ -733,14 +731,14 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 //     return res.json(result);
 // })));
 
-// app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
-//     const conn = await connProm;
-//     const [result, _fields] = await conn.execute(
-//         "",
-//         []
-//     );
-//     return res.json(result);
-// })));
+app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "",
+        []
+    );
+    return res.json(result);
+})));
 
 app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;

@@ -207,8 +207,8 @@ section {
 .backToSite{
 	display: block;
 	position: absolute;
-	top:10vh;
-	left:3vw;
+	top:15vh;
+	left:2vw;
 }
 
 .buttonGroup{
@@ -218,6 +218,6 @@ section {
 }
 
 .buttonGroup button{
-	width: 30%;
+	width: 45%;
 	margin:0.5rem;
 }

@@ -722,7 +722,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 
 
 
-//  app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+//  app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
 //     const conn = await connProm;
 //     const [result, _fields] = await conn.execute(
 //         "",
@@ -731,7 +731,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 //     return res.json(result);
 // })));
 
-app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "",

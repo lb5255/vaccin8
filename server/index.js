@@ -691,7 +691,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
         UNION
         SELECT 'Total:', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1`,
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?`,
         [res.params.startDate, res.params.endDate, res.params.locationID, res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
@@ -710,7 +710,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         UNION
         SELECT 'Total:', '-------', '-------', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
         `,
         [res.params.startDate, res.params.endDate, res.params.locationID]
     );

@@ -114,7 +114,16 @@
 				</section>
 				
 				<section centered>
-					<button next>Next</button>
+					<button modal-button="confirmAddUserModal">Confirm</button>
+					<div id="confirmAddUserModal" class="modal">
+						<div class="modal-content">
+							<span class="modal-close">&times;</span>
+							<h1>Are you sure you want to create this user?</h1>
+							<br>
+							<button next close-modal>Yes</button>
+							<button unfilled close-modal>No, go back</button>
+						</div>
+					</div>
 				</section>
 			</div>
 			

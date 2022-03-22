@@ -18,27 +18,29 @@
 		</header>
 		
 		<main>
-			<h1>View All Employees</h1>
+			<h1>View All Sites</h1>
 			
 			<section centered>
 				<table style="display: inline-table; text-align: initial;">
 					<thead>
-						<th>Username</th>
 						<th>Name</th>
-						<th>ID #</th>
-						<th>Role</th>
+						<th>Address</th>
+						<th>City</th>
+						<th>State</th>
+						<th>ZIP code</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
 				</table>
 				<script>
-					apiGet("/api/admin/accounts").then(accts => {
-						for(const acct of accts) {
+					apiGet("/api/admin/locations").then(locs => {
+						for(const loc of locs) {
 							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.username),
-								element("td", {}, acct.firstName + " " + acct.lastName),
-								element("td", {}, acct.accountID + ""),
-								element("td", {}, acct.position)
+								element("td", {}, loc.locationName),
+								element("td", {}, loc.locationAddr),
+								element("td", {}, loc.locationCity),
+								element("td", {}, loc.locationState),
+								element("td", {}, loc.locationZip),
 							));
 						}
 					});
@@ -48,7 +50,6 @@
 			<section centered>
 				<button unfilled onclick="history.back()">Back</button>
 			</section>
-			
 		</main>
 	</body>
 </html>

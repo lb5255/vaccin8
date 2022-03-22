@@ -10,7 +10,7 @@
 }
 
 .modal-contents {
-	height: 70%;
+	height: 80%;
 	width: 60%;
 	background-color: white;
 	text-align: center;
@@ -18,6 +18,17 @@
 	position: relative;
 	border-radius: 4px;
     overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.modal2-contents {
+	height: 25%;
+	width: 60%;
+	background-color: white;
+	text-align: center;
+	padding: 20px;
+	position: relative;
+	border-radius: 4px;
 }
 
 input {

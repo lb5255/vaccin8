@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
+	</head>
+	<body>
+		<header>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
+		</header>
+		
+		<main>
+			<h1>View All Employees</h1>
+			
+			<section centered>
+				<table style="display: inline-table; text-align: initial;">
+					<thead>
+						<th>Username</th>
+						<th>Name</th>
+						<th>ID #</th>
+						<th>Role</th>
+					</thead>
+					<tbody id="tbody">
+					</tbody>
+				</table>
+				<script>
+					apiGet("/api/admin/accounts").then(accts => {
+						for(const acct of accts) {
+							tbody.appendChild(element("tr", {},
+								element("td", {}, acct.username),
+								element("td", {}, acct.firstName + " " + acct.lastName),
+								element("td", {}, acct.accountID + ""),
+								element("td", {}, acct.position)
+							));
+						}
+					});
+				</script>
+			</section>
+			
+		</main>
+	</body>
+</html>

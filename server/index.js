@@ -332,7 +332,7 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
     //const dob = convertDate.mysqlFormat(req.body.dob);
     //console.log(dob);
     const [result, _fields] = await conn.execute(
-        "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
+        "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email, insuranceProvider, insuranceNum FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
         params([req.query.firstName, req.query.lastName, req.query.dob])
     );
     return res.json(result);

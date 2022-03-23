@@ -274,8 +274,15 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
     //const endDate = dateFormat.mysqlFormat(req.body.endDate);
 
     const [result, _fields] = await conn.execute(
-        "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
-        [req.params.locationID, req.params.startDate, req.params.endDate]
+        `SELECT appointment.appointmentID, location.locationName, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime
+        FROM appointment
+        INNER JOIN patient on appointment.patientID = patient.patientID
+        INNER JOIN campaignvaccines on appointment.campaignVaccID = campaignvaccines.campaignVaccID
+        INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID
+        INNER JOIN location on campaignlocation.locationID = location.locationID
+        WHERE appointment.locationID = ?
+        AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';`,
+        params([req.query.locationID, req.query.startDate, req.query.endDate])
     );
     res.json(result);
 }));
@@ -326,7 +333,7 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
     //console.log(dob);
     const [result, _fields] = await conn.execute(
         "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
-        [req.params.firstName, req.params.lastName, req.params.dob]
+        params([req.query.firstName, req.query.lastName, req.query.dob])
     );
     return res.json(result);
 }));
@@ -337,7 +344,7 @@ app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleE
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
-        [req.params.patientID]
+        params([req.query.patientID])
     );
     return res.json(result);
 }));
@@ -387,7 +394,7 @@ app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), hand
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "select accountID, username, firstName, lastName, position, email, phone from account where firstName = ? AND LastName = ?;",
-        [req.params.firstName, req.params.lastName]
+        params([req.query.firstName, req.query.lastName])
     );
     return res.json(result);
 }));
@@ -563,7 +570,7 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.params.accountID]
+        [req.query.accountID]
     );
     return res.json(result);
 }));
@@ -574,7 +581,7 @@ app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemg
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
-        [req.params.locationID]
+        [req.query.locationID]
     );
     return res.json(result);
 }));
@@ -756,7 +763,7 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handle
         INNER JOIN location ON campaignLocation.locationID = location.locationID
         INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
         WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;`,
-        [req.params.startDate, req.params.endDate, req.params.locationID, req.params.batchNum]
+        params([req.query.startDate, req.query.endDate, req.query.locationID, req.query.batchNum])
     );
     return res.json(result);
 }));

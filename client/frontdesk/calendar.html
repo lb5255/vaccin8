@@ -25,51 +25,38 @@
 				<br/>
 				<br/>
             <a href="frontdeskmain.html" class="backToSite">Back to Sites</a>
-			<h1>March 25, 2022</h1>
+			<h1 id="date">March 25, 2022</h1>
+            <script>id("date").textContent = new Date().toLocaleDateString()</script>
 
-            <section centered style="border: 2px solid black; padding-bottom: 2rem; width: 30rem;">
-                <h2>Joe Peterson</h2>
-                <p>Flu Vaccine <br/> 9:00 am - 9:30 am</p>
-                
-                <div class="buttonGroup">
-                    <button modal-button="confirm-modal">Check in</button>
-                    <button unfilled>No Show</button>
-                    <button unfilled>Cancel Appointment</button>
-                </div>
-            </section>
-
-            <section centered style="border: 2px solid black; padding-bottom: 2rem; width: 30rem">
-                <h2>Person 2</h2>
-                <p>Flu Vaccine <br/> 9:00 am - 9:30 am</p>
-                
-                <div class="buttonGroup">
-                    <button>Check in</button>
-                    <button unfilled>No Show</button>
-                    <button unfilled>Cancel Appointment</button>
+            <div id="appointments"></div>
+            <template id="appointment">
+                <section centered style="border: 2px solid black; padding-bottom: 2rem; width: 30rem;">
+                    <h2>Joe Peterson</h2>
+                    <p><span data-vaccine></span><br/><span data-time>9:00 am - 9:30 am</span></p>
+                    
+                    <div class="buttonGroup">
+                        <button modal-button="confirm-modal">Check in</button>
+                        <button unfilled>No Show</button>
+                        <button unfilled>Cancel Appointment</button>
                     </div>
-            </section>
-
-            <section centered style="border: 2px solid black; padding-bottom: 2rem; width: 30rem">
-                <h2>Person 3</h2>
-                <p>Flu Vaccine <br/> 9:00 am - 9:30 am</p>
-                
-                <div class="buttonGroup">
-                    <button>Check in</button>
-                    <button unfilled>No Show</button>
-                    <button unfilled>Cancel Appointment</button>
-                    </div>
-            </section>
-
-            <section centered style="border: 2px solid black; padding-bottom: 2rem; width: 30rem">
-                <h2>Person 4</h2>
-                <p>Flu Vaccine <br/> 9:00 am - 9:30 am</p>
-                
-                <div class="buttonGroup">
-                    <button>Check in</button>
-                    <button unfilled>No Show</button>
-                    <button unfilled>Cancel Appointment</button>
-                </div>
-            </section>
+                </section>
+            </template>
+            <script>
+                apiGet("/api/staff/appointments", {
+                    locationID: queryParams().site,
+                    startDate: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString().substr(0, 10), // one day ago
+                    endDate: new Date().toISOString().substr(0, 10), // now
+                }).then(appts => {
+                    for(const appt of appts) {
+                        const el = id("appointment").content.cloneNode(true);
+                        el.querySelector("h2").textContent = appt.firstName + " " + appt.lastName;
+                        el.querySelector("span[data-time]").textContent = appt.apptTime;
+                        el.querySelector("span[data-vaccine]").textContent = appt.vaccineType + " - " + appt.manufacturer + " - " + appt.vaccineDose;
+                        el.querySelectorAll("[modal-button]").forEach(enableModalButton);
+                        id("appointments").appendChild(el);
+                    }
+                })
+            </script>
 
             <div class="modal" id="confirm-modal">
                 <div class="modal-content">

@@ -37,8 +37,9 @@ function element(tag, attr = {}, ...children) {
 	return el;
 }
 
-async function apiGet(path) {
-	const res = await fetch(path);
+async function apiGet(path, params = {}) {
+	const p = Object.entries(params).map(n => n.map(encodeURIComponent).join("=")).join("&");
+	const res = await fetch(path + (p ? "?" + p : ""));
 	if(!res.ok) {
 		throw new Error(res);
 	}

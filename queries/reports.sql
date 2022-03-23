@@ -70,13 +70,13 @@ select accountID, username, firstName, lastName, position, email, phone from acc
 
 --Get Total Completed Appointments given a date range and location. Subtotaled by date
 SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
-FROM appointment
-WHERE apptStatus = 'C' WHERE apptDate BETWEEN ? AND ? AND locationID = ?
-GROUP BY apptDate
-UNION
-SELECT 'Total', COUNT(*)
-FROM appointment
-WHERE apptStatus = 'C';
+        FROM appointment
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+        GROUP BY apptDate
+        UNION
+        SELECT 'Total:', COUNT(*)
+        FROM appointment
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
 
 --Get Total patients processed for each vaccine manufacturer given a date range and location. Subtotaled by date
 SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", COUNT(*) AS 'Completed Appointments' 
@@ -90,19 +90,48 @@ FROM appointment
 WHERE apptStatus = 'C';
 
 
---Get Total patients processed for each shot type given a date range and location. Subtotaled by date
+--Get Total patients processed for each shot type given a date range. Subtotaled by date
+SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
+        FROM appointment
+        INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+        GROUP BY apptDate, location.locationID, appointment.campaignVaccID
+        UNION
+        SELECT 'Total:', '-------', '-------', '-------', COUNT(*)
+        FROM appointment
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+
+
 
 --Get Total patients processed that had adverse reactions. Subtotaled by date
+--TODO:
+
+--Activity By Employee - (subtotaled by date) Employee Name, location, total patients processed,
+--count of adverse reactions for the time period (if any)
+--TODO:
 
 
 
+--Adverse Reaction Report: List Date, patient Name, Shot sequence, employee that administered shot, 
+--vaccine manufacturer, vaccine product/brand, batch number, reactionNotes
 
+--TODO: Not Done yet
 
+SELECT appointmentID, apptDate AS "Appointment Date", CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS "Vaccine Name", campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", batchNum AS "Batch Number", advReaction AS "Reaction Notes"
+FROM appointment
+INNER JOIN patient ON appointment.patientID = patient.patientID
+INNER JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
+INNER JOIN account ON acctlocation.accountID = account.accountID
+INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID 
+WHERE advReaction IS NOT NULL;
 
 
 -- Batch Report: List all patients by date and location 
 -- who recieved shots from a particular batch of vaccine.
 
+--This one works but doesn't subtotal by date
 SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignVaccines.vaccineType AS "Vaccine", campaignVaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
 FROM appointment
 INNER JOIN patient ON appointment.patientID = patient.patientID
@@ -110,3 +139,15 @@ INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locatio
 INNER JOIN location ON campaignLocation.locationID = location.locationID
 INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
 WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;
+
+
+--Testing this one w/ rollup to try and get subtotal working.
+SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
+        FROM appointment
+        INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+        GROUP BY apptDate, location.locationID
+        WITH ROLLUP
+        ORDER BY apptDate;

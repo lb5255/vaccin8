@@ -620,7 +620,7 @@ app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sit
 app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff'",
+        "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff';",
     );
 
 
@@ -641,14 +641,14 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
         //If the account doesn't exist, insert it into the account
         if (!result.length || !result[0].accountID) {
             await conn.execute(
-                "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N')",
+                "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N');",
                 [req.body.accountID, req.body.locationID]
             );
         }
         //If the account exists, change the status of it  active.
         else {
             await conn.execute(
-                "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?",
+                "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?;",
                 [req.body.accountID, req.body.locationID]
             );  
         }
@@ -670,7 +670,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
 app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?",
+        "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
         [req.body.accountID,req.body.locationID]
     );
    
@@ -686,50 +686,40 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
         GROUP BY apptDate
         UNION
         SELECT 'Total:', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?`,
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?;`,
         [res.params.startDate, res.params.endDate, res.params.locationID, res.params.startDate, res.params.endDate, res.params.locationID]
     );
     return res.json(result);
 }));
 
 
-//Total for each vaccine manufacturer + shot type subtotaled by date
+//Total for each vaccine manufacturer + shot type at all locations.
 app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
+        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
         FROM appointment
         INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-31' AND locationID = 1
-        GROUP BY apptDate, appointment.campaignVaccID
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+        GROUP BY apptDate, location.locationID, appointment.campaignVaccID
         UNION
-        SELECT 'Total:', '-------', '-------', COUNT(*)
+        SELECT 'Total:', '-------', '-------', '-------', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
+        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30';
         `,
-        [res.params.startDate, res.params.endDate, res.params.locationID]
+        [res.params.startDate, res.params.endDate, res.params.startDate, res.params.endDate]
     );
     return res.json(result);
 }));
-
+//location.locationID, appointment.campaignVaccID
 //total adverse reactions.
-
-
-
-
-//  app.get("/api/admin/reports/activityByEmployee", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
-//     const conn = await connProm;
-//     const [result, _fields] = await conn.execute(
-//         "",
-//         []
-//     );
-//     return res.json(result);
-// })));
 
 app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
     const conn = await connProm;

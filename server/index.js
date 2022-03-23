@@ -101,7 +101,7 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
 
     //get user info from db
     const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.params.username, req.params.position]
+        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
         );
     //console.log(result[0].password); //gets the password
     //If the user does not exist i.e 0 rows returned

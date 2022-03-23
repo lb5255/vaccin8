@@ -93,6 +93,8 @@ const handleErrors = func => async (req, res) => {
     }
 }
 
+const params = p => p.map(n => n === undefined ? null : n)
+
 //Login
 //Takes a JSON string with username, password, and position.
 app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
@@ -199,12 +201,12 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum].map(n => n === undefined ? null : n)
+            params([req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum])
         );
         //2nd query, update the chosen timeslot with patient info.
         await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
-            [req.body.campaignVaccID, result.insertId, req.body.appointmentID].map(n => n === undefined ? null : n)
+            params([req.body.campaignVaccID, result.insertId, req.body.appointmentID])
         );
         //Probably gonna need another query here to get information to be used in email.
 
@@ -248,12 +250,12 @@ app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req
 
 //Front desk staff api calls
 
-//api call to get Locations that the user is active at. Takes accountID of user as a query parameter.
+//api call to get Locations that the user is active at.
 app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.params.accountID]
+        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctlocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
+        params([req.userID])
     );
     res.json(result);
 }));

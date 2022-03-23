@@ -52,11 +52,12 @@ const authMiddleware = function(role = []){
             else {
                 //Query to get userID and their role
                 const [result, _fields] = await conn.execute(
-                    "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
+                    "SELECT session.accountID, account.position, account.username FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
                 );
                 
                 req.userID = result[0].accountID;
                 req.position = result[0].position;
+                req.username = result[0].username;
                 //console.log(result);
             }
             if(!req.userID) {
@@ -148,7 +149,10 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     }
 })); //end of login api call
 
-
+// gives the user their username, if they're authenticated
+app.get("/api/whoami", authMiddleware([admin, staff, nurse, sitemgr]), handleErrors(async (req, res) => {
+    res.json({ username: req.username });
+}))
 
 
 //Recipient APIs 

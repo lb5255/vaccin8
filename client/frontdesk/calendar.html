@@ -6,17 +6,17 @@
 		<title>Vaccin8</title>
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
-        <link rel="stylesheet" type="text/css" href="../assets/stylesheet/modal.css" />
-        <script src="../assets/javascript/modal.js"></script>
+        <script src="../assets/javascript/index.js"></script>
+        <script src="../assets/javascript/nav.js"></script>
 	</head>
-	<body onload="init()">
+	<body>
 		<header>
 			<div id="header-title">
 				<a href="#">VACCIN8</a>
 			</div>
 			<div id="header-links">
 				<a href="#">Report Adverse Reaction</a>
-				<a href="#">Jane Doe</a>
+				<a href="#" id="myusername"></a>
 			</div>
 		</header>
 
@@ -32,7 +32,7 @@
                 <p>Flu Vaccine <br/> 9:00 am - 9:30 am</p>
                 
                 <div class="buttonGroup">
-                    <button id="checkIn">Check in</button>
+                    <button modal-button="confirm-modal">Check in</button>
                     <button unfilled>No Show</button>
                     <button unfilled>Cancel Appointment</button>
                 </div>
@@ -71,9 +71,9 @@
                 </div>
             </section>
 
-            <div class="bg-modal">
-                <div class="modal-contents">
-                    <div class="close">+</div>
+            <div class="modal" id="confirm-modal">
+                <div class="modal-content">
+                    <div class="modal-close">&times;</div>
             
                     <h1>Patient Name: Joe Peterson</h1>
 				<section>

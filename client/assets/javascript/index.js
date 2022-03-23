@@ -12,6 +12,16 @@ function byname(name) {
 	return document.getElementsByName(name)[0];
 }
 
+function queryParams() {
+	return Object.fromEntries(location.search
+		.substring(1)
+		.split("&")
+		.map(n =>
+			n.split("=").map(decodeURIComponent)
+		)
+	)
+}
+
 // short function to create an element with attributes and children
 function element(tag, attr = {}, ...children) {
 	const el = document.createElement(tag);
@@ -64,3 +74,9 @@ async function logIn(username, password, position) {
 		return false;
 	}
 }
+
+window.addEventListener("load", () => {
+	if(id("myusername")) {
+		apiGet("/api/whoami").then(({ username }) => id("myusername").textContent = username);
+	}
+})

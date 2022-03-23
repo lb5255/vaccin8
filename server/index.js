@@ -761,6 +761,10 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handle
 
 
 
-app.listen(8080, () => console.log("Listening on port 8080"));
+const server = app.listen(8080, () => console.log("Listening on port 8080"));
 
-
+process.on("SIGINT", () => {
+    server.close(() => {
+        process.exit(0);
+    });
+});

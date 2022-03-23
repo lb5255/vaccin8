@@ -5,6 +5,7 @@ services:
     build:
       dockerfile: ./dev-dockerfile
     restart: unless-stopped
+    init: true
     depends_on:
       - db
     volumes:

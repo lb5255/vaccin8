@@ -212,8 +212,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
             params([req.body.campaignVaccID, result.insertId, req.body.appointmentID])
         );
-        //Probably gonna need another query here to get information to be used in email.
-
+        
 
         await connection.commit();//Commit the changes
 
@@ -744,7 +743,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 
 //Activity by location - total adverse reactions (Subtotaled by date)
 //Takes a start and end date.
- app.get("/api/reports/activityByLocation/totalAdvReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+ app.get("/api/reports/activityByLocation/totalAdvReactions", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT 
@@ -765,7 +764,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
     return res.json(result);
 }));
 
-app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DISTINCT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee Name', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
@@ -783,7 +782,7 @@ app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin), h
 
 //Batch Report to get all patients that recieved a shot from a particular batch number at a location across a date range.
 //Takes in a date range, the locationID, and the batch number.
-app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
@@ -799,9 +798,23 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handle
 }));
 
 
-//TODO: Activity by Employee (Subtotaled by Date)
+// Activity by Employee (Subtotaled by Date)
 // Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
-
+app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Date', CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C') AS 'Patients Processed', (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C' AND advReaction IS NOT NULL) AS 'Adverse Reactions'
+        FROM appointment
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
+        INNER JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
+        INNER JOIN account ON acctlocation.accountID = account.accountID
+        WHERE staffMember = ? AND apptDate BETWEEN ? AND ?
+        GROUP BY apptDate;`,
+        params([req.query.accountID, req.query.accountID, req.query.accountID, req.query.startDate, req.query.endDate])
+    );
+    return res.json(result);
+}));
 
 
 

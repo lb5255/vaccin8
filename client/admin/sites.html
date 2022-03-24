@@ -15,10 +15,17 @@
 			<div id="header-title">
 				<a href="#">VACCIN8</a>
 			</div>
+			<div id="header-links">
+				<a href="#" id="myusername"></a>
+			</div>
 		</header>
 		
 		<main>
 			<h1>View All Sites</h1>
+			
+			<section style="text-align: right;">
+				<a href="newsite.html">Add a site</a>
+			</section>
 			
 			<section centered>
 				<table style="display: inline-table; text-align: initial;">
@@ -33,19 +40,61 @@
 					</tbody>
 				</table>
 				<script>
-					apiGet("/api/admin/locations").then(locs => {
-						for(const loc of locs) {
-							tbody.appendChild(element("tr", {},
-								element("td", {}, loc.locationName),
-								element("td", {}, loc.locationAddr),
-								element("td", {}, loc.locationCity),
-								element("td", {}, loc.locationState),
-								element("td", {}, loc.locationZip),
-							));
+					function refreshTable() {
+						const tbody = id("tbody");
+						apiGet("/api/admin/locations").then(locs => {
+							tbody.innerHTML = "";
+							for(const loc of locs) {
+								let b;
+								tbody.appendChild(element("tr", {},
+									element("td", {}, loc.locationName),
+									element("td", {}, loc.locationAddr),
+									element("td", {}, loc.locationCity),
+									element("td", {}, loc.locationState),
+									element("td", {}, loc.locationZip),
+									b = element("button", {unfilled: true}, "Remove Site"),
+								));
+								
+								b.onclick = () => deleteSiteConfirm(loc.locationID, loc.locationName);
+							}
+						});
+					}
+					
+					refreshTable();
+					
+					let siteToDelete;
+					function deleteSiteConfirm(i, name) {
+						siteToDelete = i;
+						id("site-name").textContent = name;
+						openModal(id("confirm-modal"));
+					}
+					
+					async function deleteSite() {
+						try {
+							await apiPost("/api/admin/locations", {
+								locationID: siteToDelete,
+							}, "DELETE", false);
+							toast("Deleted site");
+							refreshTable();
+						} catch(err) {
+							console.error("Error deleting site", err);
+							toast("Error deleting site");
 						}
-					});
+					}
 				</script>
 			</section>
+			
+			<div class="modal" id="confirm-modal">
+				<div class="modal-content">
+					<span class="modal-close">&times;</span>
+					<h1>Are you sure you want to remove site <span id="site-name"></span></h1>
+					
+					<section centered>
+						<button unfilled close-modal>Back</button>
+						<button close-modal onclick="deleteSite()">Confirm</button>
+					</section>
+				</div>
+			</div>
 			
 			<section centered>
 				<button unfilled onclick="history.back()">Back</button>

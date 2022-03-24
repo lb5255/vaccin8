@@ -7,6 +7,9 @@ function updateTimeline() {
 	const page = document.querySelector(".page.active");
 	const timelineNum = parseInt(page.dataset.timeline);
 	const timeline = document.querySelector(".timeline");
+	if(!timeline || isNaN(timelineNum)) {
+		return;
+	}
 	
 	[...timeline.children].filter(n => n.classList.contains("timeline-point")).forEach((point, index) => {
 		if(index < timelineNum) {

@@ -332,7 +332,7 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
     //const dob = convertDate.mysqlFormat(req.body.dob);
     //console.log(dob);
     const [result, _fields] = await conn.execute(
-        "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
+        "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email, insuranceProvider, insuranceNum FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
         params([req.query.firstName, req.query.lastName, req.query.dob])
     );
     return res.json(result);
@@ -343,19 +343,19 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
 app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
+        "SELECT appointment.appointmentID, appointment.campaignVaccID, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignvaccines on appointment.campaignVaccID = campaignvaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
         params([req.query.patientID])
     );
     return res.json(result);
 }));
 
 //api call to record a recipient has recieved their vaccine dose
-//Takes batch number entered by nurse, the currently logged in staff member's ID, and appointment ID selected in previous query. 
+//Takes batch number entered by nurse and appointment ID selected in previous query. 
 app.put("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleErrors(async(req, res) => {
     const conn = await connProm;
-    const [result, _fields] = await conn.execute(
-        "UPDATE appointment SET batchNum = ?, vaccDatestamp = NOW(), apptStatus = 'C', staffMember = ? WHERE appointmentID = ?;",
-        [req.body.batchNum, req.body.accountID, req.body.appointmentID]
+    await conn.execute(
+        "UPDATE appointment SET batchNum = ?, vaccDatestamp = NOW(), apptStatus = 'C', staffMember = ?, campaignVaccID = ? WHERE appointmentID = ?;",
+        [req.body.batchNum, req.userID, req.body.vaccineID, req.body.appointmentID]
     )
     return res.send("");
 }));
@@ -786,12 +786,12 @@ app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin), h
 app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignVaccines.vaccineType AS "Vaccine", campaignVaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
+        `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
         FROM appointment
         INNER JOIN patient ON appointment.patientID = patient.patientID
         INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
         INNER JOIN location ON campaignLocation.locationID = location.locationID
-        INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
+        INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
         WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;`,
         params([req.query.startDate, req.query.endDate, req.query.locationID, req.query.batchNum])
     );

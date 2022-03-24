@@ -8,17 +8,18 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
 		<script src="../assets/javascript/nav.js"></script>
 		<script src="../assets/javascript/index.js"></script>
+		<script src="../assets/javascript/nurse.js"></script>
 	</head>
 	<body>
 		<header>
 			<div id="header-title">VACCIN8</div>
 			<div id="header-links">
 				<a href="../RAR.html">Report Adverse Reaction</a>
-				<a href="#">Joe Simpson</a>
+				<a href="#" id="myusername"></a>
 			</div>
 		</header>
 		<main>
-			<div class="page active" style="margin-top: 6rem;">
+			<div class="page active" style="margin-top: 6rem;" validate="getPatient()">
 				<h1>Find Vaccine Patient</h1>
 				<section>
 					<div style="margin: auto;
@@ -50,25 +51,24 @@
 				</section>
 			</div>
 			<div class="page">
-				<a href="nursemain.html">&#8249; Back to patient search</a>
-				<h1>Patient Name: Ben Park</h1>
+				<a prev>&#8249; Back to patient search</a>
+				<h1>Patient Name: <span id="patient-name"></span></h1>
 				<section>
 					<h2 style="text-align: center;">Personal Information</h2>
-					<p>Full Name:</p>
-					<p>Address:</p>
-					<p>City/State/Zip:</p>
-					<p>DOB:</p>
-					<p>Phone:</p>
-					<p>Email:</p>
+					<p>Full Name: <span id="full-name"></span></p>
+					<p>Address: <span id="address"></span></p>
+					<p>City, State, ZIP: <span id="address2"></span></p>
+					<p>DOB: <span id="dob"></span></p>
+					<p>Phone: <span id="phone"></span></p>
+					<p>Email: <span id="email"></span></p>
 				</section>
 				<section>
 					<h2 style="text-align: center;">Insurance Carrier</h2>
-					<p>Company:</p>
-					<p>Employer:</p>
-					<p>ID #:</p>
-					<p>Group #:</p>
+					<p>Provider: <span id="insur-prov"></span></p>
+					<p>ID #: <span id="insur-num"></span></p>
 				</section>
 				<section>
+					<!--
 					<h2 style="text-align: center;">Previous Vaccinations</h2>
 					<table id="reporttable">
 					<tr>
@@ -102,12 +102,13 @@
 						<td>01/18/2018</td>
 					</tr>
 				</table>
+				-->
 				<section centered>
 					<button next>Enter new vaccination</button>
 				</section>
 			</section>
 			</div>
-			<div class="page">
+			<div class="page" validate="enterBatch()">
 				<h1>Enter New Vaccination</h1>
 				<section>
 					<div style="margin: auto;
@@ -122,9 +123,10 @@
 						<br />
 						<label>
 							<div class="input-label">
-								Date
+								Vaccine Type
 							</div>
-							<input type="date" id="date" placeholder="Enter the date" />
+							<select id="vaccine-select-dropdown">
+							</select>
 						</label>
 					</div>
 				</section>
@@ -134,7 +136,7 @@
 				</section>
 			</div>
 			<div class="page">
-				<h1><span class="first-name"> </span><span class="last-name"></span> COVID-19 vaccine has been entered.</h1>
+				<h1><span class="first-name"></span> <span class="last-name"></span>'s vaccine has been entered.</h1>
 				<section centered>
 					<button next>Schedule Next Appointment</button>
 					<br />

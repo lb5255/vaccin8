@@ -6,6 +6,8 @@
 		<title>Vaccin8</title>
         <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/index.js"></script>
+
 	</head>
 	<body>
 		<header>
@@ -17,7 +19,34 @@
 
         <div style="margin-top: 6rem;">
 			<h1>Staff Members</h1>
-
+			<div>
+				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+				<section centered>
+					<a href="SMaddemployee.html" style="margin-left: 30rem;"> + Add a staff member</a>
+					<table id="reporttable">
+						<thead>
+							<th>Employee ID</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Site Location</th>
+						</thead>
+						<tbody id="td">
+						</tbody>
+					</table>
+					<script>
+						apiGet("/api/sitemgr/accounts").then(accts => {
+							for(const acct of accts) {
+								tbody.appendChild(element("tr", {},
+									element("td", {}, acct.accountID),
+									element("td", {}, acct.firstName),
+									element("td", {}, acct.lastName),
+									element("td", {}, acct.position)
+								));
+							}
+						});
+					</script>
+				</section>
+			</div>
         </div>
     </body>
 </html>

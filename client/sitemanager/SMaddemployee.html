@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+        <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/index.js"></script>
+        <script src="../assets/javascript/nav.js"></script>
+
+	</head>
+	<body>
+		<header>
+			<div id="header-title">VACCIN8</div>
+			<div id="header-links">
+				<a href="#">Jane Doe</a>
+			</div>
+		</header>
+        <main>
+            <div class="page active">
+                <h2> Add User</h2>
+                <h1>Enter Employee ID</h1>
+                <div centered>
+                    <p> Find the employee that you would like to add to one of your sites, then select them from the list</p>
+                    <br>
+                    <input type="text" placeholder="search employee ID...">
+    
+                </div>
+                
+                <section centered style="margin-top: 8rem;">
+                    <button unfilled type="button" onclick="history.back()">Return to dashboard</button>
+                    <button next>Add User</button>
+                </section>
+            </div>
+
+            <div class="page">
+                <h2> Add User</h2>
+                <h1>Select Location</h1>
+                <p centered>Select which locations to assign [employee name(s)] to.</p>
+                
+
+
+
+                <section centered style="margin-top: 8rem;">
+                    <button unfilled prev>Return to dashboard</button>
+                    <button next>Assign Location</button>
+                </section>
+            </div>
+
+            <div class="page">
+                <h1>[Employee name] has been assigned to [location]</h1>
+
+                <section centered style="margin-top: 8rem;">
+                    <button unfilled onclick="document.location='SMstaff.html'">Return to dashboard</button>
+                </section>
+
+
+            </div>
+
+        </main>
+
+    </body>
+</html>

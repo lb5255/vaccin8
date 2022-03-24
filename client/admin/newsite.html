@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
+	</head>
+	<body>
+		<header>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
+			<div id="header-links">
+				<a href="#" id="myusername"></a>
+			</div>
+		</header>
+		
+		<main>
+			<div class="page active" validate="validateInfo()">
+				<h1>Add Site</h1>
+				
+				<section>
+					<style>
+						.personal-info-section {
+							display: flex;
+							flex-wrap: wrap;
+						}
+						
+						.personal-info-section>label {
+							width: 50%;
+							min-width: 17rem;
+						}
+					</style>
+					<div class="personal-info-section">
+						<label style="width: 100%;">
+							<div class="input-label">
+								Site Name *
+							</div>
+							<input id="loc-name" type="text" placeholder="Enter the name of the site" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Address *
+							</div>
+							<input id="loc-address" type="text" placeholder="Enter the site's street address" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								Zip code *
+							</div>
+							<input id="loc-zip" type="text" placeholder="Enter the site's zip code" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								City *
+							</div>
+							<input id="loc-city" type="text" placeholder="Enter the site's city" />
+						</label>
+						
+						<label>
+							<div class="input-label">
+								State *
+							</div>
+							<select id="state-input">
+								<option value="" selected="" disabled="">Enter the site's state</option>
+								<option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District Of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="PR">Puerto Rico</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+							</select>
+						</label>
+					</div>
+				</section>
+				
+				<section centered>
+					<button modal-button="confirmAddSiteModal">Confirm</button>
+					<div id="confirmAddSiteModal" class="modal">
+						<div class="modal-content">
+							<span class="modal-close">&times;</span>
+							<h1>Are you sure you want to create this site?</h1>
+							<br>
+							<button next close-modal>Yes</button>
+							<button unfilled close-modal>No, go back</button>
+						</div>
+					</div>
+				</section>
+			</div>
+			
+			<div class="page">
+				<h1>Created site <span id="loc-name-confirm"></span></h1>
+				
+				<section>
+					<button unfilled onclick="history.back()">Back</button>
+				</section>
+			</div>
+		</main>
+		
+		<script>
+			async function validateInfo() {
+				const infoFields = {
+					"loc-name": "name",
+					"loc-address": "address",
+					"loc-zip": "zip code",
+					"loc-city": "city",
+					"state-input": "state",
+				}
+				
+				for(const fieldId in infoFields) {
+					if(id(fieldId).value === "") {
+						return "Please enter the site's " + infoFields[fieldId];
+					}
+				}
+				
+				id("loc-name-confirm").textContent = id("loc-name").value;
+				
+				// register the site
+				try {
+					const res = await apiPost("/api/admin/locations", {
+						locationName: id("loc-name").value,
+						locationCity: id("loc-city").value,
+						locationState: id("state-input").value,
+						locationAddr: id("loc-address").value,
+						locationZip: id("loc-zip").value,
+					}, "POST", false);
+				} catch(err) {
+					console.log("Failed to create site:", err);
+					return "Failed to create site";
+				}
+			}
+			
+		</script>
+	</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/modal.css" />
+        <script src="../assets/javascript/modal.js"></script>
+	</head>
+	<body onload="init()">
+		<header>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
+			<div id="header-links">
+				<a href="#">Report Adverse Reaction</a>
+				<a href="#">Jane Doe</a>
+			</div>
+		</header>
+
+		<div class="page active" data-timeline="1">
+			<div style="margin-top: 5rem;"></div>
+            
+
+			<section centered>
+				<h2>Joe Peterson is checked in</h2>
+				<br/>
+				<p><strong>Date:</strong> Tuesday, March 22, 2022</p>
+				<p><strong>Time:</strong> 10:00am EST</p>
+				<p><strong>Vaccine type:</strong> HPV</p>
+				
+			</section>
+
+				<section centered style="margin-top: 3rem;">
+					<a id="checkIn" style="cursor: pointer;"><u>Cancel check-in</u></a>
+					<a href="calendar.html">
+                        <button next>Back to calendar</button>
+                    </a>
+					
+				</section>
+
+				<div class="bg-modal">
+					<div class="modal2-contents">
+						<div class="close">+</div>
+				
+						
+					<section>
+						<h1>Are you sure you want to cancel this check-in?</h1>
+						<div class="buttonRow">
+							<button unfilled class="close2">No, go back</button>
+							<a href="checkincancel.html">
+								<button>Yes, cancel</button>
+							</a>
+							
+						</div>
+					</section>
+						
+				
+					</div>
+				</div>
+
+		</div>
+
+
+		
+    </body>
+</html>

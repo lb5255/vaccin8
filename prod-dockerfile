@@ -9,5 +9,4 @@ WORKDIR /code
 
 RUN npm i --no-audit --no-fund
 
-ENTRYPOINT ["npm"]
-CMD ["start"]
+ENTRYPOINT ["node", "index.js"]

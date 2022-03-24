@@ -203,3 +203,21 @@ section {
 	background-color: #B7D8FF;
 	color: black;
 }
+
+.backToSite{
+	display: block;
+	position: absolute;
+	top:15vh;
+	left:2vw;
+}
+
+.buttonGroup{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.buttonGroup button{
+	width: 45%;
+	margin:0.5rem;
+}

@@ -52,11 +52,12 @@ const authMiddleware = function(role = []){
             else {
                 //Query to get userID and their role
                 const [result, _fields] = await conn.execute(
-                    "SELECT session.accountID, account.position FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
+                    "SELECT session.accountID, account.position, account.username FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
                 );
                 
                 req.userID = result[0].accountID;
                 req.position = result[0].position;
+                req.username = result[0].username;
                 //console.log(result);
             }
             if(!req.userID) {
@@ -93,6 +94,8 @@ const handleErrors = func => async (req, res) => {
     }
 }
 
+const params = p => p.map(n => n === undefined ? null : n)
+
 //Login
 //Takes a JSON string with username, password, and position.
 app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
@@ -101,7 +104,7 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
 
     //get user info from db
     const [result, _fields] = await conn.execute(
-        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.params.username, req.params.position]
+        'SELECT username, password, accountID FROM account WHERE username = ? AND position = ?', [req.body.username, req.body.position]
         );
     //console.log(result[0].password); //gets the password
     //If the user does not exist i.e 0 rows returned
@@ -146,7 +149,10 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     }
 })); //end of login api call
 
-
+// gives the user their username, if they're authenticated
+app.get("/api/whoami", authMiddleware([admin, staff, nurse, sitemgr]), handleErrors(async (req, res) => {
+    res.json({ username: req.username });
+}))
 
 
 //Recipient APIs 
@@ -199,12 +205,12 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum].map(n => n === undefined ? null : n)
+            params([req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum])
         );
         //2nd query, update the chosen timeslot with patient info.
         await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
-            [req.body.campaignVaccID, result.insertId, req.body.appointmentID].map(n => n === undefined ? null : n)
+            params([req.body.campaignVaccID, result.insertId, req.body.appointmentID])
         );
         //Probably gonna need another query here to get information to be used in email.
 
@@ -248,12 +254,12 @@ app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req
 
 //Front desk staff api calls
 
-//api call to get Locations that the user is active at. Takes accountID of user as a query parameter.
+//api call to get Locations that the user is active at.
 app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.params.accountID]
+        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctlocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
+        params([req.userID])
     );
     res.json(result);
 }));
@@ -268,8 +274,15 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
     //const endDate = dateFormat.mysqlFormat(req.body.endDate);
 
     const [result, _fields] = await conn.execute(
-        "SELECT appointment.appointmentID, location.locationName, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';",
-        [req.params.locationID, req.params.startDate, req.params.endDate]
+        `SELECT appointment.appointmentID, location.locationName, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime
+        FROM appointment
+        INNER JOIN patient on appointment.patientID = patient.patientID
+        INNER JOIN campaignvaccines on appointment.campaignVaccID = campaignvaccines.campaignVaccID
+        INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID
+        INNER JOIN location on campaignlocation.locationID = location.locationID
+        WHERE appointment.locationID = ?
+        AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';`,
+        params([req.query.locationID, req.query.startDate, req.query.endDate])
     );
     res.json(result);
 }));
@@ -320,7 +333,7 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
     //console.log(dob);
     const [result, _fields] = await conn.execute(
         "SELECT patientID, firstName, lastName, dateOfBirth, address, city, state, zip, phone, email FROM patient WHERE firstName = ? AND lastName = ? and dateOfBirth = ?;",
-        [req.params.firstName, req.params.lastName, req.params.dob]
+        params([req.query.firstName, req.query.lastName, req.query.dob])
     );
     return res.json(result);
 }));
@@ -331,7 +344,7 @@ app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleE
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT appointment.appointmentID, campaignVaccines.vaccineType, campaignVaccines.vaccineDose, campaignVaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignVaccines on appointment.campaignVaccID = campaignVaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
-        [req.params.patientID]
+        params([req.query.patientID])
     );
     return res.json(result);
 }));
@@ -381,7 +394,7 @@ app.get("/api/admin/accounts/search", encodedParser, authMiddleware(admin), hand
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "select accountID, username, firstName, lastName, position, email, phone from account where firstName = ? AND LastName = ?;",
-        [req.params.firstName, req.params.lastName]
+        params([req.query.firstName, req.query.lastName])
     );
     return res.json(result);
 }));
@@ -557,7 +570,7 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.params.accountID]
+        [req.query.accountID]
     );
     return res.json(result);
 }));
@@ -568,7 +581,7 @@ app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemg
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
-        [req.params.locationID]
+        [req.query.locationID]
     );
     return res.json(result);
 }));
@@ -681,24 +694,32 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 
 //Activity by Location (Subtotaled by date).
 //Get Total patient's processed, 
+//Takes a start and end date.
 app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', COUNT(*) AS 'Completed Appointments' 
-        FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?
-        GROUP BY apptDate
-        UNION
-        SELECT 'Total:', COUNT(*)
-        FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ? AND locationID = ?;`,
-        [res.params.startDate, res.params.endDate, res.params.locationID, res.params.startDate, res.params.endDate, res.params.locationID]
+        `SELECT 
+        IF(GROUPING(apptDate), 
+        'Grand Total',
+        DATE_FORMAT(apptDate,'%m/%d/%Y')) AS "Date",
+        IF(GROUPING(appointment.locationID),
+        'All Locations', locationName) AS "Location", 
+        COUNT(*) AS 'Completed Appointments'
+            FROM appointment
+            INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+            INNER JOIN location ON campaignlocation.locationID = location.locationID
+            WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?
+            GROUP BY apptDate, appointment.locationID
+            WITH ROLLUP;`,
+        [res.params.startDate, res.params.endDate]
     );
     return res.json(result);
 }));
 
 
 //Total for each vaccine manufacturer + shot type at all locations.
+//Takes a start and end date.
+//TODO: This query is kinda bad, rewrite it with grouping
 app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -707,29 +728,61 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
         INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
         INNER JOIN location ON campaignlocation.locationID = location.locationID
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30'
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?
         GROUP BY apptDate, location.locationID, appointment.campaignVaccID
         UNION
         SELECT 'Total:', '-------', '-------', '-------', COUNT(*)
         FROM appointment
-        WHERE apptStatus = 'C' AND apptDate BETWEEN '2022-01-01' AND '2022-12-30';
+        WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?;
         `,
         [res.params.startDate, res.params.endDate, res.params.startDate, res.params.endDate]
     );
     return res.json(result);
 }));
-//location.locationID, appointment.campaignVaccID
-//total adverse reactions.
 
-app.get("/api/admin/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res => {
+
+
+//Activity by location - total adverse reactions (Subtotaled by date)
+//Takes a start and end date.
+ app.get("/api/reports/activityByLocation/totalAdvReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "",
-        []
+        `SELECT 
+        IF(GROUPING(apptDate), 
+        'Grand Total',
+        DATE_FORMAT(apptDate,'%m/%d/%Y')) AS "Date",
+        IF(GROUPING(appointment.locationID),
+        'All Locations', locationName) AS "Location", 
+        COUNT(*) AS 'Adverse Reactions'
+            FROM appointment
+            INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+            INNER JOIN location ON campaignlocation.locationID = location.locationID
+            WHERE apptStatus = 'C' AND advReaction IS NOT NULL AND apptDate BETWEEN ? AND ?
+            GROUP BY apptDate, appointment.locationID
+            WITH ROLLUP;`,
+        [res.params.startDate, res.params.endDate]
     );
     return res.json(result);
-})));
+}));
 
+app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT DISTINCT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee Name', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
+        FROM appointment
+        JOIN patient ON appointment.patientID = patient.patientID
+        JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
+        JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID 
+        JOIN account ON acctlocation.accountID = account.accountID
+        WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.advReaction IS NOT NULL;`,
+        [req.query.startDate, req.query.endDate]
+    );
+    return res.json(result);
+}));
+
+
+//Batch Report to get all patients that recieved a shot from a particular batch number at a location across a date range.
+//Takes in a date range, the locationID, and the batch number.
 app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
@@ -740,17 +793,25 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin), handle
         INNER JOIN location ON campaignLocation.locationID = location.locationID
         INNER JOIN campaignVaccines ON appointment.campaignVaccID = campaignVaccines.campaignVaccID
         WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;`,
-        [req.params.startDate, req.params.endDate, req.params.locationID, req.params.batchNum]
+        params([req.query.startDate, req.query.endDate, req.query.locationID, req.query.batchNum])
     );
     return res.json(result);
 }));
 
 
+//TODO: Activity by Employee (Subtotaled by Date)
+// Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
 
 
 
 
 
-app.listen(8080, () => console.log("Listening on port 8080"));
 
 
+const server = app.listen(8080, () => console.log("Listening on port 8080"));
+
+process.on("SIGINT", () => {
+    server.close(() => {
+        process.exit(0);
+    });
+});

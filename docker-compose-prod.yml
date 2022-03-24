@@ -6,6 +6,7 @@ services:
       dockerfile: ./prod-dockerfile
     scale: 3
     restart: unless-stopped
+    init: true
     depends_on:
       - db
     environment:

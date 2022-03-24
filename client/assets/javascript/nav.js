@@ -134,7 +134,9 @@ function openModal(modal) {
 	})
 	
 	// When the user clicks on <span> (x), close the modal
-	span.onclick = closeModal;
+	if(span) {
+		span.onclick = closeModal;
+	}
 
 	// When the user clicks anywhere outside of the modal, close it
 	const onclick = function(event) {
@@ -145,6 +147,10 @@ function openModal(modal) {
 	
 	window.addEventListener("click", onclick);
 	onclose.push(() => window.removeEventListener("click", onclick));
+	
+	const prom = new Promise(r => onclose.push(r));
+	prom.close = closeModal;
+	return prom;
 }
 
 function toast(message, timeout = 5000) {

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Vaccin8</title>
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/timeline.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
+	</head>
+	<body>
+		<header>
+			<div id="header-title">
+				<a href="#">VACCIN8</a>
+			</div>
+		</header>
+		
+		<main>
+			<h1>View All Sites</h1>
+			
+			<section centered>
+				<table style="display: inline-table; text-align: initial;">
+					<thead>
+						<th>Name</th>
+						<th>Address</th>
+						<th>City</th>
+						<th>State</th>
+						<th>ZIP code</th>
+					</thead>
+					<tbody id="tbody">
+					</tbody>
+				</table>
+				<script>
+					apiGet("/api/admin/locations").then(locs => {
+						for(const loc of locs) {
+							tbody.appendChild(element("tr", {},
+								element("td", {}, loc.locationName),
+								element("td", {}, loc.locationAddr),
+								element("td", {}, loc.locationCity),
+								element("td", {}, loc.locationState),
+								element("td", {}, loc.locationZip),
+							));
+						}
+					});
+				</script>
+			</section>
+			
+			<section centered>
+				<button unfilled onclick="history.back()">Back</button>
+			</section>
+		</main>
+	</body>
+</html>

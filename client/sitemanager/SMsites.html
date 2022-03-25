@@ -6,12 +6,14 @@
 		<title>Vaccin8</title>
         <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
 	</head>
 	<body>
 		<header>
 			<div id="header-title">VACCIN8</div>
 			<div id="header-links">
-				<a href="#">Jane Doe</a>
+				<a href="#" id="myusername"></a>
 			</div>
 		</header>
 
@@ -19,29 +21,71 @@
 			<div style="margin-top: 6rem;" class="page active" data-timeline="1">
 				<h1>Select a site to edit</h1>
 	
-				<div class="sitemanagerdashboard">
-					<a href="#">
+				<template id="site">
+					<a href="">
 						<img src="../assets/image/Sites_48dp.svg"/>
-						<br>
-						Penfield Rd.
+						<div></div>
 					</a>
-					<a href="#">
-						<img src="../assets/image/Sites_48dp.svg"/>
-						<br>
-						Jefferson rd.
-					</a>
-					<a href="#">
-						<img src="../assets/image/Sites_48dp.svg"/>
-						<br>
-						John St.
-					</a>
+				</template>
+				<div class="sitemanagerdashboard" id="sites">
 				</div>
+				
+				<script>
+					let site;
+					apiGet("/api/sitemgr/activeLocations").then(locs => {
+						for(const loc of locs) {
+							const el = id("site").content.cloneNode(true);
+							el.querySelector("a").onclick = ev => {
+								ev.preventDefault();
+								site = loc.locationID;
+								nextPage();
+							}
+							el.querySelector("div").textContent = loc.locationName;
+							id("sites").appendChild(el);
+						}
+					})
+				</script>
 			</div>
 
-			<!-- <div class="page" data-timeline="2">
+			<div class="page" data-timeline="2" onload="loadSlots()">
 
-
-			</div> -->
+				<h1>Appointment slots</h1>
+				
+				<section centered>
+					<button next>Add time slot</button>
+					
+					<template id="slot">
+						<div class="slot" style="display: inline-block; margin: 1rem;">
+							<div class="slot-time"></div>
+						</div>
+					</template>
+					<div id="timeslots">
+					</div>
+				</section>
+				
+				<section centered>
+					<button unfilled prev>Back</button>
+				</section>
+				
+				<script>
+					async function loadSlots() {
+						const res = await apiGet("/api/sitemgr/locations/timeslots", {
+							locationID: site
+						});
+						console.log(res);
+						
+						for(const slot of res) {
+							const el = id("slot").content.cloneNode(true);
+							el.querySelector(".slot-time").textContent = new Date(slot.apptDate).toLocaleDateString() + " " + slot.apptTime;
+							id("timeslots").appendChild(el);
+						}
+					}
+				</script>
+			</div>
+			
+			<div class="page">
+				
+			</div>
 
 
 		</main>

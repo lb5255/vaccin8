@@ -139,13 +139,20 @@
 						}
 						
 						try {
-							await apiPost("/api/sitemgr/location/timeslots", {
+							const camp = await apiGet("/api/sitemgr/activeCampaign");
+							if(!camp.length) {
+								throw new Error("no active campaign, this shouldn't happen");
+							}
+							await apiPost("/api/sitemgr/locations/timeslots", {
 								locationID: site,
-								campaignID: 1, //?
+								campaignID: camp[0].campaignID,
 								apptDate: id("slot-date").value,
 								apptTime: id("slot-time").value,
 								count: +id("slot-count").value,
 							}, "POST", false);
+							id("slot-date-confirm").textContent = id("slot-date").value;
+							id("slot-time-confirm").textContent = id("slot-time").value;
+							id("slot-count-confirm").textContent = id("slot-count").value;
 						} catch(err) {
 							console.error("error creating timeslot", err);
 							return "There was an error creating the appointment";
@@ -157,6 +164,14 @@
 			
 			<div class="page">
 				<h1>Confirmation</h1>
+				
+				<section centered>
+					<div>
+						<p><strong>Date:</strong> <span id="slot-date-confirm"></span></p>
+						<p><strong>Time:</strong> <span id="slot-time-confirm"></span></p>
+						<p><strong>Count:</strong> <span id="slot-count-confirm"></span></p>
+					</div>
+				</section>
 				
 				<section centered>
 					<button unfilled onclick="goToPageIndex(1)">Back to site page</button>

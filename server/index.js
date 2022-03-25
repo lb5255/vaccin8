@@ -600,7 +600,7 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
         for (var i = 0; i < req.body.count; i++) {
             await conn.execute(
                 "INSERT INTO appointment (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
-                [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+                params([req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime])
             );
         }
     }

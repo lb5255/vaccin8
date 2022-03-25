@@ -33,6 +33,7 @@
 				<script>
 					let site;
 					apiGet("/api/sitemgr/activeLocations").then(locs => {
+						id("sites").innerHTML = "";
 						for(const loc of locs) {
 							const el = id("site").content.cloneNode(true);
 							el.querySelector("a").onclick = ev => {
@@ -74,6 +75,7 @@
 						});
 						console.log(res);
 						
+						id("timeslots").innerHTML = "";
 						for(const slot of res) {
 							const el = id("slot").content.cloneNode(true);
 							el.querySelector(".slot-time").textContent = new Date(slot.apptDate).toLocaleDateString() + " " + slot.apptTime;
@@ -83,8 +85,82 @@
 				</script>
 			</div>
 			
-			<div class="page">
+			<div class="page" validate="createSlot()">
+				<h1>Create appointment</h1>
+				<section centered>
+					<label>
+						<div class="input-label">
+							Date *
+						</div>
+						<input id="slot-date" type="date" />
+					</label>
+					
+					<label>
+						<div class="input-label">
+							Time *
+						</div>
+						<input id="slot-time" type="time" />
+					</label>
+					
+					<label>
+						<div class="input-label">
+							Count *
+						</div>
+						<input id="slot-count" type="number" value="1" />
+					</label>
+				</section>
 				
+				<section centered>
+					<button unfilled prev>Back</button>
+					<button modal-button="confirmModal">Confirm</button>
+					<div id="confirmModal" class="modal">
+						<div class="modal-content">
+							<span class="modal-close">&times;</span>
+							<h1>Are you sure you want to create this appointment slot?</h1>
+							<br>
+							<button next close-modal>Yes</button>
+							<button unfilled close-modal>No, go back</button>
+						</div>
+					</div>
+				</section>
+				
+				<script>
+					async function createSlot() {
+						const infoFields = {
+							"slot-date": "date",
+							"slot-time": "time",
+							"slot-count": "count",
+						}
+						
+						for(const fieldId in infoFields) {
+							if(id(fieldId).value === "") {
+								return "Please enter the slot's " + infoFields[fieldId];
+							}
+						}
+						
+						try {
+							await apiPost("/api/sitemgr/location/timeslots", {
+								locationID: site,
+								campaignID: 1, //?
+								apptDate: id("slot-date").value,
+								apptTime: id("slot-time").value,
+								count: +id("slot-count").value,
+							}, "POST", false);
+						} catch(err) {
+							console.error("error creating timeslot", err);
+							return "There was an error creating the appointment";
+						}
+					}
+				</script>
+
+			</div>
+			
+			<div class="page">
+				<h1>Confirmation</h1>
+				
+				<section centered>
+					<button unfilled onclick="goToPageIndex(1)">Back to site page</button>
+				</section>
 			</div>
 
 

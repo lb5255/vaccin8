@@ -564,12 +564,12 @@ app.delete("/api/admin/campaign/locations", encodedParser, authMiddleware(admin)
 //Site Manager API calls
 
 
-//api call to get all sites they are a site manager at, takes in the user's account ID
+//api call to get all sites they are a site manager at
 app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctLocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        [req.query.accountID]
+        "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctlocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
+        params([req.userID])
     );
     return res.json(result);
 }));
@@ -588,8 +588,8 @@ app.get("/api/sitemgr/activeCampaign", encodedParser, authMiddleware(sitemgr, ad
 app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
-        [req.query.locationID]
+        "SELECT appointment.appointmentID, location.locationName, appointment.apptTime, appointment.apptDate, appointment.apptStatus FROM appointment JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID JOIN location ON campaignlocation.locationID = location.locationID WHERE appointment.locationID = ? AND apptDate >= CURDATE()",
+        params([req.query.locationID])
     );
     return res.json(result);
 }));
@@ -609,7 +609,7 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
         for (var i = 0; i < req.body.count; i++) {
             await conn.execute(
                 "INSERT INTO appointment (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
-                [req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime]
+                params([req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime])
             );
         }
     }

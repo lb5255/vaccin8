@@ -574,6 +574,15 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     return res.json(result);
 }));
 
+//api call to get the campaignID of the currently active campaign
+app.get("/api/sitemgr/activeCampaign", encodedParser, authMiddleware(sitemgr, admin), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        "SELECT campaignID FROM campaign WHERE campaignStatus = 'a'"
+    );
+    return res.json(result);
+}));
+
 
 //api call to get open timeslots at the selected location, takes in locationID
 app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
@@ -800,6 +809,7 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin, sitemgr
 
 // Activity by Employee (Subtotaled by Date)
 // Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
+//Takes in a start date, end date, and accountID.
 app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(

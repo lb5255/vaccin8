@@ -668,7 +668,7 @@ app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleE
     const [result, _fields] = await conn.execute(
         "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff';",
     );
-
+    return res.json(result);
 }));
 
 //api call to get all staff and nurse accounts and the locations they are active at.
@@ -682,7 +682,7 @@ app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr),
         WHERE acctlocation.acctStatus = 'Active' AND account.position = 'Nurse' OR account.position = 'Staff'
         ORDER BY accountID`,
     );
-
+    return res.json(result);
 }));
 
 //api call to assign an account to be active at a location.

@@ -6,37 +6,185 @@
 		<title>Vaccin8</title>
         <link rel="stylesheet" type="text/css" href="../assets/stylesheet/style.css" />
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
+		<script src="../assets/javascript/nav.js"></script>
+		<script src="../assets/javascript/index.js"></script>
 	</head>
 	<body>
 		<header>
 			<div id="header-title">VACCIN8</div>
 			<div id="header-links">
-				<a href="#">Jane Doe</a>
+				<a href="#" id="myusername"></a>
 			</div>
 		</header>
+		<main>
+			<div style="margin-top: 6rem;" class="page active" data-timeline="1">
+				<h1>Reports</h1>
 
-        <div style="margin-top: 6rem;">
-			<h1>Reports</h1>
+				<section centered>
+					<label>
+						<div class="SMinput-label">
+							Type of report
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an report type</option>
+							<option value="1">Appointment Information</option>
+							<option value="2">Vaccination Information</option>
+							<option value="3">Adverse Reaction</option>
+						</select>
+					</label>
+				</section>
+				<section centered>
+					<button unfilled type="button" onclick="history.back()">Return to dashboard</button>
+				</section>
+        	</div>
 
-			<section centered>
-				<label>
-					<div class="SMinput-label">
-						Type of report
-					</div>
-					<select id="report-select-dropdown">
-						<option value="0" selected disabled>Choose an report type</option>
-						<option value="1">Appointment Information</option>
-						<option value="2">Vaccination Information</option>
-						<option value="3">Adverse Reaction</option>
-					</select>
-				</label>
-			</section>
+			<div class="page">
+				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+				<h1>Appointment Information</h1>
 
-			<section centered>
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start" />
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end" />
+					</label>
 
-				<button unfilled type="button" onclick="history.back()">Return to dashboard</button>
-			</section>
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
 
-        </div>
+				<br>
+
+				<table id="reporttable">
+					<thead>
+						<th>Day</th>
+						<th>Site Location</th>
+						<th>Number of Appointments</th>
+						<th>Vaccine Type</th>
+						<th>Number of Patients Treated</th>
+						<th>On Time</th>
+					</thead>
+					<tbody id="td">
+					</tbody>
+				</table>
+				<!-- <script>
+					apiGet("/api/sitemgr/accounts").then(accts => {
+						for(const acct of accts) {
+							tbody.appendChild(element("tr", {},
+								element("td", {}, acct.accountID),
+								element("td", {}, acct.firstName + " " + acct.lastName),
+								element("td", {}, acct.position)
+							));
+						}
+					});
+				</script> -->
+			</div>
+
+			<div class="page">
+				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+				<h1>Vaccination Information</h1>
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start" />
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end" />
+					</label>
+
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
+
+				<br>
+				<table id="reporttable">
+					<thead>
+						<th>Day</th>
+						<th>Vaccine Type</th>
+						<th>Number of Appointment</th>
+					</thead>
+					<tbody id="td">
+					</tbody>
+				</table>
+
+			</div>
+
+			<div class="page">
+				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+				<h1>Adverse Reaction</h1>
+
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start" />
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end" />
+					</label>
+
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
+
+				<br>
+
+				<table id="reporttable">
+					<thead>
+						<th>Day</th>
+						<th>Time of Report</th>
+						<th>Patient Name</th>
+						<th>Vaccine Type</th>
+						<th>Site Location</th>
+						<th>Patient Contact</th>
+						<th>Comments</th>
+					</thead>
+					<tbody id="td">
+					</tbody>
+				</table>
+
+
+			</div>
+		</main>
     </body>
 </html>

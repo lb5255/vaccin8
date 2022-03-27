@@ -13,7 +13,7 @@
 		<header>
 			<div id="header-title">VACCIN8</div>
 			<div id="header-links">
-				<a href="#">Jane Doe</a>
+				<a href="#" id="myusername"></a>
 			</div>
 		</header>
 
@@ -26,8 +26,7 @@
 					<table id="reporttable">
 						<thead>
 							<th>Employee ID</th>
-							<th>First Name</th>
-							<th>Last Name</th>
+							<th>Name</th>
 							<th>Site Location</th>
 						</thead>
 						<tbody id="td">
@@ -38,9 +37,8 @@
 							for(const acct of accts) {
 								tbody.appendChild(element("tr", {},
 									element("td", {}, acct.accountID),
-									element("td", {}, acct.firstName),
-									element("td", {}, acct.lastName),
-									element("td", {}, acct.position)
+									element("td", {}, acct.firstName + " " + acct.lastName),
+									element("td", {}, acct.location)
 								));
 							}
 						});

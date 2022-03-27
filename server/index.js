@@ -237,7 +237,7 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 }); //End of app.post
 
 
-//Api call to cancel their appointment, and putting it back into the available list of vaccines.
+//Api call to cancel their appointment, and putting it back into the available list of appointments.
 //Takes in the appointmentID they selected
 app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
@@ -374,6 +374,31 @@ app.put("/api/nurse/nextAppointment", encodedParser, authMiddleware(nurse), hand
     res.send("");
 }));
 
+
+//api call to record an adverse reaction
+//Takes in the adverse reaction notes, the account ID of the currently logged in staff member, the patient's first name, the patient's last name, 
+//Date of appointment, location name, vaccine Type (Ex: COVID-19), vaccine dose (Ex: 2nd), manufacturer (Ex: Johnson & Johnson), and a description of the adverse reaction.
+app.put("/api/nurse/adverseReaction", encodedParser, authMiddleware([staff,nurse]), handleErrors(async(req,res) => {
+    const conn = await connProm;
+    //Enter the adverse reaction
+    const [result, _fields] = await conn.execute(
+        `UPDATE appointment SET advReaction = ?, advReactionReporter = ? WHERE 
+        appointment.patientID = (SELECT patientID FROM patient WHERE patient.firstName = ? AND patient.lastName = ?)
+        AND apptDate = ? 
+        AND appointment.locationID = (SELECT locationID FROM location WHERE locationName = ?)
+        AND campaignVaccID = (SELECT campaignVaccID FROM campaignvaccines WHERE vaccineType = ? AND vaccineDose = ? AND manufacturer = ?)`,
+        [req.body.advReaction, req.body.accountID, req.body.firstName, req.body.lastName, req.body.apptDate, req.body.locationName, req.body.vaccineType, req.body.vaccineDose, req.body.manufacturer]
+    );
+
+    //If result.affectedRows = 0, return "Appointment not found"
+    if (result.affectedRows == 0) {
+        return res.status(404).send("Appointment not found.");
+    }
+    //If result.affectedRows > 0, there was a result, return success.
+    if (result.affectedRows > 0) {
+        return res.send("Recorded adverse reaction.");
+    }
+}));
 
 
 //Admin API calls
@@ -575,7 +600,7 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
 }));
 
 //api call to get the campaignID of the currently active campaign
-app.get("/api/sitemgr/activeCampaign", encodedParser, authMiddleware(sitemgr, admin), handleErrors(async (req, res) => {
+app.get("/api/sitemgr/activeCampaign", encodedParser, authMiddleware([sitemgr, admin]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT campaignID FROM campaign WHERE campaignStatus = 'a'"
@@ -666,7 +691,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
                 [req.body.accountID, req.body.locationID]
             );
         }
-        //If the account exists, change the status of it  active.
+        //If the account exists, change the status of it to active.
         else {
             await conn.execute(
                 "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?;",
@@ -698,12 +723,13 @@ app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr
 
 }));
 
-//Reports
+
+//Report APIs
 
 //Activity by Location (Subtotaled by date).
 //Get Total patient's processed, 
 //Takes a start and end date.
-app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT 
@@ -719,7 +745,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
             WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?
             GROUP BY apptDate, appointment.locationID
             WITH ROLLUP;`,
-        [res.params.startDate, res.params.endDate]
+        params([res.query.startDate, res.query.endDate])
     );
     return res.json(result);
 }));
@@ -728,7 +754,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
 //Total for each vaccine manufacturer + shot type at all locations.
 //Takes a start and end date.
 //TODO: This query is kinda bad, rewrite it with grouping
-app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
@@ -743,7 +769,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         FROM appointment
         WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?;
         `,
-        [res.params.startDate, res.params.endDate, res.params.startDate, res.params.endDate]
+        params([res.query.startDate, res.query.endDate, res.query.startDate, res.query.endDate])
     );
     return res.json(result);
 }));
@@ -752,7 +778,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 
 //Activity by location - total adverse reactions (Subtotaled by date)
 //Takes a start and end date.
- app.get("/api/reports/activityByLocation/totalAdvReactions", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+ app.get("/api/reports/activityByLocation/totalAdvReactions", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT 
@@ -768,22 +794,27 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
             WHERE apptStatus = 'C' AND advReaction IS NOT NULL AND apptDate BETWEEN ? AND ?
             GROUP BY apptDate, appointment.locationID
             WITH ROLLUP;`,
-        [res.params.startDate, res.params.endDate]
+        params([res.query.startDate, res.query.endDate])
     );
     return res.json(result);
 }));
 
-app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+//Report for adverse reactions across a date range.
+//Takes in a start date and an end date.
+app.get("/api/reports/adverseReactions", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DISTINCT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee Name', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
+        `SELECT DISTINCT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee that Administered', CONCAT(c.firstName,' ',c.lastName) AS 'Reaction Reporter', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
         FROM appointment
-        JOIN patient ON appointment.patientID = patient.patientID
-        JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
-        JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID 
-        JOIN account ON acctlocation.accountID = account.accountID
-        WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.advReaction IS NOT NULL;`,
-        [req.query.startDate, req.query.endDate]
+        INNER JOIN patient ON appointment.patientID = patient.patientID
+        INNER JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
+        INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID 
+        INNER JOIN account ON acctlocation.accountID = account.accountID
+        INNER JOIN acctlocation b ON appointment.advReactionReporter = b.accountID
+        INNER JOIN account c ON b.accountID = c.accountID
+        WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.advReaction IS NOT NULL
+        ORDER BY apptDate;`,
+        params([req.query.startDate, req.query.endDate])
     );
     return res.json(result);
 }));
@@ -791,7 +822,7 @@ app.get("/api/reports/adverseReactions", encodedParser, authMiddleware(admin, si
 
 //Batch Report to get all patients that recieved a shot from a particular batch number at a location across a date range.
 //Takes in a date range, the locationID, and the batch number.
-app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
@@ -810,7 +841,7 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware(admin, sitemgr
 // Activity by Employee (Subtotaled by Date)
 // Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
 //Takes in a start date, end date, and accountID.
-app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware(admin, sitemgr, staff), handleErrors(async (req, res) => {
+app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         `SELECT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Date', CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C') AS 'Patients Processed', (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C' AND advReaction IS NOT NULL) AS 'Adverse Reactions'

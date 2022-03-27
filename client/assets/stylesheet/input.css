@@ -57,6 +57,12 @@ button[disabled] {
 	margin-top: 2rem;
 }
 
+.input-label2 {
+	margin-bottom: 0.5rem;
+	margin-top: 2rem;
+	font-size: 12px;
+}
+
 .SMinput-label {
 	margin-bottom: 0.5rem;
 	margin-top: 2rem;

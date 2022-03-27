@@ -669,7 +669,7 @@ app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleE
         "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff';",
     );
 
-
+    res.json(result);
 
 }));
 

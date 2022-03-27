@@ -93,6 +93,11 @@ function goToPageIndex(index) {
 	if(pages[index]) {
 		qa(".page.active").forEach(n => n.classList.remove("active"));
 		pages[index].classList.add("active");
+		
+		const nextpageonload = pages[index].getAttribute("onload");
+		if(nextpageonload) {
+			(new Function(nextpageonload))();
+		}
 	}
 	updateTimeline();
 }

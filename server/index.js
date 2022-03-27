@@ -661,7 +661,7 @@ app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sit
 }));
 
 
-//TODO
+
 //api call to search staff and nurse accounts by id 
 app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
@@ -669,7 +669,19 @@ app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleE
         "SELECT accountID, username, firstName, lastName, position, email, phone FROM account WHERE position = 'Nurse' OR position = 'Staff';",
     );
 
+}));
 
+//api call to get all staff and nurse accounts and the locations they are active at.
+app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [result, _fields] = await conn.execute(
+        `SELECT account.accountID, account.username, account.firstName, account.lastName, account.position, account.email, account.phone, location.locationName
+        FROM acctlocation
+        LEFT JOIN account ON account.accountID = acctlocation.accountID
+        JOIN location ON acctlocation.locationID = location.locationID
+        WHERE acctlocation.acctStatus = 'Active' AND account.position = 'Nurse' OR account.position = 'Staff'
+        ORDER BY accountID`,
+    );
 
 }));
 

@@ -29,16 +29,16 @@
 							<th>Name</th>
 							<th>Site Location</th>
 						</thead>
-						<tbody id="td">
+						<tbody id="tbody">
 						</tbody>
 					</table>
 					<script>
-						apiGet("/api/sitemgr/accounts").then(accts => {
+						apiGet("/api/sitemgr/accountLocations").then(accts => {
 							for(const acct of accts) {
 								tbody.appendChild(element("tr", {},
 									element("td", {}, acct.accountID),
 									element("td", {}, acct.firstName + " " + acct.lastName),
-									element("td", {}, acct.location)
+									element("td", {}, acct.locationName)
 								));
 							}
 						});

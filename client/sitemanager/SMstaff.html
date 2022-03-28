@@ -36,7 +36,7 @@
 						apiGet("/api/sitemgr/accountLocations").then(accts => {
 							for(const acct of accts) {
 								tbody.appendChild(element("tr", {},
-									element("td", {}, acct.accountID),
+									element("td", {}, acct.accountID + ""),
 									element("td", {}, acct.firstName + " " + acct.lastName),
 									element("td", {}, acct.locationName)
 								));

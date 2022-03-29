@@ -1,0 +1,5 @@
+- vaccin8 system accounts -
+Main01    / HashThis          (Admin)
+Manager01 / ManagerPassword   (Site Manager)
+MainNurse / MainNursePassword (Nurse)
+MainStaff / MainStaffPassword (Staff) 

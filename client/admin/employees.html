@@ -36,18 +36,59 @@
 					</tbody>
 				</table>
 				<script>
-					apiGet("/api/admin/accounts").then(accts => {
-						for(const acct of accts) {
-							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.username),
-								element("td", {}, acct.firstName + " " + acct.lastName),
-								element("td", {}, acct.accountID + ""),
-								element("td", {}, acct.position)
-							));
+					function refreshTable() {
+						apiGet("/api/admin/accounts").then(accts => {
+							const tbody = id("tbody");
+							for(const acct of accts) {
+								let b;
+								tbody.appendChild(element("tr", {},
+									element("td", {}, acct.username),
+									element("td", {}, acct.firstName + " " + acct.lastName),
+									element("td", {}, acct.accountID + ""),
+									element("td", {}, acct.position),
+									b = element("button", {unfilled: true}, "Remove employee"),
+								));
+								
+								b.onclick = () => deleteConfirm(acct.accountID, acct.username);
+							}
+						});
+					}
+					
+					refreshTable();
+					
+					let empToDelete;
+					function deleteConfirm(i, name) {
+						empToDelete = i;
+						id("emp-name").textContent = name;
+						openModal(id("confirm-modal"));
+					}
+					
+					async function deleteEmp() {
+						try {
+							await apiPost("/api/admin/accounts", {
+								accountID: empToDelete,
+							}, "DELETE", false);
+							toast("Deleted account");
+							refreshTable();
+						} catch(err) {
+							console.error("Error deleting employee", err);
+							toast("Error removing employee");
 						}
-					});
+					}
 				</script>
 			</section>
+			
+			<div class="modal" id="confirm-modal">
+				<div class="modal-content">
+					<span class="modal-close">&times;</span>
+					<h1>Are you sure you want to remove employee <span id="emp-name"></span></h1>
+					
+					<section centered>
+						<button unfilled close-modal>Back</button>
+						<button close-modal onclick="deleteEmp()">Confirm</button>
+					</section>
+				</div>
+			</div>
 			
 			<section centered>
 				<button unfilled onclick="history.back()">Back</button>

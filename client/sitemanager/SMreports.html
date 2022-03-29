@@ -25,7 +25,7 @@
 						<div class="SMinput-label">
 							Type of report
 						</div>
-						<select id="report-select-dropdown">
+						<select id="report-select-dropdown" onchange="changeFunc();">
 							<option value="0" selected disabled>Choose an report type</option>
 							<option value="1">Appointment Information</option>
 							<option value="2">Vaccination Information</option>
@@ -33,13 +33,27 @@
 						</select>
 					</label>
 				</section>
+
+				<script>
+
+					function changeFunc() {
+						var selectBox = document.getElementById("report-select-dropdown");
+						var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+
+						if (selectedValue) {
+							goToPageIndex(selectedValue);
+						}
+					} 
+					
+					</script>
+
 				<section centered>
 					<button unfilled type="button" onclick="history.back()">Return to dashboard</button>
 				</section>
         	</div>
 
-			<div class="page">
-				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+			<div class="page" data-timeline="2">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
 				<h1>Appointment Information</h1>
 
 				<div>
@@ -79,7 +93,7 @@
 						<th>Number of Patients Treated</th>
 						<th>On Time</th>
 					</thead>
-					<tbody id="td">
+					<tbody id="tbody">
 					</tbody>
 				</table>
 				<!-- <script>
@@ -95,8 +109,8 @@
 				</script> -->
 			</div>
 
-			<div class="page">
-				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+			<div class="page" data-timeline="3">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
 				<h1>Vaccination Information</h1>
 				<div>
 					<label>
@@ -131,14 +145,25 @@
 						<th>Vaccine Type</th>
 						<th>Number of Appointment</th>
 					</thead>
-					<tbody id="td">
+					<tbody id="tbody">
 					</tbody>
 				</table>
+				<script>
+					// apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
+					// 	for(const acct of accts) {
+					// 		tbody.appendChild(element("tr", {},
+					// 			element("td", {}, acct.apptDate + ""),
+					// 			element("td", {}, acct.campaignVaccID),
+					// 			element("td", {}, acct.locationName)
+					// 		));
+					// 	}
+					// });
+				</script>
 
 			</div>
 
-			<div class="page">
-				<a href="sitemanagermain.html" style="margin-left: 8rem;">&#8249; Return to Dashboard</a>
+			<div class="page" data-timeline="4">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
 				<h1>Adverse Reaction</h1>
 
 				<div>
@@ -179,7 +204,7 @@
 						<th>Patient Contact</th>
 						<th>Comments</th>
 					</thead>
-					<tbody id="td">
+					<tbody id="tbody">
 					</tbody>
 				</table>
 

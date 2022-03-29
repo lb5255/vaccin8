@@ -116,8 +116,12 @@
 						</label>
 					</div>
 				</section>
-				
 				<section centered>
+                    <button unfilled type="button" onclick="history.back()">Return to dashboard</button>
+					<button next> Next </button>
+				</section>
+				
+				<!-- <section centered>
 					<button modal-button="confirmAddUserModal">Confirm</button>
 					<div id="confirmAddUserModal" class="modal">
 						<div class="modal-content">
@@ -128,7 +132,7 @@
 							<button unfilled close-modal>No, go back</button>
 						</div>
 					</div>
-				</section>
+				</section> -->
 			</div>
 			
 			<div class="page" data-timeline="2" onload="loadLocationPage()" validate="setLocations()">
@@ -168,6 +172,11 @@
 					<strong>Role:</strong> <span id="acct-role"></span><br />
 					<strong>Locations:</strong> <span id="acct-locations"></span><br />
 				</section>
+
+				<section centered>
+					<button unfilled onclick="document.location='adminmain.html'">Return to dashboard</button>
+				</section>
+
 			</div>
 		</main>
 	</body>

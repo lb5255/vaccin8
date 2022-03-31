@@ -32,6 +32,7 @@ function element(tag, attr = {}, ...children) {
 		el.appendChild(
 			typeof(child) === "string" ? document.createTextNode(child) :
 			typeof(child) === "number" ? document.createTextNode(child + "") :
+			(child === null || child === undefined) ? document.createTextNode("") :
 			child
 		);
 	}

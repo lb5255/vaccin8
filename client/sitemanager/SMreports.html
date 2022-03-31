@@ -124,13 +124,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" onchange="loadByManufacturer()" />
+						<input type="date" id="date-of-start2" onchange="loadByManufacturer()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" onchange="loadByManufacturer()" />
+						<input type="date" id="date-of-end2" onchange="loadByManufacturer()" />
 					</label>
 
 					<label>
@@ -159,7 +159,10 @@
 				</table>
 				<script>
 					function loadByManufacturer() {
-						apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
+						apiGet("/api/reports/activityByLocation/totalByManufacturer", {
+							startDate: id("date-of-start2").value,
+							endDate: id("date-of-end2").value,
+						}).then(accts => {
 							console.log(accts);
 							tbody2.innerHTML = "";
 							for(const acct of accts) {
@@ -186,13 +189,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" onchange="loadByAdverse()" />
+						<input type="date" id="date-of-start3" onchange="loadByAdverse()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" onchange="loadByAdverse()" />
+						<input type="date" id="date-of-end3" onchange="loadByAdverse()" />
 					</label>
 
 					<label>
@@ -228,12 +231,15 @@
 
 				<script>
 					function loadByAdverse() {
-						apiGet("/api/reports/adverseReactions").then(accts => {
+						apiGet("/api/reports/adverseReactions", {
+							startDate: id("date-of-start3").value,
+							endDate: id("date-of-end3").value,
+						}).then(accts => {
 							console.log(accts);
 							tbody3.innerHTML = "";
 							for(const acct of accts) {
 								tbody3.appendChild(element("tr", {},
-									element("td", {}, acct["Appointment Date"]),
+									element("td", {}, new Date(acct["Appointment Date"]).toLocaleDateString()),
 									element("td", {}, acct["Appointment Number"]),
 									element("td", {}, acct["Patient Name"]),
 									element("td", {}, acct["Vaccine Name"]),

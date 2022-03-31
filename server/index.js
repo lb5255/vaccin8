@@ -747,6 +747,7 @@ app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr),
 app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm; 
     const connection = await conn.getConnection();
+    connection.beginTransaction();
     try {
         //Check if the selected account is in the acctlocation table.
         const [result, _fields] = await conn.execute(
@@ -782,14 +783,21 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
 
 
 //api call to remove an account from being active at a location.
-app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+app.delete("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm;
-    const [result, _fields] = await conn.execute(
-        "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
-        [req.body.accountID,req.body.locationID]
-    );
+    if(req.body.locationID) {
+        await conn.execute(
+            "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
+            params([req.body.accountID,req.body.locationID])
+        );
+    } else {
+        await conn.execute( // remove the employee from all locations
+            "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ?;",
+            params([req.body.accountID])
+        )
+    }
    
-
+    res.send("Removed account from location");
 }));
 
 

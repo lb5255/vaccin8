@@ -30,7 +30,9 @@ function element(tag, attr = {}, ...children) {
 	}
 	for(const child of children) {
 		el.appendChild(
-			typeof(child) === "string" ? document.createTextNode(child) : child
+			typeof(child) === "string" ? document.createTextNode(child) :
+			typeof(child) === "number" ? document.createTextNode(child + "") :
+			child
 		);
 	}
 	

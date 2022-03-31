@@ -25,3 +25,5 @@ services:
       - MYSQL_DATABASE=db
     volumes:
       - ./mysql:/var/lib/mysql
+    command:
+      - --sql_mode=

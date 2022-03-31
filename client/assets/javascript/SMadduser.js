@@ -2,6 +2,7 @@ let findID;
 let findname;
 let findlocation;
 
+
 let accountID;
 let locations;
 
@@ -9,11 +10,11 @@ function findEmployee() {
 	if(id(findID).value === "") {
 		return "Please enter the employee's ID";
 	}
-
 	//find 
 	try {
-		const res = await apiPost("/api/sitemgr/accounts", {
-			
+		const res = await apiPost("/api/sitemgr/accountLocations", {
+			findname: id("firstName").value + " " + id("lastName").value,
+			findlocation: id("locationName").value
 		});
 	} catch(err) {
 		console.log("Failed to retrieve account:", err);

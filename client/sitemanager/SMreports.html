@@ -89,7 +89,7 @@
 					<thead>
 						<th>Day</th>
 						<th>Site Location</th>
-						<th>Appointment Status</th>
+						<th>Completed Appointments</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
@@ -98,18 +98,19 @@
 					function load() {
 
 						apiGet("/api/reports/activityByLocation/totalPatients", {
-						startDate: id("date-of-start").value,
-						endDate: id("date-of-end").value,
-					}).then(accts => {
-						tbody.innerHTML = "";
-						for(const acct of accts) {
-							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.apptDate),
-								element("td", {}, acct.locationName),
-								element("td", {}, acct.apptStatus)
-							));
-						}
-					});
+							startDate: id("date-of-start").value,
+							endDate: id("date-of-end").value,
+						}).then(accts => {
+							tbody.innerHTML = "";
+							console.log(accts);
+							for(const acct of accts) {
+								tbody.appendChild(element("tr", {},
+									element("td", {}, acct.Date),
+									element("td", {}, acct.Location),
+									element("td", {}, acct["Completed Appointments"])
+								));
+							}
+						});
 					}
 
 				</script>
@@ -123,13 +124,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" />
+						<input type="date" id="date-of-start2" onchange="loadByManufacturer()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" />
+						<input type="date" id="date-of-end2" onchange="loadByManufacturer()" />
 					</label>
 
 					<label>
@@ -148,22 +149,33 @@
 				<table id="reporttable">
 					<thead>
 						<th>Day</th>
-						<th>Vaccine Type</th>
-						<th>Appointment Status</th>
+						<th>Location</th>
+						<th>Manufacturer</th>
+						<th>Vaccine Dose</th>
+						<th>Completed Appointments</th>
 					</thead>
-					<tbody id="tbody">
+					<tbody id="tbody2">
 					</tbody>
 				</table>
 				<script>
-					apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
-						for(const acct of accts) {
-							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.apptDate),
-								element("td", {}, acct.campaignVaccID + ""),
-								element("td", {}, acct.apptStatus)
-							));
-						}
-					});
+					function loadByManufacturer() {
+						apiGet("/api/reports/activityByLocation/totalByManufacturer", {
+							startDate: id("date-of-start2").value,
+							endDate: id("date-of-end2").value,
+						}).then(accts => {
+							console.log(accts);
+							tbody2.innerHTML = "";
+							for(const acct of accts) {
+								tbody2.appendChild(element("tr", {},
+									element("td", {}, acct.Date),
+									element("td", {}, acct.locationName),
+									element("td", {}, acct.Manufacturer),
+									element("td", {}, acct["Vaccine Dose"]),
+									element("td", {}, acct["Completed Appointments"]),
+								));
+							}
+						});
+					}
 				</script>
 
 			</div>
@@ -177,13 +189,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" />
+						<input type="date" id="date-of-start3" onchange="loadByAdverse()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" />
+						<input type="date" id="date-of-end3" onchange="loadByAdverse()" />
 					</label>
 
 					<label>
@@ -203,31 +215,44 @@
 				<table id="reporttable">
 					<thead>
 						<th>Day</th>
-						<th>Patient ID</th>
+						<th>Appointment Number</th>
 						<th>Patient Name</th>
-						<th>Vaccine Type</th>
+						<th>Vaccine Name</th>
 						<th>Vaccine Manifacturer</th>
 						<th>Vaccine Dose</th>
-						<th>Reaction</th>
+						<th>Who Administered</th>
+						<th>Reaction Reporter</th>
+						<th>Batch Number</th>
+						<th>Reaction Notes</th>
 					</thead>
-					<tbody id="tbody">
+					<tbody id="tbody3">
 					</tbody>
 				</table>
 
 				<script>
-					apiGet("/api/reports/adverseReactions").then(accts => {
-						for(const acct of accts) {
-							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.apptDate),
-								element("td", {}, acct.patientID + ""),
-								element("td", {}, acct.firstName + " " + acct.lastName),
-								element("td", {}, acct.campaignVaccID + ""),
-								element("td", {}, acct.manufacturer),
-								element("td", {}, acct.vaccineDose),
-								element("td", {}, acct.advReaction)
-							));
-						}
-					});
+					function loadByAdverse() {
+						apiGet("/api/reports/adverseReactions", {
+							startDate: id("date-of-start3").value,
+							endDate: id("date-of-end3").value,
+						}).then(accts => {
+							console.log(accts);
+							tbody3.innerHTML = "";
+							for(const acct of accts) {
+								tbody3.appendChild(element("tr", {},
+									element("td", {}, new Date(acct["Appointment Date"]).toLocaleDateString()),
+									element("td", {}, acct["Appointment Number"]),
+									element("td", {}, acct["Patient Name"]),
+									element("td", {}, acct["Vaccine Name"]),
+									element("td", {}, acct["Manufacturer"]),
+									element("td", {}, acct["Vaccine Dose"]),
+									element("td", {}, acct["Employee that Administered"]),
+									element("td", {}, acct["Reaction Reporter"]),
+									element("td", {}, acct["Batch Number"] || ""),
+									element("td", {}, acct["Reaction Notes"]),
+								));
+							}
+						});
+					}
 				</script>
 			</div>
 		</main>

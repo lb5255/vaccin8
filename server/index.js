@@ -5,7 +5,8 @@ const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
-const dateFormat = require("./dateFormat.js");
+
+const email = require("./email.js");
 const saltRounds = 12;
 
 const admin = "Admin";
@@ -13,8 +14,9 @@ const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
 
-// const emailBuilder = require("./emailBuilder.js");
-// const apptConfirm = "Vaccine Appointment Confirmation";
+const emailBuilder = require("./emailBuilder.js");
+const apptConfirm = "Vaccine Appointment Confirmation";
+const apptCancel = "Vaccine Appointment Cancellation";
 
 
 
@@ -26,7 +28,8 @@ const connProm = require("./load-db.js");
 const app = express();
 const encodedParser = bodyParser.urlencoded({ extended: false});
 const convertDate = require("./dateFormat.js");
-const email = require("./email.js");
+const convertTime = require("./timeFormat.js");
+
 
 
 // statically serve the client on /
@@ -201,14 +204,12 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     try {
         await connection.beginTransaction();
         //first query, insert patient data into patient table
-        var dob = convertDate.mysqlFormat(req.body.dob); //Convert date to mysql format
-
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            params([req.body.fName, req.body.lName, dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum])
+            params([req.body.fName, req.body.lName, req.body.dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum])
         );
         //2nd query, update the chosen timeslot with patient info.
-        await connection.execute(
+        const [apptResult] = await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
             params([req.body.campaignVaccID, result.insertId, req.body.appointmentID])
         );
@@ -217,14 +218,37 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
         await connection.commit();//Commit the changes
 
         //Send confirmation email
-        // if (req.body.email != null) {
-        //     //Build Email message
-        //     var apptMessage = await emailBuilder.buildConfAppt("Test","Test","Test");
-        //     //Send email
-        //     const email = require("./email.js");
-        //     email.main(req.body.email, apptConfirm, apptMessage);
-        // }
-        res.send("");
+        if (typeof(req.body.email) === 'string') {
+
+            //Query info for conf email
+            const [confResult] = await connection.execute(
+                `SELECT locationName, vaccineType, manufacturer, vaccineDose, apptDate, apptTime
+                FROM appointment
+                INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+                INNER JOIN location ON campaignlocation.locationID = location.locationID
+                INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
+                WHERE appointmentID = ?`,
+                params([req.body.appointmentID])
+            );
+
+            //For some reason, date and time are formatted very wierdly.
+
+            //console.log(confResult[0].apptDate);
+            //console.log(confResult[0].apptTime);
+           
+            
+            var confVaccine = confResult[0].manufacturer + " " + confResult[0].vaccineType + " " + confResult[0].vaccineDose + " shot";
+            var confDate = convertDate.normalFormat(confResult[0].apptDate);
+            var confTime = convertTime.formatTime(confResult[0].apptTime);
+            //console.log(confDate);
+            //console.log(confTime);
+
+            //Build Email message, date, time, vaccine
+            var apptMessage = await emailBuilder.buildConfAppt(confResult[0].locationName,confVaccine,confDate,confTime);
+            //Send email
+            email.main(req.body.email, apptConfirm, apptMessage);
+        }
+        res.send("Registered for appointment.");
     } 
     catch(e) {
         console.log("An error has occurred with this transaction.", e);
@@ -241,11 +265,44 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
 //Takes in the appointmentID they selected
 app.delete("/api/recipient/vaccineAppts", encodedParser, handleErrors(async (req, res) => {
     const conn = await connProm;
-    const [result] = await conn.execute(
-        "UPDATE appointment SET campaignVaccID = NULL, patientID = NULL, apptStatus = 'O', perferredContact = NULL WHERE appointmentID = ?",
-        [req.body.appointmentID]
+
+    //Check if there is an appointment with that id.
+    const [checkResult] = await conn.execute(
+        `SELECT location.locationName, patient.email, apptDate, apptTime, apptStatus 
+        FROM appointment 
+        INNER JOIN patient ON appointment.patientID = patient.patientID
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
+        WHERE appointmentID = ? AND apptStatus = 'F'`,
+        params([req.body.appointmentID])
     );
-    return res.send("Removed appointment.");
+
+    //If the result returned a row
+    if (checkResult.length > 0 && (typeof checkResult !== 'undefined')) {
+    
+        const [result] = await conn.execute(
+            "UPDATE appointment SET campaignVaccID = NULL, patientID = NULL, apptStatus = 'O', perferredContact = NULL WHERE appointmentID = ?",
+            params([req.body.appointmentID])
+        );
+        
+        //If the returned result has an email registered:
+        if (checkResult[0].email != undefined) {
+            //Code to send a cancellation email
+            //Build Email message, date, time
+            var confDate = convertDate.normalFormat(checkResult[0].apptDate);
+            var confTime = convertTime.formatTime(checkResult[0].apptTime);
+            var apptMessage = await emailBuilder.buildCancelAppt(checkResult[0].locationName,confDate,confTime);
+            //Send email
+            email.main(checkResult[0].email, apptCancel, apptMessage);
+
+        }
+    
+        return res.send("Removed appointment.");
+    }
+    else {
+        return res.send("No appointment found.");
+    }
+    
 }));
 
 

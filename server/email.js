@@ -12,7 +12,7 @@ async function main(reciever, header, message) {
     secure: false, // true for 465, false for other ports
     auth: {
       user: "vaccin8system@outlook.com", // username
-      pass: "DSecZHtMJg7nTKP",  //password
+      pass: "S51stfZoZPDjdNYSenior_Dev_II",  //password
     },
   });
 

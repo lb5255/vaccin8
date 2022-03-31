@@ -7,4 +7,13 @@ function mysqlFormat(normDate) {
     return formattedDate;
 }
 
-module.exports = {mysqlFormat};
+//Function to change date returned to mm/dd/yyyy
+function normalFormat(mysqlDate) {
+    
+    const [year, month, day] = [mysqlDate.getFullYear(), mysqlDate.getMonth(), mysqlDate.getDate()]
+    const formattedDate = [month, day, year].join('/');
+    return formattedDate;
+}
+
+
+module.exports = {mysqlFormat, normalFormat};

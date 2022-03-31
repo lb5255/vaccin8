@@ -119,7 +119,7 @@
 							<span class="modal-close">&times;</span>
 							<h1>Are you sure you want to create this appointment slot?</h1>
 							<br>
-							<button next close-modal>Yes</button>
+							<button next>Yes</button>
 							<button unfilled close-modal>No, go back</button>
 						</div>
 					</div>
@@ -154,6 +154,7 @@
 							id("slot-date-confirm").textContent = id("slot-date").value;
 							id("slot-time-confirm").textContent = id("slot-time").value;
 							id("slot-count-confirm").textContent = id("slot-count").value;
+							closeModal();
 						} catch(err) {
 							console.error("error creating timeslot", err);
 							return "There was an error creating the appointment";

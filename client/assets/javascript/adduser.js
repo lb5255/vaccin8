@@ -47,6 +47,7 @@ let accountID;
 let locations;
 
 async function loadLocationPage() {
+	closeModal();
 	locations = await apiGet("/api/admin/locations");
 	
 	const container = id("location-select");

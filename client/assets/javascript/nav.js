@@ -20,52 +20,72 @@ function updateTimeline() {
 	})
 }
 
+async function validatePage() {
+	const page = getPages()[getActivePageIndex()];
+	
+	let validator = page.getAttribute("validate");
+	if(!validator) {
+		return;
+	}
+	
+	try {
+		let res = (new Function("return " + validator))();
+		if(res?.then) {
+			res = await res;
+		}
+		return res;
+	} catch(err) {
+		return err?.message || false;
+	}
+}
+
+function getActivePageIndex() {
+	const pages = getPages();
+	for(let i = 0; i < pages.length; i++) {
+		if(pages[i].classList.contains("active")) {
+			return i;
+		}
+	}
+	return 0;
+}
+
 async function nextPage() {
 	// clear any validation errors that exist
 	qa(".error-message").forEach(n => n.remove());
 	qa(".error-button").forEach(n => n.classList.remove("error-button"));
 	
 	const pages = getPages();
-	for(let i = 0; i < pages.length; i++) {
-		if(pages[i].classList.contains("active")) {
-			// optionally validate
-			let validator = pages[i].getAttribute("validate");
-			if(validator) {
-				let res = (new Function("return " + validator))();
-				if(res?.then) { // can be awaited
-					res = await res;
-				}
-				
-				// display the error message
-				if(res === false || typeof(res) === "string") {
-					const nextButton = pages[i].querySelector("[next]");
-					nextButton.classList.add("error-button");
-					
-					if(typeof(res) === "string") {
-						nextButton.parentNode.appendChild(
-							element("div", {
-								class: "error-message"
-							}, res)
-						);
-					}
-					
-					return;
-				}
-			}
-			
-			// switch pages
-			const nextpage = pages[i + 1];
-			if(nextpage) {
-				const nextpageonload = nextpage.getAttribute("onload");
-				if(nextpageonload) {
-					(new Function(nextpageonload))();
-				}
-				
-				nextpage.classList.add("active");
-				pages[i].classList.remove("active");
-				break;
-			}
+	const i = getActivePageIndex();
+	
+	// optionally validate
+	const res = await validatePage();
+	
+	// display the error message
+	if(res === false || typeof(res) === "string") {
+		const nextButton = pages[i].querySelector("[next]");
+		nextButton.classList.add("error-button");
+		
+		if(typeof(res) === "string") {
+			nextButton.parentNode.appendChild(
+				element("div", {
+					class: "error-message"
+				}, res)
+			);
 		}
+		
+		return;
+	}
+	
+	// switch pages
+	const nextpage = pages[i + 1];
+	if(nextpage) {
+		const nextpageonload = nextpage.getAttribute("onload");
+		if(nextpageonload) {
+			(new Function(nextpageonload))();
+		}
+		
+		nextpage.classList.add("active");
+		pages[i].classList.remove("active");
 	}
 	
 	// scroll to the top of the page on page advance
@@ -117,17 +137,25 @@ function enableModalButton(btn) {
 	});
 }
 
+let closeModal = () => {};
+
 function openModal(modal) {
 	// open the modal 
 	modal.style.display = "block";
 	
 	// functions to execute when the modal exits
-	const onclose = [];
+	let onclose = [];
 	// function to close the modal and execute all onclose functions
-	const closeModal = () => {
+	let closed = false;
+	const closeModalFunc = () => {
+		if(closed) {
+			return;
+		}
+		closed = true;
 		modal.style.display = "none";
 		onclose.forEach(n => n());
 	}
+	closeModal = closeModalFunc;
 	
 	// Get the <span> element that closes the modal
 	// using modal.getElementsByClassName to get the one inside the
@@ -137,19 +165,19 @@ function openModal(modal) {
 	// all the elements inside the modal that have the close-modal
 	// attribute should close the modal when clicked
 	modal.querySelectorAll("[close-modal]").forEach(n => {
-		n.addEventListener("click", closeModal);
-		onclose.push(() => n.removeEventListener("click", closeModal));
+		n.addEventListener("click", closeModalFunc);
+		onclose.push(() => n.removeEventListener("click", closeModalFunc));
 	})
 	
 	// When the user clicks on <span> (x), close the modal
 	if(span) {
-		span.onclick = closeModal;
+		span.onclick = closeModalFunc;
 	}
 
 	// When the user clicks anywhere outside of the modal, close it
 	const onclick = function(event) {
 		if (event.target == modal) {
-			closeModal();
+			closeModalFunc();
 		}
 	}
 	
@@ -157,7 +185,7 @@ function openModal(modal) {
 	onclose.push(() => window.removeEventListener("click", onclick));
 	
 	const prom = new Promise(r => onclose.push(r));
-	prom.close = closeModal;
+	prom.close = closeModalFunc;
 	return prom;
 }
 

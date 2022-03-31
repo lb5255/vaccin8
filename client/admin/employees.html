@@ -46,7 +46,7 @@
 									element("td", {}, acct.firstName + " " + acct.lastName),
 									element("td", {}, acct.accountID + ""),
 									element("td", {}, acct.position),
-									b = element("button", {unfilled: true}, "Remove employee"),
+									b = element("button", {unfilled: true}, "Deactivate employee"),
 								));
 								
 								b.onclick = () => deleteConfirm(acct.accountID, acct.username);

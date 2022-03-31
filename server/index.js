@@ -747,6 +747,7 @@ app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr),
 app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm; 
     const connection = await conn.getConnection();
+    connection.beginTransaction();
     try {
         //Check if the selected account is in the acctlocation table.
         const [result, _fields] = await conn.execute(
@@ -782,14 +783,21 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
 
 
 //api call to remove an account from being active at a location.
-app.put("/api/sitemgr/locations/accounts", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+app.delete("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm;
-    const [result, _fields] = await conn.execute(
-        "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
-        [req.body.accountID,req.body.locationID]
-    );
+    if(req.body.locationID) {
+        await conn.execute(
+            "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
+            params([req.body.accountID,req.body.locationID])
+        );
+    } else {
+        await conn.execute( // remove the employee from all locations
+            "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ?;",
+            params([req.body.accountID])
+        )
+    }
    
-
+    res.send("Removed account from location");
 }));
 
 
@@ -804,7 +812,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
         `SELECT 
         IF(GROUPING(apptDate), 
         'Grand Total',
-        DATE_FORMAT(apptDate,'%m/%d/%Y')) AS "Date",
+        apptDate) AS "Date",
         IF(GROUPING(appointment.locationID),
         'All Locations', locationName) AS "Location", 
         COUNT(*) AS 'Completed Appointments'
@@ -826,7 +834,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
 app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DATE_FORMAT(apptDate,'%m/%d/%Y') AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
+        `SELECT apptDate AS 'Date', location.locationName, campaignvaccines.manufacturer AS "Manufacturer", campaignvaccines.vaccineDose AS "Vaccine Dose", COUNT(*) AS 'Completed Appointments' 
         FROM appointment
         INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
         INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
@@ -853,7 +861,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         `SELECT 
         IF(GROUPING(apptDate), 
         'Grand Total',
-        DATE_FORMAT(apptDate,'%m/%d/%Y')) AS "Date",
+        apptDate) AS "Date",
         IF(GROUPING(appointment.locationID),
         'All Locations', locationName) AS "Location", 
         COUNT(*) AS 'Adverse Reactions'
@@ -873,7 +881,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
 app.get("/api/reports/adverseReactions", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DISTINCT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee that Administered', CONCAT(c.firstName,' ',c.lastName) AS 'Reaction Reporter', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
+        `SELECT DISTINCT appointment.apptDate AS 'Appointment Date', appointment.appointmentID AS 'Appointment Number', CONCAT(patient.firstName,' ',patient.lastName) AS 'Patient Name', campaignvaccines.vaccineType AS 'Vaccine Name', campaignvaccines.manufacturer AS 'Manufacturer', campaignvaccines.vaccineDose AS 'Vaccine Dose', CONCAT(account.firstName,' ',account.lastName) AS 'Employee that Administered', CONCAT(c.firstName,' ',c.lastName) AS 'Reaction Reporter', appointment.batchNum AS 'Batch Number', appointment.advReaction AS 'Reaction Notes'
         FROM appointment
         INNER JOIN patient ON appointment.patientID = patient.patientID
         INNER JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
@@ -894,7 +902,7 @@ app.get("/api/reports/adverseReactions", encodedParser, authMiddleware([admin, s
 app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", DATE_FORMAT(appointment.apptDate, "%m/%d/%Y") AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
+        `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", appointment.apptDate AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
         FROM appointment
         INNER JOIN patient ON appointment.patientID = patient.patientID
         INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
@@ -913,7 +921,7 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemg
 app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT DATE_FORMAT(appointment.apptDate,'%m/%d/%Y') AS 'Date', CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C') AS 'Patients Processed', (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C' AND advReaction IS NOT NULL) AS 'Adverse Reactions'
+        `SELECT appointment.apptDate AS 'Date', CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C') AS 'Patients Processed', (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C' AND advReaction IS NOT NULL) AS 'Adverse Reactions'
         FROM appointment
         INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
         INNER JOIN location ON campaignlocation.locationID = location.locationID

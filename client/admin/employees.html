@@ -65,14 +65,14 @@
 					
 					async function deleteEmp() {
 						try {
-							await apiPost("/api/admin/accounts", {
+							await apiPost("/api/sitemgr/locations/accounts", {
 								accountID: empToDelete,
 							}, "DELETE", false);
-							toast("Deleted account");
+							toast("Account marked as inactive");
 							refreshTable();
 						} catch(err) {
-							console.error("Error deleting employee", err);
-							toast("Error removing employee");
+							console.error("Error deactivating employee", err);
+							toast("Error deactivating employee");
 						}
 					}
 				</script>

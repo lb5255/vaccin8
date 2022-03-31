@@ -124,13 +124,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" />
+						<input type="date" id="date-of-start" onchange="loadByManufacturer()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" />
+						<input type="date" id="date-of-end" onchange="loadByManufacturer()" />
 					</label>
 
 					<label>
@@ -154,14 +154,16 @@
 						<th>Vaccine Dose</th>
 						<th>Completed Appointments</th>
 					</thead>
-					<tbody id="tbody">
+					<tbody id="tbody2">
 					</tbody>
 				</table>
 				<script>
 					function loadByManufacturer() {
 						apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
+							console.log(accts);
+							tbody2.innerHTML = "";
 							for(const acct of accts) {
-								tbody.appendChild(element("tr", {},
+								tbody2.appendChild(element("tr", {},
 									element("td", {}, acct.Date),
 									element("td", {}, acct.locationName),
 									element("td", {}, acct.Manufacturer),
@@ -184,13 +186,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" />
+						<input type="date" id="date-of-start" onchange="loadByAdverse()" />
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" />
+						<input type="date" id="date-of-end" onchange="loadByAdverse()" />
 					</label>
 
 					<label>
@@ -220,15 +222,17 @@
 						<th>Batch Number</th>
 						<th>Reaction Notes</th>
 					</thead>
-					<tbody id="tbody">
+					<tbody id="tbody3">
 					</tbody>
 				</table>
 
 				<script>
 					function loadByAdverse() {
 						apiGet("/api/reports/adverseReactions").then(accts => {
+							console.log(accts);
+							tbody3.innerHTML = "";
 							for(const acct of accts) {
-								tbody.appendChild(element("tr", {},
+								tbody3.appendChild(element("tr", {},
 									element("td", {}, acct["Appointment Date"]),
 									element("td", {}, acct["Appointment Number"]),
 									element("td", {}, acct["Patient Name"]),

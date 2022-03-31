@@ -822,7 +822,7 @@ app.get("/api/reports/activityByLocation/totalPatients", encodedParser, authMidd
             WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?
             GROUP BY apptDate, appointment.locationID
             WITH ROLLUP;`,
-        params([res.query.startDate, res.query.endDate])
+        params([req.query.startDate, req.query.endDate])
     );
     return res.json(result);
 }));
@@ -846,7 +846,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
         FROM appointment
         WHERE apptStatus = 'C' AND apptDate BETWEEN ? AND ?;
         `,
-        params([res.query.startDate, res.query.endDate, res.query.startDate, res.query.endDate])
+        params([req.query.startDate, req.query.endDate, req.query.startDate, req.query.endDate])
     );
     return res.json(result);
 }));
@@ -871,7 +871,7 @@ app.get("/api/reports/activityByLocation/totalByManufacturer", encodedParser, au
             WHERE apptStatus = 'C' AND advReaction IS NOT NULL AND apptDate BETWEEN ? AND ?
             GROUP BY apptDate, appointment.locationID
             WITH ROLLUP;`,
-        params([res.query.startDate, res.query.endDate])
+        params([req.query.startDate, req.query.endDate])
     );
     return res.json(result);
 }));

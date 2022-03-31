@@ -320,15 +320,11 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), hand
     res.json(result);
 }));
 
-//api call to get appointment info for a date range (Start date, end date) at the locationID they picked when they selected their location.
-//Takes the locationID they selected, and their entered start and end date as query parameters.
+//api call to get appointment info of all filled appointments at the locationID they picked when they selected their location.
+//Takes the locationID they selected.
 app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleErrors(async (req, res) => {
     const conn = await connProm;
     
-    //Date range is in YYYY-MM-DD format when it's sent back
-    //const startDate = dateFormat.mysqlFormat(req.body.startDate);
-    //const endDate = dateFormat.mysqlFormat(req.body.endDate);
-
     const [result, _fields] = await conn.execute(
         `SELECT appointment.appointmentID, location.locationName, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime
         FROM appointment
@@ -337,8 +333,8 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
         INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID
         INNER JOIN location on campaignlocation.locationID = location.locationID
         WHERE appointment.locationID = ?
-        AND appointment.campaignID IN ( SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate BETWEEN ? AND ? AND apptStatus = 'F';`,
-        params([req.query.locationID, req.query.startDate, req.query.endDate])
+        AND appointment.campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate = CURDATE() AND apptStatus = 'F';`,
+        params([req.query.locationID])
     );
     res.json(result);
 }));
@@ -915,6 +911,7 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemg
 }));
 
 
+//Come back to this later
 // Activity by Employee (Subtotaled by Date)
 // Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
 //Takes in a start date, end date, and accountID.

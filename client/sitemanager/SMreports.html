@@ -89,25 +89,22 @@
 					<thead>
 						<th>Day</th>
 						<th>Site Location</th>
-						<th>Number of Appointments</th>
-						<th>Vaccine Type</th>
-						<th>Number of Patients Treated</th>
-						<th>On Time</th>
+						<th>Appointment Status</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
 				</table>
-				<!-- <script>
-					apiGet("/api/sitemgr/accounts").then(accts => {
+				<script>
+					apiGet("/api/reports/activityByLocation/totalPatients").then(accts => {
 						for(const acct of accts) {
 							tbody.appendChild(element("tr", {},
-								element("td", {}, acct.accountID),
-								element("td", {}, acct.firstName + " " + acct.lastName),
-								element("td", {}, acct.position)
+								element("td", {}, acct.apptDate),
+								element("td", {}, acct.locationName),
+								element("td", {}, acct.apptStatus)
 							));
 						}
 					});
-				</script> -->
+				</script>
 			</div>
 
 			<div class="page" data-timeline="3">
@@ -144,21 +141,21 @@
 					<thead>
 						<th>Day</th>
 						<th>Vaccine Type</th>
-						<th>Number of Appointment</th>
+						<th>Appointment Status</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
 				</table>
 				<script>
-					// apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
-					// 	for(const acct of accts) {
-					// 		tbody.appendChild(element("tr", {},
-					// 			element("td", {}, acct.apptDate + ""),
-					// 			element("td", {}, acct.campaignVaccID),
-					// 			element("td", {}, acct.locationName)
-					// 		));
-					// 	}
-					// });
+					apiGet("/api/reports/activityByLocation/totalByManufacturer").then(accts => {
+						for(const acct of accts) {
+							tbody.appendChild(element("tr", {},
+								element("td", {}, acct.apptDate),
+								element("td", {}, acct.campaignVaccID),
+								element("td", {}, acct.apptStatus)
+							));
+						}
+					});
 				</script>
 
 			</div>
@@ -198,18 +195,32 @@
 				<table id="reporttable">
 					<thead>
 						<th>Day</th>
-						<th>Time of Report</th>
+						<th>Patient ID</th>
 						<th>Patient Name</th>
 						<th>Vaccine Type</th>
-						<th>Site Location</th>
-						<th>Patient Contact</th>
-						<th>Comments</th>
+						<th>Vaccine Manifacturer</th>
+						<th>Vaccine Dose</th>
+						<th>Reaction</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
 				</table>
 
-
+				<script>
+					apiGet("/api/reports/adverseReactions").then(accts => {
+						for(const acct of accts) {
+							tbody.appendChild(element("tr", {},
+								element("td", {}, acct.apptDate),
+								element("td", {}, acct.patientID),
+								element("td", {}, acct.firstName + " " + acct.lastName),
+								element("td", {}, acct.campaignVaccID),
+								element("td", {}, acct.manufacturer),
+								element("td", {}, acct.vaccineDose),
+								element("td", {}, acct.advReaction)
+							));
+						}
+					});
+				</script>
 			</div>
 		</main>
     </body>

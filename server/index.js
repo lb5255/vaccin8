@@ -751,20 +751,20 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
         //Check if the selected account is in the acctlocation table.
         const [result, _fields] = await conn.execute(
             "SELECT * FROM acctlocation WHERE accountID = ? AND locationID = ?",
-            [req.body.accountID, req.body.locationID]
+            params([req.body.accountID, req.body.locationID])
         ); 
         //If the account doesn't exist, insert it into the account
         if (!result.length || !result[0].accountID) {
             await conn.execute(
                 "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N');",
-                [req.body.accountID, req.body.locationID]
+                params([req.body.accountID, req.body.locationID])
             );
         }
         //If the account exists, change the status of it to active.
         else {
             await conn.execute(
                 "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?;",
-                [req.body.accountID, req.body.locationID]
+                params([req.body.accountID, req.body.locationID])
             );  
         }
         res.send("Added user to location");

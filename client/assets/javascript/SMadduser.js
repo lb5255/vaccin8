@@ -2,20 +2,20 @@ let findID;
 let findname;
 let findlocation;
 
-
 let accountID;
 let locations;
 
-function findEmployee() {
-	if(id(findID).value === "") {
+let account;
+async function findEmployee() {
+	if(id("findID").value === "") {
 		return "Please enter the employee's ID";
 	}
 	//find 
 	try {
-		const res = await apiPost("/api/sitemgr/accountLocations", {
-			findname: id("firstName").value + " " + id("lastName").value,
-			findlocation: id("locationName").value
-		});
+		const user = (await apiGet("/api/sitemgr/accountLocations")).find(n => n.accountID === +id("findID").value);
+		id("findname").textContent = user.firstName + " " + user.lastName;
+		id("findname2").textContent = user.firstName + " " + user.lastName;
+		account = user;
 	} catch(err) {
 		console.log("Failed to retrieve account:", err);
 		return "Failed to retrieve account";
@@ -24,7 +24,7 @@ function findEmployee() {
 
 
 async function loadLocationPage() {
-	locations = await apiGet("/api/admin/locations");
+	locations = await apiGet("/api/sitemgr/activeLocations");
 	
 	const container = id("location-select");
 	container.innerHTML = "";
@@ -42,6 +42,17 @@ async function loadLocationPage() {
 	}
 }
 
+function commas(list) {
+	switch(list.length) {
+		case 0: return "";
+		case 1: return list[0];
+		case 2: return list[0] + " and " + list[1];
+		default: {
+			return list.slice(0, list.length - 1).join(", ") + ", and " + list[list.length - 1];
+		}
+	}
+}
+
 async function setLocations() {
 	const locs = [].map.call(qa("input[name=location]:checked"), n => parseInt(n.dataset.value));
 	console.log("locations:", locs);
@@ -52,7 +63,7 @@ async function setLocations() {
 	for(const loc of locs) {
 		try {
 			await apiPost("/api/sitemgr/locations/accounts", {
-				accountID,
+				accountID: account.accountID,
 				locationID: loc,
 			}, "POST", false);
 		} catch(err) {

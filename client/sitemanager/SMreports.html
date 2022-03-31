@@ -62,13 +62,13 @@
 						<div class="input-label2">
 							Start Date
 						</div>
-						<input type="date" id="date-of-start" />
+						<input type="date" id="date-of-start" onchange="load()"/>
 					</label>
 					<label>
 						<div class="input-label2">
 							End Date
 						</div>
-						<input type="date" id="date-of-end" />
+						<input type="date" id="date-of-end" onchange="load()"/>
 					</label>
 
 					<label>
@@ -95,7 +95,13 @@
 					</tbody>
 				</table>
 				<script>
-					apiGet("/api/reports/activityByLocation/totalPatients").then(accts => {
+					function load() {
+
+						apiGet("/api/reports/activityByLocation/totalPatients", {
+						startDate: id("date-of-start").value,
+						endDate: id("date-of-end").value,
+					}).then(accts => {
+						tbody.innerHTML = "";
 						for(const acct of accts) {
 							tbody.appendChild(element("tr", {},
 								element("td", {}, acct.apptDate),
@@ -104,6 +110,8 @@
 							));
 						}
 					});
+					}
+
 				</script>
 			</div>
 

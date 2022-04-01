@@ -913,20 +913,23 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemg
 
 //Come back to this later
 // Activity by Employee (Subtotaled by Date)
-// Total Patients Processed: Employee Name, Location, Total Patients Processed, Total Adverse Reactions
+// Total Patients Processed: Date, Employee Name, Location, Total Patients Processed, Total Adverse Reactions
 //Takes in a start date, end date, and accountID.
 app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware([admin, sitemgr, staff]), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT appointment.apptDate AS 'Date', CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C') AS 'Patients Processed', (SELECT count(*) FROM appointment WHERE staffMember = ? AND apptStatus = 'C' AND advReaction IS NOT NULL) AS 'Adverse Reactions'
+        `SELECT IF(GROUPING(apptDate), 
+        'Grand Total',
+        apptDate) AS "Date", CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, count(*) AS 'Patients Processed'
         FROM appointment
         INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
         INNER JOIN location ON campaignlocation.locationID = location.locationID
         INNER JOIN acctlocation ON appointment.staffMember = acctlocation.accountID
         INNER JOIN account ON acctlocation.accountID = account.accountID
         WHERE staffMember = ? AND apptDate BETWEEN ? AND ?
-        GROUP BY apptDate;`,
-        params([req.query.accountID, req.query.accountID, req.query.accountID, req.query.startDate, req.query.endDate])
+        GROUP BY apptDate
+        WITH ROLLUP;`,
+        params([req.query.accountID, req.query.startDate, req.query.endDate])
     );
     return res.json(result);
 }));

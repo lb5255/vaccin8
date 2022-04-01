@@ -334,7 +334,7 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
         INNER JOIN location on campaignlocation.locationID = location.locationID
         WHERE appointment.locationID = ?
         AND appointment.campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate = CURDATE() AND apptStatus = 'F';`,
-        params([req.body.locationID])
+        params([req.query.locationID])
     );
     res.json(result);
 }));

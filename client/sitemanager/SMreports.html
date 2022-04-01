@@ -31,6 +31,9 @@
 							<option value="1">Appointment Information</option>
 							<option value="2">Vaccination Information</option>
 							<option value="3">Adverse Reaction</option>
+							<option value="4">Total Adverse Reactions</option>
+							<option value="5">Batch Report</option>
+							<option value="6">Activity By Employee</option>
 						</select>
 					</label>
 				</section>
@@ -255,6 +258,231 @@
 					}
 				</script>
 			</div>
+			
+			
+			<div class="page">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
+				<h1>Total Adverse Reactions</h1>
+
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start4" onchange="load4()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end4" onchange="load4()"/>
+					</label>
+
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
+
+				<br>
+
+				<table id="reporttable">
+					<thead>
+						<th>Day</th>
+						<th>Location</th>
+						<th>Adverse Reactions</th>
+					</thead>
+					<tbody id="tbody4">
+					</tbody>
+				</table>
+				<script>
+					function load4() {
+
+						apiGet("/api/reports/activityByLocation/totalAdvReactions", {
+							startDate: id("date-of-start4").value,
+							endDate: id("date-of-end4").value,
+						}).then(accts => {
+							tbody4.innerHTML = "";
+							console.log(accts);
+							for(const acct of accts) {
+								tbody4.appendChild(element("tr", {},
+									element("td", {}, acct.Date),
+									element("td", {}, acct.Location),
+									element("td", {}, acct["Adverse Reactions"])
+								));
+							}
+						});
+					}
+
+				</script>
+			</div>
+			
+			
+			<div class="page">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
+				<h1>Batch Report</h1>
+
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start5" onchange="load5()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end5" onchange="load5()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							Batch Number
+						</div>
+						<input type="number" id="batch-num" onchange="load5()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							Location ID
+						</div>
+						<input type="number" id="loc-id" onchange="load5()"/>
+					</label>
+
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
+
+				<br>
+
+				<table id="reporttable">
+					<thead>
+						<th>Appt #</th>
+						<th>Patient</th>
+						<th>Appt Date</th>
+						<th>Location</th>
+						<th>Vaccine</th>
+						<th>Manufacturer</th>
+						<th>Batch Number</th>
+					</thead>
+					<tbody id="tbody5">
+					</tbody>
+				</table>
+				<script>
+					function load5() {
+
+						apiGet("/api/reports/batchReport", {
+							startDate: id("date-of-start5").value,
+							endDate: id("date-of-end5").value,
+							batchNum: +id("batch-num").value,
+							locationID: +id("loc-id").value,
+						}).then(accts => {
+							tbody5.innerHTML = "";
+							console.log(accts);
+							for(const acct of accts) {
+								tbody5.appendChild(element("tr", {},
+									element("td", {}, acct["Appointment Number"]),
+									element("td", {}, acct["Patient Name"]),
+									element("td", {}, acct["Appointment Date"]),
+									element("td", {}, acct.Location),
+									element("td", {}, acct.Vaccine),
+									element("td", {}, acct.Manufacturer),
+									element("td", {}, acct["Batch Number"]),
+								));
+							}
+						});
+					}
+
+				</script>
+			</div>
+			
+			
+			<div class="page">
+				<a href="SMreports.html" style="margin-left: 8rem;">&#8249; Return to Reports</a>
+				<h1>Activity By Employee</h1>
+
+				<div>
+					<label>
+						<div class="input-label2">
+							Start Date
+						</div>
+						<input type="date" id="date-of-start6" onchange="load6()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							End Date
+						</div>
+						<input type="date" id="date-of-end6" onchange="load6()"/>
+					</label>
+					<label>
+						<div class="input-label2">
+							Employee ID
+						</div>
+						<input type="number" id="emp-id" onchange="load6()"/>
+					</label>
+
+					<label>
+						<div class="input-label2">
+							Export As:
+						</div>
+						<select id="report-select-dropdown">
+							<option value="0" selected disabled>Choose an export type</option>
+							<option value="1">PDF</option>
+							<option value="2">CSV</option>
+						</select>
+					</label>
+				</div>
+
+				<br>
+
+				<table id="reporttable">
+					<thead>
+						<th>Date</th>
+						<th>Employee Name</th>
+						<th>Location</th>
+						<th>Patients Processed</th>
+					</thead>
+					<tbody id="tbody6">
+					</tbody>
+				</table>
+				<script>
+					function load6() {
+
+						apiGet("/api/reports/activityByEmployee", {
+							startDate: id("date-of-start6").value,
+							endDate: id("date-of-end6").value,
+							accountID: +id("emp-id").value,
+						}).then(accts => {
+							tbody6.innerHTML = "";
+							console.log(accts);
+							for(const acct of accts) {
+								tbody6.appendChild(element("tr", {},
+									element("td", {}, acct.Date),
+									element("td", {}, acct["Employee Name"]),
+									element("td", {}, acct.locationName),
+									element("td", {}, acct["Patients Processed"]),
+								));
+							}
+						});
+					}
+
+				</script>
+			</div>
+			
+			
 		</main>
     </body>
 </html>

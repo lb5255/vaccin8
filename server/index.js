@@ -901,8 +901,8 @@ app.get("/api/reports/batchReport", encodedParser, authMiddleware([admin, sitemg
         `SELECT appointment.appointmentID AS "Appointment Number", CONCAT(patient.firstName," ",patient.lastName) AS "Patient Name", appointment.apptDate AS "Appointment Date", location.locationName AS "Location", campaignvaccines.vaccineType AS "Vaccine", campaignvaccines.manufacturer AS "Manufacturer", appointment.batchNum AS "Batch Number"
         FROM appointment
         INNER JOIN patient ON appointment.patientID = patient.patientID
-        INNER JOIN campaignLocation ON appointment.locationID = campaignLocation.locationID
-        INNER JOIN location ON campaignLocation.locationID = location.locationID
+        INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
+        INNER JOIN location ON campaignlocation.locationID = location.locationID
         INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
         WHERE appointment.apptDate BETWEEN ? AND ? AND appointment.locationID = ? AND batchNum = ?;`,
         params([req.query.startDate, req.query.endDate, req.query.locationID, req.query.batchNum])

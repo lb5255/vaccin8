@@ -315,7 +315,7 @@ app.get("/api/staff/activeLocations", encodedParser, authMiddleware(staff), hand
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctlocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        params([req.query.userID])
+        params([req.userID])
     );
     res.json(result);
 }));
@@ -647,7 +647,7 @@ app.get("/api/sitemgr/activeLocations", encodedParser, authMiddleware(sitemgr), 
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
         "SELECT acctlocation.accountID, acctlocation.locationID, location.locationName FROM acctlocation JOIN location ON acctlocation.locationID = location.locationID WHERE accountID = ?;",
-        params([req.query.userID])
+        params([req.userID])
     );
     return res.json(result);
 }));

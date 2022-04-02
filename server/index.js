@@ -920,7 +920,8 @@ app.get("/api/reports/activityByEmployee", encodedParser, authMiddleware([admin,
     const [result, _fields] = await conn.execute(
         `SELECT IF(GROUPING(apptDate), 
         'Grand Total',
-        apptDate) AS "Date", CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, count(*) AS 'Patients Processed'
+        apptDate) AS "Date", CONCAT(account.firstName,' ',account.lastName) AS "Employee Name", location.locationName, count(*) AS 'Patients Processed',
+        sum(appointment.advReaction IS NOT NULL) AS "Adverse Reactions"
         FROM appointment
         INNER JOIN campaignlocation ON appointment.locationID = campaignlocation.locationID
         INNER JOIN location ON campaignlocation.locationID = location.locationID

@@ -45,8 +45,8 @@
             <script>
                 apiGet("/api/staff/appointments", {
                     locationID: queryParams().site,
-                    startDate: new Date().toISOString().substr(0, 10), // now
-                    endDate: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString().substr(0, 10), // one day from now
+                    startDate: UTCDate().toISOString().substr(0, 10), // now
+                    endDate: UTCDate(1000 * 60 * 60 * 24).toISOString().substr(0, 10), // one day from now
                 }).then(appts => {
                     for(const appt of appts) {
                         const el = id("appointment").content.cloneNode(true);

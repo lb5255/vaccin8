@@ -80,7 +80,7 @@ function loadDateTimePage() {
 		// sort the results by location
 		for(const result of results) {
 			// parse the date
-			result.date = new Date(result.apptDate.replace(/T[\d:]+\./,
+			result.date = LocalDate(result.apptDate.replace(/T[\d:]+\./,
 				"T" + result.apptTime.replace(/^(\d):/, "0$1") + "."));
 			if(!(result.locationID in locations)) {
 				locations[result.locationID] = {

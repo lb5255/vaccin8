@@ -40,7 +40,7 @@ async function getPatient() {
 		id("patient-name").textContent = id("full-name").textContent = patient.firstName + " " + patient.lastName;
 		id("address").textContent = patient.address;
 		id("address2").textContent = patient.city + ", " + patient.state + " " + patient.zip;
-		id("dob").textContent = new Date(patient.dateOfBirth).toLocaleDateString();
+		id("dob").textContent = LocalDate(patient.dateOfBirth).toLocaleDateString();
 		id("phone").textContent = patient.phone || "none";
 		id("email").textContent = patient.email || "none";
 		id("insur-prov").textContent = patient.insuranceProvider || "none";

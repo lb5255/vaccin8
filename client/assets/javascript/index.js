@@ -84,3 +84,14 @@ window.addEventListener("load", () => {
 		apiGet("/api/whoami").then(({ username }) => id("myusername").textContent = username);
 	}
 })
+
+// time zones are weird
+function LocalDate(time) {
+	const d = time ? new Date(time) : new Date();
+	return new Date(d.getTime() + d.getTimezoneOffset() * 60 * 1000);
+}
+
+function UTCDate(ofs = 0) {
+	const d = new Date();
+	return new Date(d.getTime() + ofs - d.getTimezoneOffset() * 60 * 1000);
+}

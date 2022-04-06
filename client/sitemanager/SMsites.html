@@ -79,7 +79,7 @@
 						id("timeslots").innerHTML = "";
 						for(const slot of res) {
 							const el = id("slot").content.cloneNode(true);
-							el.querySelector(".slot-time").textContent = new Date(slot.apptDate).toLocaleDateString() + " " + slot.apptTime;
+							el.querySelector(".slot-time").textContent = LocalDate(slot.apptDate).toLocaleDateString() + " " + slot.apptTime;
 							id("timeslots").appendChild(el);
 						}
 					}

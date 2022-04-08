@@ -40,13 +40,15 @@ function element(tag, attr = {}, ...children) {
 	return el;
 }
 
-async function apiGet(path, params = {}) {
+async function apiGet(path, params = {}, json = true) {
 	const p = Object.entries(params).map(n => n.map(encodeURIComponent).join("=")).join("&");
 	const res = await fetch(path + (p ? "?" + p : ""));
 	if(!res.ok) {
 		throw new Error(res);
 	}
-	return await res.json();
+	if(json) {
+		return await res.json();
+	}
 }
 
 async function apiPost(path, data, method = "POST", json = true) {

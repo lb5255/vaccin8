@@ -152,6 +152,25 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     }
 })); //end of login api call
 
+
+app.get("/api/logout", handleErrors(async (req, res) => {
+    if(!req.cookies.token) {
+        return res.send("Already logged out");
+    }
+    
+    const conn = await connProm;
+    
+    // remove the token from the database
+    await conn.execute(
+        'DELETE FROM session WHERE sessionInfo = ?', [req.cookies.token]
+    );
+    
+    // remove the cookie
+    res.clearCookie("token");
+    
+    res.send("Logout successful");
+}));
+
 // gives the user their username, if they're authenticated
 app.get("/api/whoami", authMiddleware([admin, staff, nurse, sitemgr]), handleErrors(async (req, res) => {
     res.json({ username: req.username });

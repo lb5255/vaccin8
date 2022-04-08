@@ -8,6 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="../assets/stylesheet/input.css" />
 		<link rel="icon" type="image/x-icon" href="../assets/image/Favicon.png">
 		<script src="../assets/javascript/index.js"></script>
+		<script src="../assets/javascript/nav.js"></script>
 
 	</head>
 	<body>
@@ -27,23 +28,74 @@
 					<table id="reporttable">
 						<thead>
 							<th>Employee ID</th>
+							<th>Username</th>
 							<th>Name</th>
 							<th>Site Location</th>
+							<th>Remove?</th>
 						</thead>
 						<tbody id="tbody">
 						</tbody>
 					</table>
 					<script>
-						apiGet("/api/sitemgr/accountLocations").then(accts => {
-							for(const acct of accts) {
-								tbody.appendChild(element("tr", {},
-									element("td", {}, acct.accountID + ""),
-									element("td", {}, acct.firstName + " " + acct.lastName),
-									element("td", {}, acct.locationName)
-								));
+						function refreshTable() {
+							apiGet("/api/sitemgr/accountLocations").then(accts => {
+								tbody.innerHTML = "";
+								for(const acct of accts) {
+									let b;
+									tbody.appendChild(element("tr", {},
+										element("td", {}, acct.accountID + ""),
+										element("td", {}, acct.username),
+										element("td", {}, acct.firstName + " " + acct.lastName),
+										element("td", {}, acct.locationName),
+										b = element("button", {unfilled: true}, "Remove employee from location"),
+									));
+									
+									b.onclick = () => deleteConfirm(acct.accountID, acct.locationID, acct.username, acct.locationName);
+								}
+							});
+						}
+						
+						refreshTable();
+						
+						let empToDelete, locationToDelete;
+						function deleteConfirm(empId, locId, name, locName) {
+							empToDelete = empId;
+							locationToDelete = locId;
+							id("emp-name").textContent = name;
+							id("loc-name").textContent = locName;
+							openModal(id("confirm-modal"));
+						}
+						
+						async function deleteEmp() {
+							try {
+								await apiPost("/api/sitemgr/locations/accounts", {
+									accountID: empToDelete,
+									locationID: locationToDelete,
+								}, "DELETE", false);
+								toast("Employee removed from location");
+								refreshTable();
+							} catch(err) {
+								console.error("Error removing employee from location");
+								toast("Error removing employee from location");
 							}
-						});
+						}
 					</script>
+				</section>
+				
+				<div class="modal" id="confirm-modal">
+					<div class="modal-content">
+						<span class="modal-close">&times;</span>
+						<h1>Are you sure you want to remove employee <span id="emp-name"></span> from location <span id="loc-name"></span>?</h1>
+						
+						<section centered>
+							<button unfilled close-modal>Back</button>
+							<button close-modal onclick="deleteEmp()">Confirm</button>
+						</section>
+					</div>
+				</div>
+				
+				<section centered>
+					<button unfilled onclick="history.back()">Back</button>
 				</section>
 			</div>
         </div>

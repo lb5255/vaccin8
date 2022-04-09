@@ -85,6 +85,17 @@ window.addEventListener("load", () => {
 	if(id("myusername")) {
 		apiGet("/api/whoami").then(({ username }) => id("myusername").textContent = username);
 	}
+	let logout = q("#myusername+.dropdown-content>a");
+	if(logout) {
+		logout.onclick = async ev => {
+			ev.preventDefault();
+			try {
+				await apiGet("/api/logout", {}, false)
+			} finally {
+				location.href = logout.href;
+			}
+		}
+	}
 })
 
 // time zones are weird

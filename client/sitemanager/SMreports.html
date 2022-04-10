@@ -401,7 +401,7 @@
 								tbody5.appendChild(element("tr", {},
 									element("td", {}, acct["Appointment Number"]),
 									element("td", {}, acct["Patient Name"]),
-									element("td", {}, acct["Appointment Date"]),
+									element("td", {}, LocalDate(acct["Appointment Date"]).toLocaleDateString()),
 									element("td", {}, acct.Location),
 									element("td", {}, acct.Vaccine),
 									element("td", {}, acct.Manufacturer),

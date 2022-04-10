@@ -1,4 +1,7 @@
+let vaccineList;
+
 apiGet("/api/vaccineList").then(vacc => {
+	vaccineList = vacc;
 	const sel = id("vaccine-select-dropdown");
 	
 	// add <option> tags to the select
@@ -37,6 +40,14 @@ function validateVaccineType() {
 function validatePreScreening() {
 	if(id("date-of-birth").value === "") {
 		return "Please select your date of birth";
+	}
+	
+	if(vaccineList) {
+		const vacc = vaccineList.find(v => v.campaignVaccID == id("vaccine-select-dropdown").value);
+		const check = ageCheck(id("date-of-birth").value, vacc.minAge, vacc.maxAge);
+		if(typeof(check) === "string") {
+			return check;
+		}
 	}
 	
 	if(!q("input[name=is-essential-worker]:checked")) {

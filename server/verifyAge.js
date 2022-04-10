@@ -13,12 +13,12 @@ function ageCheck(dob, minAge, maxAge) {
             return true;
         }
     }
-    else if (typeof(minAge === 'number')) {
+    else if (typeof(minAge) === 'number') {
         if (years >= minAge) {
             return true;
         }
     }
-    else if (typeof(maxAge === 'number')) {
+    else if (typeof(maxAge) === 'number') {
         if (years <= maxAge) {
             return true;
         }

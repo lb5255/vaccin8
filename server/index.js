@@ -200,6 +200,23 @@ app.get("/api/vaccineList", handleErrors(async (req, res) => {
     res.json(result);
 }));
 
+//api to check if they meet the age requirement for the vaccine they selected.
+//takes in their date of birth, and the id of the vaccine
+app.get("/api/vaccineList/age", handleErrors(async (req, res) => {
+    const conn = await connProm;
+    const [vaccineInfo, _fields] = await conn.execute(
+        "SELECT maxAge, minAge FROM campaignvaccines WHERE campaignVaccID = ?",
+        params([req.body.campaignVaccID])
+    );
+    if (ageVal.ageCheck(req.body.dob, vaccineInfo[0].minAge, vaccineInfo[0].maxAge) == false) {
+        return res.send("Age requirement is not met.");
+    }
+    else {
+        return res.send("Age requirement met.");
+    }
+}));
+
+
 // api call for available timeslots at an active campaign
 // This can also be used when nurse is scheduling a follow up appointment
 app.get("/api/recipient/vaccineAppts", handleErrors(async (req, res) => {
@@ -268,7 +285,8 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
             var confVaccine = confResult[0].manufacturer + " " + confResult[0].vaccineType + " " + confResult[0].vaccineDose + " shot";
             var confDate = convertDate.normalFormat(confResult[0].apptDate);
             var confTime = convertTime.formatTime(confResult[0].apptTime);
-
+            console.log(confResult[0].apptDate);
+            console.log(confDate);
             //Build Email message, date, time, vaccine
             var apptMessage = await emailBuilder.buildConfAppt(confResult[0].locationName,confVaccine,confDate,confTime);
             //Send email

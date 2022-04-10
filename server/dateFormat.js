@@ -9,8 +9,8 @@ function mysqlFormat(normDate) {
 
 //Function to change date returned to mm/dd/yyyy
 function normalFormat(mysqlDate) {
-    
-    const [year, month, day] = [mysqlDate.getFullYear(), mysqlDate.getMonth(), mysqlDate.getDate()]
+                                                      //Month is a value from 0-11, added 1 to get the actual month
+    const [year, month, day] = [mysqlDate.getFullYear(), mysqlDate.getMonth()+1, mysqlDate.getDate()]
     const formattedDate = [month, day, year].join('/');
     return formattedDate;
 }

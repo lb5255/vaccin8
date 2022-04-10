@@ -14,7 +14,12 @@
 		<header>
 			<div id="header-title">VACCIN8</div>
 			<div id="header-links">
-				<a href="#" id="myusername"></a>
+				<div class="dropdown">
+					<a href="#" id="myusername"></a>
+					<div class="dropdown-content">
+					  <a href="../loginhomepage.html">Logout</a>
+					</div>
+				  </div>
 			</div>
 		</header>
 		<main>
@@ -242,7 +247,7 @@
 							tbody3.innerHTML = "";
 							for(const acct of accts) {
 								tbody3.appendChild(element("tr", {},
-									element("td", {}, new Date(acct["Appointment Date"]).toLocaleDateString()),
+									element("td", {}, LocalDate(acct["Appointment Date"]).toLocaleDateString()),
 									element("td", {}, acct["Appointment Number"]),
 									element("td", {}, acct["Patient Name"]),
 									element("td", {}, acct["Vaccine Name"]),

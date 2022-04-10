@@ -40,13 +40,15 @@ function element(tag, attr = {}, ...children) {
 	return el;
 }
 
-async function apiGet(path, params = {}) {
+async function apiGet(path, params = {}, json = true) {
 	const p = Object.entries(params).map(n => n.map(encodeURIComponent).join("=")).join("&");
 	const res = await fetch(path + (p ? "?" + p : ""));
 	if(!res.ok) {
 		throw new Error(res);
 	}
-	return await res.json();
+	if(json) {
+		return await res.json();
+	}
 }
 
 async function apiPost(path, data, method = "POST", json = true) {
@@ -83,4 +85,26 @@ window.addEventListener("load", () => {
 	if(id("myusername")) {
 		apiGet("/api/whoami").then(({ username }) => id("myusername").textContent = username);
 	}
+	let logout = q("#myusername+.dropdown-content>a");
+	if(logout) {
+		logout.onclick = async ev => {
+			ev.preventDefault();
+			try {
+				await apiGet("/api/logout", {}, false)
+			} finally {
+				location.href = logout.href;
+			}
+		}
+	}
 })
+
+// time zones are weird
+function LocalDate(time) {
+	const d = time ? new Date(time) : new Date();
+	return new Date(d.getTime() + d.getTimezoneOffset() * 60 * 1000);
+}
+
+function UTCDate(ofs = 0) {
+	const d = new Date();
+	return new Date(d.getTime() + ofs - d.getTimezoneOffset() * 60 * 1000);
+}

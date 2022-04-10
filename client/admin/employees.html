@@ -17,7 +17,12 @@
 				<a href="#">VACCIN8</a>
 			</div>
 			<div id="header-links">
-				<a href="#" id="myusername"></a>
+				<div class="dropdown">
+					<a href="#" id="myusername"></a>
+					<div class="dropdown-content">
+					  <a href="../loginhomepage.html">Logout</a>
+					</div>
+				  </div>
 			</div>
 		</header>
 		
@@ -31,6 +36,7 @@
 						<th>Name</th>
 						<th>ID #</th>
 						<th>Role</th>
+						<th>Remove?</th>
 					</thead>
 					<tbody id="tbody">
 					</tbody>
@@ -39,6 +45,7 @@
 					function refreshTable() {
 						apiGet("/api/admin/accounts").then(accts => {
 							const tbody = id("tbody");
+							tbody.innerHTML = "";
 							for(const acct of accts) {
 								let b;
 								tbody.appendChild(element("tr", {},

@@ -153,6 +153,25 @@ app.post("/api/login", encodedParser, handleErrors(async (req, res) => {
     }
 })); //end of login api call
 
+
+app.get("/api/logout", handleErrors(async (req, res) => {
+    if(!req.cookies.token) {
+        return res.send("Already logged out");
+    }
+    
+    const conn = await connProm;
+    
+    // remove the token from the database
+    await conn.execute(
+        'DELETE FROM session WHERE sessionInfo = ?', [req.cookies.token]
+    );
+    
+    // remove the cookie
+    res.clearCookie("token");
+    
+    res.send("Logout successful");
+}));
+
 // gives the user their username, if they're authenticated
 app.get("/api/whoami", authMiddleware([admin, staff, nurse, sitemgr]), handleErrors(async (req, res) => {
     res.json({ username: req.username });
@@ -735,7 +754,7 @@ app.get("/api/sitemgr/accounts", encodedParser, authMiddleware(sitemgr), handleE
 app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        `SELECT account.accountID, account.username, account.firstName, account.lastName, account.position, account.email, account.phone, location.locationName
+        `SELECT account.accountID, account.username, account.firstName, account.lastName, account.position, account.email, account.phone, location.locationID, location.locationName
         FROM acctlocation
         LEFT JOIN account ON account.accountID = acctlocation.accountID
         JOIN location ON acctlocation.locationID = location.locationID
@@ -788,12 +807,14 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
 //api call to remove an account from being active at a location.
 app.delete("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
     const conn = await connProm;
-    if(req.body.locationID) {
+    if(req.body.locationID !== undefined) {
+        console.log("removing employee from one location", req.body.accountID,req.body.locationID)
         await conn.execute(
             "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ? AND locationID = ?;",
             params([req.body.accountID,req.body.locationID])
         );
     } else {
+        console.log("removing employee from all locations")
         await conn.execute( // remove the employee from all locations
             "UPDATE acctlocation SET acctStatus = 'Inactive' WHERE accountID = ?;",
             params([req.body.accountID])

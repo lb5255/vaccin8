@@ -14,6 +14,7 @@ const nurse = "Nurse";
 const staff = "Staff";
 const sitemgr = "Site Manager";
 
+const ageVal = require("./verifyAge.js");
 const emailBuilder = require("./emailBuilder.js");
 const apptConfirm = "Vaccine Appointment Confirmation";
 const apptCancel = "Vaccine Appointment Cancellation";
@@ -175,7 +176,7 @@ app.get("/api/vaccineList", handleErrors(async (req, res) => {
     
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT DISTINCT campaignVaccID, vaccineType, manufacturer, vaccineDose FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
+        "SELECT DISTINCT campaignVaccID, vaccineType, manufacturer, vaccineDose, minAge, maxAge FROM campaignvaccines WHERE campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a');"
     );
     res.json(result);
 }));
@@ -203,12 +204,27 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
     //appointmentID is from the appointment timeslot that they selected
     try {
         await connection.beginTransaction();
-        //first query, insert patient data into patient table
+
+        //1st query, verify the user is between the maximum and minimum age.
+        const [vaccineInfo] = await connection.execute(
+            "SELECT maxAge, minAge FROM campaignvaccines WHERE campaignVaccID = ?",
+            params([req.body.campaignVaccID])
+        );
+        //Verify dob entered is within the min and max age.
+        if (ageVal.ageCheck(req.body.dob, vaccineInfo[0].minAge, vaccineInfo[0].maxAge) == false) {
+            await connection.rollback(); //roll back changes
+            return res.send("Age requirement is not met.");
+        }
+
+
+
+
+        //2nd query, insert patient data into patient table
         const [result] = await connection.execute(
             "INSERT INTO patient(firstName,lastName,dateOfBirth,email,phone,city,state,address,zip,insuranceProvider,insuranceNum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
             params([req.body.fName, req.body.lName, req.body.dob, req.body.email, req.body.phone, req.body.city, req.body.state, req.body.address, req.body.zip, req.body.insuranceProvider, req.body.insuranceNum])
         );
-        //2nd query, update the chosen timeslot with patient info.
+        //3rd query, update the chosen timeslot with patient info.
         const [apptResult] = await connection.execute(
             "UPDATE appointment SET campaignVaccID = ?, patientID = ?, apptStatus = 'F', perferredContact = 'Email' WHERE appointmentID = ?;",
             params([req.body.campaignVaccID, result.insertId, req.body.appointmentID])
@@ -229,19 +245,10 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
                 INNER JOIN campaignvaccines ON appointment.campaignVaccID = campaignvaccines.campaignVaccID
                 WHERE appointmentID = ?`,
                 params([req.body.appointmentID])
-            );
-
-            //For some reason, date and time are formatted very wierdly.
-
-            //console.log(confResult[0].apptDate);
-            //console.log(confResult[0].apptTime);
-           
-            
+            );   
             var confVaccine = confResult[0].manufacturer + " " + confResult[0].vaccineType + " " + confResult[0].vaccineDose + " shot";
             var confDate = convertDate.normalFormat(confResult[0].apptDate);
             var confTime = convertTime.formatTime(confResult[0].apptTime);
-            //console.log(confDate);
-            //console.log(confTime);
 
             //Build Email message, date, time, vaccine
             var apptMessage = await emailBuilder.buildConfAppt(confResult[0].locationName,confVaccine,confDate,confTime);
@@ -333,7 +340,7 @@ app.get("/api/staff/appointments", encodedParser, authMiddleware(staff), handleE
         INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID
         INNER JOIN location on campaignlocation.locationID = location.locationID
         WHERE appointment.locationID = ?
-        AND appointment.campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate = CURDATE() AND apptStatus = 'F';`,
+        AND appointment.campaignID IN (SELECT campaignID FROM campaign WHERE campaignStatus = 'a') AND apptDate = CURDATE() AND apptStatus = 'F' AND apptTime  >= (CURTIME() - INTERVAL 15 MINUTE);`,
         params([req.query.locationID])
     );
     res.json(result);
@@ -395,7 +402,7 @@ app.get("/api/nurse/searchPatient", encodedParser, authMiddleware(nurse), handle
 app.get("/api/nurse/appointments", encodedParser, authMiddleware(nurse), handleErrors(async (req, res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "SELECT appointment.appointmentID, appointment.campaignVaccID, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignvaccines on appointment.campaignVaccID = campaignvaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F';",
+        "SELECT appointment.appointmentID, appointment.campaignVaccID, campaignvaccines.vaccineType, campaignvaccines.vaccineDose, campaignvaccines.manufacturer, patient.firstName, patient.lastName, patient.dateOfBirth, patient.insuranceNum, patient.address,patient.phone,patient.city,patient.state,patient.zip,patient.email, apptDate, apptTime FROM appointment INNER JOIN patient on appointment.patientID = patient.patientID INNER JOIN campaignvaccines on appointment.campaignVaccID = campaignvaccines.campaignVaccID INNER JOIN campaignlocation on appointment.locationID = campaignlocation.locationID INNER JOIN location on campaignlocation.locationID = location.locationID WHERE patient.patientID = ? AND apptStatus = 'F' OR apptStatus = 'A';",
         params([req.query.patientID])
     );
     return res.json(result);
@@ -549,8 +556,8 @@ app.delete("/api/admin/vaccines", encodedParser, authMiddleware(admin), handleEr
 app.post("/api/admin/campaign/vaccines", encodedParser, authMiddleware(admin), handleErrors(async (req,res) => {
     const conn = await connProm;
     const [result, _fields] = await conn.execute(
-        "INSERT INTO campaignvaccines (vaccineType, manufacturer, vaccineDose, daysBetweenDoses, ageGroup, doseAmount) VALUES (?,?,?,?,?,?);", 
-        [req.body.vaccineType, req.body.manufacturer, req.body.vaccineDose, req.body.daysBetweenDoses, req.body.ageGroup, req.body.doseAmount]
+        "INSERT INTO campaignvaccines (vaccineType, manufacturer, vaccineDose, daysBetweenDoses, doseAmount, minAge, maxAge) VALUES (?,?,?,?,?,?,?);", 
+        [req.body.vaccineType, req.body.manufacturer, req.body.vaccineDose, req.body.daysBetweenDoses, req.body.doseAmount, req.body.minAge, req.body.maxAge]
     );
     res.send("Added vaccine to campaign.");
 }));

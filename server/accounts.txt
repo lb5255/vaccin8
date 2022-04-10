@@ -3,3 +3,9 @@ Main01    / HashThis          (Admin)
 Manager01 / ManagerPassword   (Site Manager)
 MainNurse / MainNursePassword (Nurse)
 MainStaff / MainStaffPassword (Staff) 
+
+
+
+- vaccin8 email credentials - 
+Username: vaccin8system@outlook.com
+Password: S51stfZoZPDjdNYSenior_Dev_II

@@ -108,3 +108,30 @@ function UTCDate(ofs = 0) {
 	const d = new Date();
 	return new Date(d.getTime() + ofs - d.getTimezoneOffset() * 60 * 1000);
 }
+
+//Function to check age to verify min and max age between 
+function ageCheck(dob, minAge, maxAge) {
+    //Convert dob to years.
+    //Comes in as yyyy-mm-dd
+    var years = getAge(dob);
+
+	if(typeof(minAge) === "number" && years < minAge) {
+		return "You must be at least " + minAge + " years old to receive this vaccine";
+	}
+	if(typeof(maxAge) === "number" && years > maxAge) {
+		return "You must be under " + maxAge + " years old to receive this vaccine";
+	}
+    return true;
+}
+
+//Function to get the age from a date of birth
+function getAge(dob) {
+    var today = new Date();
+    var bDate = LocalDate(dob);
+    var age = today.getFullYear() - bDate.getFullYear();
+    var month = today.getMonth() - bDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < bDate.getDate())) {
+        age--;
+    }
+    return age;
+}

@@ -53,23 +53,25 @@ const authMiddleware = function(role = []){
             if (!req.cookies.token) {
                 return res.status(401).send("Unauthorized.");
             }
-            else {
-                //Query to get userID and their role
-                const [result, _fields] = await conn.execute(
-                    "SELECT session.accountID, account.position, account.username FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
-                );
-                
-                req.userID = result[0].accountID;
-                req.position = result[0].position;
-                req.username = result[0].username;
-                //console.log(result);
+            //Query to get userID and their role
+            const [result, _fields] = await conn.execute(
+                "SELECT session.accountID, account.position, account.username FROM session JOIN account ON session.accountID = account.accountID WHERE sessionInfo = ?", [req.cookies.token]
+            );
+            
+            if(!result.length) {
+                return res.status(401).send("Unauthorized.");
             }
-            if(!req.userID) {
+            
+            req.userID = result[0].accountID;
+            req.position = result[0].position;
+            req.username = result[0].username;
+            
+            if(req.userID == undefined) {
                 return res.status(401).send("Unauthorized");
             }
             //Checks the position (Admin/Staff/Nurse/Site Manager) against the one sent in
             else if(!role.includes(req.position)) {
-                return res.status(401).send("Unauthorized");
+                return res.status(403).send("Forbidden");
             }
             
             
@@ -77,6 +79,7 @@ const authMiddleware = function(role = []){
 
         }   
         catch (e) {
+            console.log("error in authMiddleware:", e);
             return res.status(500).send("Internal server error");
         }
 

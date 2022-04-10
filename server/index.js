@@ -248,7 +248,8 @@ app.post("/api/recipient/vaccineAppts", encodedParser, async (req, res) => {
         );
         //Verify dob entered is within the min and max age.
         if (ageVal.ageCheck(req.body.dob, vaccineInfo[0].minAge, vaccineInfo[0].maxAge) == false) {
-            await connection.rollback(); //roll back changes
+            //release the connection
+            if (connection) connection.release(); 
             return res.send("Age requirement is not met.");
         }
 
@@ -720,7 +721,7 @@ app.get("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemg
 //api call to add a timeslot(Or multiple of the same timeslot). Takes in the locationID, campaignID,
 //apptDate, apptTime, apptStatus, and the count of appointments they want to add (count).
 
-app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
+app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), async (req, res) => {
     const conn = await connProm;
     const connection = await conn.getConnection();
     //Transaction to add one or more timeslots. 
@@ -729,11 +730,12 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
 
         //This query executes for as many times entered by the user.
         for (var i = 0; i < req.body.count; i++) {
-            await conn.execute(
+            await connection.execute(
                 "INSERT INTO appointment (locationID, campaignID, apptDate, apptTime, apptStatus) VALUES (?,?,?,?,'O');",
                 params([req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime])
             );
         }
+        res.send("Added timeslot(s).");
     }
     catch(e) {
         console.log("An error has occurred with this transaction.", e);
@@ -742,10 +744,9 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
     }
     finally {
         if (connection) connection.release();
-        return res.send("Added timeslot(s).");
     }
 
-}));
+});
 
 //api call to remove a timeslot. Gets the appointmentID of the timeslot.
 app.delete("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitemgr), handleErrors(async (req, res) => {
@@ -784,26 +785,26 @@ app.get("/api/sitemgr/accountLocations", encodedParser, authMiddleware(sitemgr),
 
 //api call to assign an account to be active at a location.
 //Takes in the location ID, and campaign ID.
-app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), handleErrors(async (req, res) => {
+app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin, sitemgr]), async (req, res) => {
     const conn = await connProm; 
     const connection = await conn.getConnection();
     connection.beginTransaction();
     try {
         //Check if the selected account is in the acctlocation table.
-        const [result, _fields] = await conn.execute(
+        const [result, _fields] = await connection.execute(
             "SELECT * FROM acctlocation WHERE accountID = ? AND locationID = ?",
             params([req.body.accountID, req.body.locationID])
         ); 
         //If the account doesn't exist, insert it into the account
         if (!result.length || !result[0].accountID) {
-            await conn.execute(
+            await connection.execute(
                 "INSERT INTO acctlocation (accountID, locationID, acctStatus, siteMngr) VALUES (?,?,'Active','N');",
                 params([req.body.accountID, req.body.locationID])
             );
         }
         //If the account exists, change the status of it to active.
         else {
-            await conn.execute(
+            await connection.execute(
                 "UPDATE acctlocation SET acctStatus = 'Active' WHERE accountID = ? AND locationID = ?;",
                 params([req.body.accountID, req.body.locationID])
             );  
@@ -818,7 +819,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
     finally {
         if (connection) connection.release();
     }
-}));
+});
 
 
 

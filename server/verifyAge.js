@@ -3,13 +3,9 @@ function ageCheck(dob, minAge, maxAge) {
     //Convert dob to years.
     //Comes in as yyyy-mm-dd
     var years = getAge(dob);
-    console.log(typeof(minAge));
-    console.log(typeof(maxAge));
-
     if (typeof(minAge) === 'number' && typeof(maxAge) === 'number') {
-        console.log("In first check");
         if (years >= minAge && years <= maxAge) {
-            console.log("s");
+            
             return true;
         }
     }

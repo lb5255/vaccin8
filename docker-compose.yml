@@ -4,6 +4,7 @@ services:
   node:
     build:
       dockerfile: ./dev-dockerfile
+      context: .
     restart: unless-stopped
     init: true
     depends_on:

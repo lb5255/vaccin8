@@ -738,6 +738,7 @@ app.post("/api/sitemgr/locations/timeslots", encodedParser, authMiddleware(sitem
                 params([req.body.locationID,req.body.campaignID,req.body.apptDate,req.body.apptTime])
             );
         }
+        await connection.commit();//Commit the changes
         res.send("Added timeslot(s).");
     }
     catch(e) {
@@ -812,6 +813,7 @@ app.post("/api/sitemgr/locations/accounts", encodedParser, authMiddleware([admin
                 params([req.body.accountID, req.body.locationID])
             );  
         }
+        await connection.commit();//Commit the changes
         res.send("Added user to location");
     }
     catch (e) {

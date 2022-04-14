@@ -20,6 +20,7 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_DATABASE=db
+      - TZ=America/New_York
     volumes:
       - ./mysql:/var/lib/mysql
     command:
